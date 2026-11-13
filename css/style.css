@@ -112,6 +112,18 @@ body {
   font-size: 13px;
 }
 
+/* Small honest note in the globe's corner (exaggeration, block size, sources) */
+.globe-note {
+  position: absolute;
+  left: 14px;
+  bottom: 10px;
+  max-width: calc(100% - 28px);
+  font-family: var(--font-data);
+  font-size: 11px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
 /* ---------- Side panel (the mystery lives here) ---------- */
 .panel {
   grid-area: panel;
