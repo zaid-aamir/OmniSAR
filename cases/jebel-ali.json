@@ -213,13 +213,27 @@
     "nodes": [
       {
         "id": "cause",
-        "label": "Development work in the area",
-        "detail": "Stated generally. Radar can't tell who did it or why.",
-        "source": "Published source",
+        "label": "Announced development at Palm Jebel Ali",
+        "detail": "Large-scale development at Palm Jebel Ali, inside our case box, has been publicly announced by its developer. This only tells us building work is planned here. It does not prove that the change NISAR detected is that project: we link the two only if the photo check shows the locations match. Radar can't tell who did the work or why.",
+        "source": "Published sources",
         "basis": "published",
-        "citation": null,
+        "citation": [
+          {
+            "outlet": "The National",
+            "date": "12 Jan 2026",
+            "title": "Palm Jebel Ali megaproject takes root, with units ‘on track for 2027’",
+            "url": "https://www.thenationalnews.com/news/uae/2026/01/12/palm-jebel-ali-megaproject-takes-root-with-units-on-track-for-2027"
+          },
+          {
+            "outlet": "WAM (Emirates News Agency)",
+            "date": "April 2026",
+            "title": "Nakheel awards AED3.5 billion contracts to build 544 Palm Jebel Ali villas",
+            "url": "https://www.wam.ae/en/article/bzxeeb2-nakheel-awards-aed35-billion-contracts-build-544"
+          }
+        ],
+        "locationMatch": "pending photo check",
         "hidden": false,
-        "opens": { "layer": null, "chart": null, "badge": "Source needed" }
+        "opens": { "layer": null, "chart": null, "badge": "From published sources" }
       },
       {
         "id": "hh",

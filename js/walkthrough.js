@@ -138,6 +138,17 @@ export function runWalkthrough(root, mystery, { onExit }) {
       </div>`;
   }
 
+  // Published sources as links that open in a new tab. Only https links are allowed, so a
+  // typo or a strange link in a data file can never run code on the page.
+  function citationLinks(list) {
+    return list.map((c) => {
+      const text = `${esc(c.outlet)}, ${esc(c.date)}: “${esc(c.title)}”`;
+      return /^https:\/\//.test(c.url)
+        ? `<a class="tag cite" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${text}</a>`
+        : `<span class="tag cite">${text}</span>`;
+    }).join('');
+  }
+
   // Cause-and-effect chain. Hidden nodes must be predicted before they are revealed.
   function renderGraph(step) {
     const nodes = mystery.data.graph.nodes;
@@ -148,7 +159,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
         ${nodes.map((n) => {
           const open = !n.hidden || mystery.solved.has(`node:${n.id}`);
           const answer = lastAnswer[`node:${n.id}`];
-          const basis = n.basis === 'measured' ? 'Measured' : 'Published source';
+          const basis = n.basis === 'measured' ? 'Measured' : 'From published sources';
           return `
             <li class="node ${open ? '' : 'node-hidden'}">
               <div class="node-head">
@@ -159,7 +170,8 @@ export function runWalkthrough(root, mystery, { onExit }) {
                 <p class="evidence-caption">${esc(n.detail)}</p>
                 <p class="node-meta">
                   ${n.basis === 'measured' ? sourceTag(n.source) : ''}
-                  ${n.basis === 'published' ? (n.citation ? `<span class="tag">${esc(n.citation)}</span>` : '<span class="pending-text">Source citation pending</span>') : ''}
+                  ${n.basis === 'published' ? (n.citation?.length ? citationLinks(n.citation) : '<span class="pending-text">Source citation pending</span>') : ''}
+                  ${n.locationMatch ? `<span class="pending-text">Location match: ${esc(n.locationMatch)}</span>` : ''}
                   ${n.basis === 'measured' && !n.opens.layer ? '<span class="pending-text">Layer pending</span>' : ''}
                 </p>` : `
                 <p class="node-prompt">${esc(n.prompt)}</p>
