@@ -1,0 +1,525 @@
+{
+ "case": "jebel-ali",
+ "generated": "2026-11-13T23:47Z",
+ "measured": [
+  {
+   "label": "Candidate new structures (HH rose ≥ 3 dB)",
+   "value": 275.8,
+   "unit": "ha",
+   "note": "in 108 patches of 1 ha or more — candidates only: the radar quality check failed (below), so some may be interference, not change"
+  },
+  {
+   "label": "Water ↔ land",
+   "value": "not separable",
+   "unit": "",
+   "note": "In these images open sea and desert sand are about equally dark in HH (trap 11), so radar alone can't say where water became land."
+  },
+  {
+   "label": "Passes compared",
+   "value": "1 before · 1 after",
+   "unit": "",
+   "note": "Fewer than 3 passes per side, so a bad date can't be outvoted yet; more passes are downloading."
+  },
+  {
+   "label": "Interference check",
+   "value": "anomaly found",
+   "unit": "",
+   "note": "On 2026-10-28 our box is +6.3 dB brighter in HH while the whole frame moved +0.1 dB: a broad bright patch over Dubai. We use HH only and remove each date's smooth background."
+  },
+  {
+   "label": "Radar quality check",
+   "value": "failed",
+   "unit": "",
+   "note": "After removing the background, dark ground still brightened 3.3 dB more than bright ground, so the patch adds brightness rather than scaling it, and background removal can't fully undo it. Radar alone is not enough here; the photo check decides."
+  }
+ ],
+ "check": {
+  "label": "Independent check",
+  "text": "Photo check pending: a team member is comparing each hotspot with NASA HLS photos."
+ },
+ "badge": "Weak",
+ "badge_reason": "radar only (photo check pending); radar quality check failed (gain check)",
+ "sources": [
+  "NISAR_L2_PR_GCOV_023_056_A_014_4005_DHDH_A_20260618T014305_20260618T014336_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GCOV_034_056_A_014_4005_DHDH_A_20261028T014300_20261028T014333_P05036_N_F_J_001.h5"
+ ],
+ "method": {
+  "declared": "2026-11-14T03:55+04:00, before any change map was computed",
+  "inputs": "NISAR L2 GCOV, track 056, ascending, frame 014, mode 4005 (10 m), finished files only",
+  "before_window": [
+   "2026-06-18",
+   "2026-07-12"
+  ],
+  "after_window": [
+   "2026-10-04",
+   "2026-10-28"
+  ],
+  "layers": [
+   "HHHH",
+   "HVHV",
+   "mask"
+  ],
+  "valid_pixel": "mask is a subswath number (1-254), HH > 0 and HV > 0",
+  "speckle_filter": "3x3 block mean in linear power (multilook) -> 30 m pixels; a block is valid only if all 9 pixels are valid",
+  "multilook": 3,
+  "side_value": "per-pixel median in dB of all passes inside the window (N < 3 per side = 'median not robust': one bad date can't be outvoted)",
+  "interference_check": "sample the whole frame on a 40x40 grid of 32x32-pixel windows; compare each pass with the first before-pass; anomaly over the box if |box median change - frame median change| >= 1.5 dB in HH or HV",
+  "interference_limit_db": 1.5,
+  "channel_for_rules": "HH only (HV is shown but not used, because the regional anomaly is strongest in HV)",
+  "local_normalisation": "each side's background = median dB of 2 km x 2 km tiles (66 x 66 pixels), bilinear between tile centres; delta = (after - background_after) - (before - background_before). Removes smooth regional offsets (processing version, interference); can only hide changes wider than ~2 km, never invent them",
+  "tile_px": 66,
+  "gain_check": "in every tile, delta of the darkest quarter minus delta of the brightest quarter of unchanged pixels; if the median over tiles is beyond +/-2 dB the brightness difference is not a simple gain -> radar quality check fails",
+  "gain_limit_db": 2.0,
+  "sea_window": {
+   "lon": [
+    54.956,
+    54.98
+   ],
+   "lat": [
+    25.042,
+    25.056
+   ],
+   "chosen_from": "NASA HLS photo of 18 Jun 2026 (open sea, away from the Palm)"
+  },
+  "land_window": {
+   "lon": [
+    54.96,
+    54.995
+   ],
+   "lat": [
+    24.935,
+    24.95
+   ],
+   "chosen_from": "NASA HLS photo of 18 Jun 2026 (open desert sand)"
+  },
+  "water_level": "T_water = 90th percentile of the sea window (before image)",
+  "land_level": "T_land = 10th percentile of the desert window (before image)",
+  "separable": "water and land can be told apart only if T_water < T_land; otherwise water<->land classes are 'not separable' (trap 11) and not reported",
+  "X_db": 3.0,
+  "X_reason": "3 dB is about 3 sigma of speckle noise on a difference of two 30 m pixels (~42 looks each), and new walls, roofs and fill typically raise L-band HH by 3-10 dB",
+  "classes": {
+   "water-to-land": "before <= T_water and after (brightness-matched) >= T_land and delta >= +X",
+   "land-to-water": "before >= T_land and after <= T_water and delta <= -X",
+   "new-structures": "delta >= +X and after >= T_land (and not water-to-land)"
+  },
+  "hotspots": "8-connected clusters of one class, at least 12 pixels (1.08 ha); top 10 by area",
+  "min_cluster_px": 12,
+  "photo_dates": "clearest NASA HLS (S30 or L30) day within +/-10 days of the first before pass and the last after pass; score = valid share x (1 - white-cloud share); ties (within 0.02) -> nearest date",
+  "badge_rule": "Strong if >= 7 of 10 hotspots are photo-confirmed; Moderate if radar only (photo check not done) or 4-6 confirmed; Weak otherwise. 'Radar only' counts as Moderate only if the radar quality checks pass and at least one hotspot exists; otherwise Weak.",
+  "coherence_check": "UAE interferograms on hand are track 128 frame 015, which start ~25.2 N, north of this box (top edge 25.06 N): no coherence check for Jebel Ali"
+ },
+ "results": {
+  "thresholds": {
+   "T_water_db": -15.99,
+   "T_land_db": -18.32,
+   "separable": false,
+   "sea_before_median_db": -17.11,
+   "desert_before_median_db": -16.93,
+   "sea_after_matched_median_db": -17.15,
+   "desert_after_matched_median_db": -16.9,
+   "sea_after_raw_median_db": -8.83,
+   "desert_after_raw_median_db": -10.8,
+   "sea_pixels": 4346,
+   "desert_pixels": 6783
+  },
+  "area_ha_in_hotspots": {
+   "new-structures": 275.8,
+   "water-to-land": 0.0,
+   "land-to-water": 0.0
+  },
+  "area_ha_before_cluster_filter": {
+   "new-structures": 1232.9,
+   "water-to-land": 0.0,
+   "land-to-water": 0.0
+  },
+  "hotspot_count": 108,
+  "top10": [
+   {
+    "class": "new-structures",
+    "pixels": 231,
+    "area_ha": 20.79,
+    "lat": 24.99465,
+    "lon": 55.11552,
+    "rows": [
+     232,
+     263
+    ],
+    "cols": [
+     547,
+     570
+    ],
+    "id": "H01"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 127,
+    "area_ha": 11.43,
+    "lat": 24.97863,
+    "lon": 55.11355,
+    "rows": [
+     299,
+     319
+    ],
+    "cols": [
+     541,
+     567
+    ],
+    "id": "H02"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 121,
+    "area_ha": 10.89,
+    "lat": 24.99331,
+    "lon": 55.09619,
+    "rows": [
+     235,
+     267
+    ],
+    "cols": [
+     490,
+     500
+    ],
+    "id": "H03"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 119,
+    "area_ha": 10.71,
+    "lat": 25.05875,
+    "lon": 55.10678,
+    "rows": [
+     0,
+     25
+    ],
+    "cols": [
+     526,
+     543
+    ],
+    "id": "H04"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 107,
+    "area_ha": 9.63,
+    "lat": 25.00332,
+    "lon": 55.07687,
+    "rows": [
+     205,
+     223
+    ],
+    "cols": [
+     422,
+     438
+    ],
+    "id": "H05"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 92,
+    "area_ha": 8.28,
+    "lat": 24.9369,
+    "lon": 55.11828,
+    "rows": [
+     455,
+     470
+    ],
+    "cols": [
+     558,
+     576
+    ],
+    "id": "H06"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 81,
+    "area_ha": 7.29,
+    "lat": 25.00471,
+    "lon": 55.09839,
+    "rows": [
+     201,
+     220
+    ],
+    "cols": [
+     496,
+     510
+    ],
+    "id": "H07"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 76,
+    "area_ha": 6.84,
+    "lat": 24.97421,
+    "lon": 55.11591,
+    "rows": [
+     319,
+     331
+    ],
+    "cols": [
+     556,
+     569
+    ],
+    "id": "H08"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 69,
+    "area_ha": 6.21,
+    "lat": 25.01199,
+    "lon": 55.10036,
+    "rows": [
+     180,
+     188
+    ],
+    "cols": [
+     501,
+     519
+    ],
+    "id": "H09"
+   },
+   {
+    "class": "new-structures",
+    "pixels": 66,
+    "area_ha": 5.94,
+    "lat": 25.02186,
+    "lon": 55.11893,
+    "rows": [
+     141,
+     156
+    ],
+    "cols": [
+     567,
+     578
+    ],
+    "id": "H10"
+   }
+  ],
+  "interference": [
+   {
+    "pass": "2026-10-28",
+    "compared_with": "2026-06-18",
+    "HH": {
+     "box_median_change_db": 6.28,
+     "frame_median_change_db": 0.09,
+     "frame_share_beyond_3db": 0.118,
+     "anomaly_over_box": true
+    },
+    "HV": {
+     "box_median_change_db": -1.41,
+     "frame_median_change_db": 0.36,
+     "frame_share_beyond_3db": 0.165,
+     "anomaly_over_box": true
+    },
+    "anomaly_over_box": true,
+    "picture": "interference_2026-06-18_vs_2026-10-28.png"
+   }
+  ],
+  "gain_check": {
+   "median_dark_minus_bright_db": 3.33,
+   "tiles": 72,
+   "ok": false
+  },
+  "median_robust": false,
+  "photo_check": {
+   "status": "pending",
+   "confirmed": null,
+   "total": 10,
+   "answers": null,
+   "before": {
+    "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+    "date": "2026-06-18",
+    "score": 0.999
+   },
+   "after": {
+    "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+    "date": "2026-10-29",
+    "score": 1.0
+   }
+  },
+  "coherence_check": "not available: no NISAR interferogram on hand covers this box"
+ },
+ "files": {
+  "overlay": "assets/cases/jebel-ali/change_overlay.png",
+  "overlay_corners_latlon": {
+   "nw": [
+    25.059847,
+    54.947999
+   ],
+   "ne": [
+    25.062123,
+    55.119819
+   ],
+   "sw": [
+    24.927987,
+    54.950188
+   ],
+   "se": [
+    24.93025,
+    55.121825
+   ]
+  },
+  "grid": "assets/cases/jebel-ali/grid.json"
+ },
+ "provenance": {
+  "nasa_files": [
+   {
+    "file": "NISAR_L2_PR_GCOV_023_056_A_014_4005_DHDH_A_20260618T014305_20260618T014336_P05023_N_F_J_001.h5",
+    "date": "2026-06-18",
+    "start": "2026-06-18T01:43:05.000000000",
+    "direction": "Ascending",
+    "track": 56,
+    "frame": 14,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   },
+   {
+    "file": "NISAR_L2_PR_GCOV_034_056_A_014_4005_DHDH_A_20261028T014300_20261028T014333_P05036_N_F_J_001.h5",
+    "date": "2026-10-28",
+    "start": "2026-10-28T01:43:00.000000000",
+    "direction": "Ascending",
+    "track": 56,
+    "frame": 14,
+    "product_version": "1.0.20",
+    "processing": "P05036"
+   }
+  ],
+  "collection": "NISAR L2 GCOV (ASF DAAC)",
+  "layers": [
+   "/science/LSAR/GCOV/grids/frequencyA/HHHH",
+   "/science/LSAR/GCOV/grids/frequencyA/HVHV",
+   "/science/LSAR/GCOV/grids/frequencyA/mask"
+  ],
+  "box_lonlat": [
+   54.95,
+   24.93,
+   55.12,
+   25.06
+  ],
+  "box_rows_cols": [
+   13420,
+   14885,
+   17059,
+   18796
+  ],
+  "projection_epsg": 32640,
+  "pixel_m_after_filter": 30.0,
+  "number_of_looks_native": 4.664755344390869,
+  "steps": [
+   "read only the box rows/columns",
+   "mask invalid pixels",
+   "3x3 multilook (linear power)",
+   "dB",
+   "interference check (whole-frame sample)",
+   "median per side",
+   "2 km tile background removed",
+   "classify (method.classes)",
+   "8-connected clusters >= 12 px",
+   "top 10 by area",
+   "photo kit from NASA GIBS HLS",
+   "badge (method.badge_rule)"
+  ],
+  "photo_layers": [
+   {
+    "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+    "date": "2026-06-18",
+    "score": 0.999
+   },
+   {
+    "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+    "date": "2026-10-29",
+    "score": 1.0
+   }
+  ],
+  "photo_dates_tried": {
+   "before": [
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-11",
+     "score": 0.998
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-16",
+     "score": 0.996
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-18",
+     "score": 0.999
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-21",
+     "score": 1.0
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-26",
+     "score": 0.999
+    },
+    {
+     "layer": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-12",
+     "score": 0.994
+    },
+    {
+     "layer": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-20",
+     "score": 1.0
+    },
+    {
+     "layer": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-06-28",
+     "score": 1.0
+    }
+   ],
+   "after": [
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-10-19",
+     "score": 1.0
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-10-24",
+     "score": 0.993
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-10-26",
+     "score": 1.0
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-10-29",
+     "score": 1.0
+    },
+    {
+     "layer": "HLS_S30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-11-03",
+     "score": 1.0
+    },
+    {
+     "layer": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-10-18",
+     "score": 0.986
+    },
+    {
+     "layer": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-10-26",
+     "score": 0.993
+    },
+    {
+     "layer": "HLS_L30_Nadir_BRDF_Adjusted_Reflectance",
+     "date": "2026-11-03",
+     "score": 0.996
+    }
+   ]
+  },
+  "script": "tools/process_jebel_ali.py",
+  "script_version": "1.0",
+  "script_sha256": "4d34da92d39c5d3f3362d3ab911640a5c35ec137a61bd148a3ab0a2bf67751f7",
+  "helpers_sha256": "e71f9a96fa177aa4f9713fe60baf672f78d8f36e9a49d88865eeb72d77992bf9"
+ }
+}

@@ -95,6 +95,87 @@ def lonlat_to_utm(lon, lat, p):
     return p["false_easting"] + p["k0"] * A * e, p["false_northing"] + p["k0"] * A * nn
 
 
+def utm_to_lonlat(x, y, p):
+    """The reverse of lonlat_to_utm: UTM easting/northing (m) -> (lon, lat) in degrees.
+    Same Krueger series run backwards; works on single numbers or numpy arrays."""
+    a = 6378137.0
+    f = 1 / 298.257223563
+    n = f / (2 - f)
+    A = a / (1 + n) * (1 + n ** 2 / 4 + n ** 4 / 64)
+    beta = (n / 2 - 2 * n ** 2 / 3 + 37 * n ** 3 / 96,
+            n ** 2 / 48 + n ** 3 / 15,
+            17 * n ** 3 / 480)
+    delta = (2 * n - 2 * n ** 2 / 3 - 2 * n ** 3,
+             7 * n ** 2 / 3 - 8 * n ** 3 / 5,
+             56 * n ** 3 / 15)
+    xi = (np.asarray(y, dtype=np.float64) - p["false_northing"]) / (p["k0"] * A)
+    eta = (np.asarray(x, dtype=np.float64) - p["false_easting"]) / (p["k0"] * A)
+    xi2 = xi - sum(beta[j] * np.sin(2 * (j + 1) * xi) * np.cosh(2 * (j + 1) * eta) for j in range(3))
+    eta2 = eta - sum(beta[j] * np.cos(2 * (j + 1) * xi) * np.sinh(2 * (j + 1) * eta) for j in range(3))
+    chi = np.arcsin(np.sin(xi2) / np.cosh(eta2))
+    lat = chi + sum(delta[j] * np.sin(2 * (j + 1) * chi) for j in range(3))
+    lon = np.radians(p["lon0"]) + np.arctan2(np.sinh(eta2), np.cos(xi2))
+    return np.degrees(lon), np.degrees(lat)
+
+
+def multilook(power, k):
+    """Speckle filter: average each k x k block of LINEAR power into one pixel (a 'boxcar' or
+    'multilook' filter). A block counts only if all k*k pixels are valid, so edges and gaps stay
+    empty instead of being half-averaged. Returns the smaller array."""
+    h, w = (power.shape[0] // k) * k, (power.shape[1] // k) * k
+    blocks = power[:h, :w].reshape(h // k, k, w // k, k)
+    return blocks.mean(axis=(1, 3))          # any NaN in a block makes that block NaN
+
+
+def label_clusters(flag):
+    """Group touching True pixels into clusters (8-connected: diagonals count as touching).
+    Returns a list of clusters, each a numpy array of (row, col) pairs. Written without scipy:
+    a simple flood fill that only visits the flagged pixels, so it is fast when change is rare."""
+    flag = np.asarray(flag, dtype=bool)
+    seen = np.zeros_like(flag)
+    rows, cols = flag.shape
+    clusters = []
+    for r0, c0 in zip(*np.nonzero(flag)):
+        if seen[r0, c0]:
+            continue
+        seen[r0, c0] = True
+        stack, members = [(r0, c0)], []
+        while stack:
+            r, c = stack.pop()
+            members.append((r, c))
+            for dr in (-1, 0, 1):
+                for dc in (-1, 0, 1):
+                    rr, cc = r + dr, c + dc
+                    if 0 <= rr < rows and 0 <= cc < cols and flag[rr, cc] and not seen[rr, cc]:
+                        seen[rr, cc] = True
+                        stack.append((rr, cc))
+        clusters.append(np.array(members))
+    return clusters
+
+
+GIBS_WMS = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi"
+
+
+def gibs_wms(layer, date, west, south, east, north, width, height):
+    """Download one picture from NASA GIBS (public, no login) for a lon/lat box and a date.
+    Returns (PIL RGBA image, the exact URL). WMS 1.3.0 with EPSG:4326 wants the box as
+    south,west,north,east (latitude first)."""
+    import io
+    import urllib.parse
+    import urllib.request
+    from PIL import Image
+    q = urllib.parse.urlencode({
+        "SERVICE": "WMS", "REQUEST": "GetMap", "VERSION": "1.3.0", "LAYERS": layer,
+        "CRS": "EPSG:4326", "BBOX": f"{south},{west},{north},{east}",
+        "WIDTH": int(width), "HEIGHT": int(height), "FORMAT": "image/png", "TIME": date,
+    })
+    url = f"{GIBS_WMS}?{q}"
+    req = urllib.request.Request(url, headers={"User-Agent": "OmniSAR-processing/1.0"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        img = Image.open(io.BytesIO(r.read())).convert("RGBA")
+    return img, url
+
+
 def box_window(box, x_coords, y_coords, p):
     """Find the rows/columns of a grid that cover a lon/lat box.
     A lon/lat box is slightly tilted on a UTM map, so we convert points all along its four edges
