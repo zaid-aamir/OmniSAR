@@ -1,0 +1,293 @@
+{
+  "id": "jebel-ali",
+  "format": 1,
+  "about": "Mystery file for Jebel Ali. The question, place and boxes live in cases/index.json. All text here is pre-written; every choice has its own reply. Evidence with src null is shown as 'Evidence pending' until the real image exists.",
+  "numbersFile": "cases/jebel-ali.numbers.json",
+
+  "tip": {
+    "title": "A coast that keeps changing",
+    "text": [
+      "NISAR has imaged this stretch of coast west of Dubai about every 12 days since 18 June 2026, through cloud, dust and darkness.",
+      "Your question: what appeared here between June and October 2026?",
+      "Radar can answer part of that. On the way, it will try to fool you at least five times."
+    ]
+  },
+
+  "steps": [
+    { "type": "tip" },
+    { "type": "choice", "choice": "method" },
+    { "type": "choice", "choice": "before-june" },
+    { "type": "evidence", "title": "The evidence so far", "text": "These are the exhibits for this case. Some are real changes; some are traps. Read each one before you go on." },
+    { "type": "choice", "choice": "dark-patch" },
+    { "type": "choice", "choice": "zoom" },
+    { "type": "toggles", "title": "Interrogate the evidence", "text": "Each switch changes how the radar evidence is processed, so you can see which 'changes' survive." },
+    { "type": "graph", "title": "Cause and effect", "text": "Fill in the hidden links. Each link is something a satellite measured, or something a published source says." },
+    { "type": "choice", "choice": "what-can-we-say" },
+    { "type": "verdict" },
+    { "type": "lesson" }
+  ],
+
+  "choices": {
+    "method": {
+      "prompt": "NISAR has images from 18 June to 28 October. How should we compare 'before' with 'after'?",
+      "options": [
+        {
+          "text": "Compare the first image (18 Jun) with the last one (28 Oct).",
+          "correct": false,
+          "trap": 8,
+          "reply": "That's the most common mistake. The 28 Oct image has a large bright blob over Dubai that is radio interference, not the ground. A two-date comparison would call it a giant new change. One bad day is enough to fool you."
+        },
+        {
+          "text": "Use every pass we have, from both directions, to get more data.",
+          "correct": false,
+          "trap": 7,
+          "reply": "More data sounds better, but NISAR looks at this coast going north and going south. Walls and slopes look different from each side, so mixing the two directions creates 'change' that is only the viewing angle."
+        },
+        {
+          "text": "Take the median of several June–July passes and the median of several September–October passes, all from the same direction, and compare those.",
+          "correct": true,
+          "reply": "Right. The median is the 'typical' value at each spot, so a blob that appears on one date drops out, while a real change that stays is kept. Using one direction (ascending track 056) means every image looks at the coast from the same side."
+        }
+      ]
+    },
+    "before-june": {
+      "prompt": "The timeline has no NISAR images of Jebel Ali before 18 June. What does that tell you about the area before June?",
+      "options": [
+        {
+          "text": "Nothing was there yet: no images means no buildings.",
+          "correct": false,
+          "trap": 6,
+          "reply": "Careful: missing data is not evidence. NISAR simply hadn't started imaging the UAE before 18 June 2026. The coast could have looked exactly the same in May; the radar just wasn't looking."
+        },
+        {
+          "text": "Nothing. NISAR only started here on 18 June, so earlier images would have to come from another satellite, clearly labelled.",
+          "correct": true,
+          "reply": "Exactly. Our question starts in June for a reason: that's when NISAR's record here begins. Anything earlier would need another radar, such as Sentinel-1, and would be labelled as not NISAR."
+        }
+      ]
+    },
+    "dark-patch": {
+      "prompt": "Inland, behind the coast, a patch turns dark in the radar image. Is it new water?",
+      "options": [
+        {
+          "text": "Yes: dark means water, so a new lake or pond appeared.",
+          "correct": false,
+          "trap": 11,
+          "reply": "Not so fast. Radar sees smoothness, not wetness. Calm water is smooth, so the beam bounces away and the spot looks dark. But very smooth dry sand does the same thing. In a desert, 'dark' alone can't tell water from sand."
+        },
+        {
+          "text": "Maybe. Calm water and smooth dry sand both look dark to radar, so it has to be checked against photos or a water map.",
+          "correct": true,
+          "reply": "Right. Both reflect the radar beam away like a mirror. We mark 'new water' in desert as uncertain and check it with an independent source before saying anything."
+        }
+      ]
+    },
+    "zoom": {
+      "prompt": "You want to see individual new buildings. What do you do?",
+      "options": [
+        {
+          "text": "Zoom the NISAR map in as far as it goes.",
+          "correct": false,
+          "trap": 2,
+          "reply": "NASA's NISAR map tiles break past zoom level 9 (about 280 m per pixel): the server returns scrambled images that look like detail but aren't. We tested the same address several times and got different pictures back."
+        },
+        {
+          "text": "Use NISAR to find where the ground changed, then look closer with a sharper, clearly labelled source such as 30 m Sentinel-1 radar or satellite photos.",
+          "correct": true,
+          "reply": "Good. Each satellite does what it is best at, and every image says which satellite it came from. NISAR finds and measures the change; sharper images help you see what it is."
+        }
+      ]
+    },
+    "what-can-we-say": {
+      "prompt": "Suppose the radar shows parts of the coast got much brighter in HH between the June–July median and the September–October median. What can you say?",
+      "options": [
+        {
+          "text": "A specific company built this illegally.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "Radar can't see that. It measures how the ground scatters microwaves, not who owns it, whether anything was allowed, or why it was done. Naming someone or calling it illegal goes beyond the evidence."
+        },
+        {
+          "text": "The new land will flood or collapse soon.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "That's a forecast, and radar brightness can't support it. These images say what changed between two periods, not what will happen next."
+        },
+        {
+          "text": "Something with hard surfaces or walls appeared there, such as new structures or built-up land. Photos are needed to confirm what it is.",
+          "correct": true,
+          "reply": "That is exactly as far as the evidence goes. A big rise in HH means the surface started sending more of the beam straight back, which hard surfaces and walls do. Photos can then confirm what it is. Who built it, and why, is outside what radar can see."
+        }
+      ]
+    }
+  },
+
+  "evidence": [
+    {
+      "id": "two-date",
+      "title": "Two-date change: 18 Jun vs 28 Oct",
+      "kind": "image",
+      "src": null,
+      "caption": "Change between just two NISAR images. A large bright area appears over Dubai.",
+      "source": "NISAR GCOV, track 056 ascending, 18 Jun and 28 Oct 2026",
+      "bin": "trap",
+      "trap": 8
+    },
+    {
+      "id": "median-change",
+      "title": "Median change: Jun–Jul vs Sep–Oct",
+      "kind": "image",
+      "src": null,
+      "caption": "Change between the median of several passes before and several passes after, same direction.",
+      "source": "NISAR GCOV, track 056 ascending",
+      "bin": "real",
+      "trap": null
+    },
+    {
+      "id": "no-data-before-june",
+      "title": "No NISAR images before 18 June",
+      "kind": "data",
+      "src": "cases/passes.json",
+      "caption": "NASA's catalogue lists the first NISAR pass over this box on 18 Jun 2026. Before that, the record is empty.",
+      "source": "NASA CMR file catalogue",
+      "bin": "trap",
+      "trap": 6
+    },
+    {
+      "id": "dark-inland",
+      "title": "A dark patch inland",
+      "kind": "image",
+      "src": null,
+      "caption": "An area that looks dark in the radar image. Water, or smooth dry sand?",
+      "source": "NISAR GCOV, track 056 ascending",
+      "bin": "trap",
+      "trap": 11
+    },
+    {
+      "id": "zoom-tile",
+      "title": "NISAR map tile at zoom 10",
+      "kind": "image",
+      "src": null,
+      "caption": "The same map tile requested several times at zoom 10 comes back as different images.",
+      "source": "NASA GIBS NISAR tiles, zoom 10",
+      "bin": "trap",
+      "trap": 2
+    },
+    {
+      "id": "photo-check",
+      "title": "Satellite photos: June vs October",
+      "kind": "image",
+      "src": null,
+      "caption": "Optical images of the same box, used as an independent check on what the radar found.",
+      "source": "NASA HLS (Landsat and Sentinel-2)",
+      "bin": "real",
+      "trap": null
+    }
+  ],
+
+  "toggles": [
+    {
+      "id": "median",
+      "label": "Single dates ↔ Median of several passes",
+      "explains": "Switch to two single dates and the interference blob appears as 'change'. Switch to medians and it disappears.",
+      "trap": 8,
+      "layers": { "off": null, "on": null }
+    },
+    {
+      "id": "direction",
+      "label": "One direction ↔ Mixed directions",
+      "explains": "Mixing ascending and descending passes makes walls and slopes look changed when only the viewing side changed.",
+      "trap": 7,
+      "layers": { "off": null, "on": null }
+    },
+    {
+      "id": "channel",
+      "label": "HH (direct echo) ↔ HV (rough and leafy echo)",
+      "explains": "New walls and hard ground show most strongly in HH. HV rises more where plants grow or surfaces become rough.",
+      "trap": 4,
+      "layers": { "off": null, "on": null }
+    }
+  ],
+
+  "graph": {
+    "nodes": [
+      {
+        "id": "cause",
+        "label": "Development work in the area",
+        "detail": "Stated generally. Radar can't tell who did it or why.",
+        "source": "Published source",
+        "basis": "published",
+        "citation": null,
+        "hidden": false,
+        "opens": { "layer": null, "chart": null, "badge": "Source needed" }
+      },
+      {
+        "id": "hh",
+        "label": "New hard surfaces and land",
+        "detail": "Measured by the change in NISAR's HH (direct echo) brightness.",
+        "source": "NISAR L-band, HH",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "What should NISAR's HH brightness do where new hard surfaces and land appear?",
+        "options": [
+          { "text": "HH goes up", "correct": true, "reply": "Yes. Water sends the beam away, so it looks dark. Hard ground and walls send much more of it straight back, so HH rises." },
+          { "text": "HH goes down", "correct": false, "reply": "That would mean the surface got smoother, like ground turning into calm water. New land and buildings do the opposite." },
+          { "text": "HH stays the same", "correct": false, "reply": "Swapping water or sand for hard surfaces changes how the beam bounces, so HH can't stay the same." }
+        ],
+        "opens": { "layer": null, "chart": null, "badge": "NISAR GCOV" }
+      },
+      {
+        "id": "coherence",
+        "label": "Surface disturbed",
+        "detail": "Measured by coherence: how similar the radar signal stays between two passes.",
+        "source": "NISAR L-band interferograms (GUNW)",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "Construction disturbs the ground between two passes. What happens to coherence?",
+        "options": [
+          { "text": "Coherence drops", "correct": true, "reply": "Right. Coherence measures how much the surface stays the same between passes. Digging, filling and building scramble it, so it drops." },
+          { "text": "Coherence rises", "correct": false, "reply": "Coherence rises when a surface stays unchanged, like old concrete. Active construction does the opposite." },
+          { "text": "Coherence doesn't change", "correct": false, "reply": "Coherence reacts to any change in the surface between passes, so disturbed ground shows up clearly." }
+        ],
+        "opens": { "layer": null, "chart": null, "badge": "NISAR GUNW" }
+      },
+      {
+        "id": "photos",
+        "label": "Confirmed in photos",
+        "detail": "An independent check: optical satellite images of the same place before and after.",
+        "source": "NASA HLS (Landsat and Sentinel-2)",
+        "basis": "measured",
+        "hidden": false,
+        "opens": { "layer": null, "chart": null, "badge": "HLS check" }
+      }
+    ],
+    "edges": [["cause", "hh"], ["hh", "coherence"], ["coherence", "photos"]]
+  },
+
+  "verdict": {
+    "pending": "Evidence pending — this case's measurements are being processed.",
+    "cantProve": [
+      "Who built anything here, or why.",
+      "Whether anything was allowed or not.",
+      "What will happen to this coast in the future."
+    ]
+  },
+
+  "lesson": {
+    "title": "What this case teaches about radar",
+    "points": [
+      {
+        "head": "Backscatter",
+        "text": "NISAR sends out microwaves and measures how much bounces back to it. That returned energy is called backscatter. Smooth surfaces like calm water send the beam away (dark). Rough surfaces scatter some back (medium). Corners send a lot back (bright)."
+      },
+      {
+        "head": "HH and double bounce",
+        "text": "HH means the beam is sent and received horizontally: the direct echo. A wall standing on flat ground forms a corner, so the beam bounces off the ground, then the wall, and straight back to the satellite. This 'double bounce' makes new buildings and harbour walls very bright in HH."
+      },
+      {
+        "head": "Medians, not two dates",
+        "text": "Any single radar image can contain a one-off fault, such as radio interference. Taking the median of several passes keeps what is normally there and throws away one-day oddities. Comparing a 'before' median with an 'after' median finds changes that last."
+      }
+    ]
+  }
+}

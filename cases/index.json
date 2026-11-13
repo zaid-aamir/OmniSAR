@@ -9,7 +9,13 @@
       "box": [54.95, 24.93, 55.12, 25.06],
       "question": "What appeared here between June and October 2026?",
       "mysteryFile": "cases/jebel-ali.json",
-      "numbersFile": "cases/jebel-ali.numbers.json"
+      "numbersFile": "cases/jebel-ali.numbers.json",
+      "analysis": {
+        "track": "056",
+        "direction": "A",
+        "note": "We analyse only the ascending track-056 passes: comparing passes from different directions is trap 7.",
+        "trap": 7
+      }
     },
     {
       "id": "big-sur",

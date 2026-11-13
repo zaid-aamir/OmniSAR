@@ -7,6 +7,8 @@ import { loadCases } from './cases.js';
 import { createMarkers } from './markers.js';
 import { createTimeline } from './timeline.js';
 import { createPanel } from './panel.js';
+import { loadMystery } from './engine.js';
+import { runWalkthrough } from './walkthrough.js';
 
 const params = new URLSearchParams(location.search);
 const HOME_DISTANCE = 3.2;
@@ -82,13 +84,21 @@ async function start() {
     timeline.setCase(null);
   }
 
-  function openMystery(id) {
-    // The walkthrough engine arrives in the next step
-    panel.note('This mystery’s walkthrough is not ready yet.');
+  async function openMystery(id) {
+    const c = byId[id];
+    if (!c.mysteryFile) {
+      panel.note('This mystery’s case file is still being written.');
+      return;
+    }
+    const mystery = await loadMystery(c);
+    runWalkthrough(panel.root, mystery, { onExit: () => panel.showCase(c) });
   }
 
   // ?case=<id> opens straight onto a case (for testing and screenshots)
-  if (byId[params.get('case')]) selectCase(params.get('case'));
+  if (byId[params.get('case')]) {
+    selectCase(params.get('case'));
+    if (params.has('play')) openMystery(params.get('case'));   // ?case=jebel-ali&play opens the walkthrough
+  }
 
   window.omnisar = { globe, data, selectCase };   // handy for poking at things in the browser console
 }

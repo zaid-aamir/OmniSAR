@@ -4,12 +4,8 @@
 // The mystery walkthrough (engine.js, next step) takes over the same panel.
 
 import { STATUS_TEXT } from './cases.js';
-
-// Make text safe to put inside HTML (so a stray "<" in a file can never break the page)
-export function esc(text) {
-  return String(text).replace(/[&<>"']/g, (ch) =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
-}
+import { esc } from './util.js';
+import { trapChip, wireTrapChips } from './trapcard.js';
 
 export function statusChip(status) {
   return `<span class="status status-${status}">${esc(STATUS_TEXT[status] || status)}</span>`;
@@ -54,11 +50,17 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
         <div><dt>Directions</dt><dd>${asc} ascending · ${desc} descending pass${desc === 1 ? '' : 'es'}</dd></div>
         <div><dt>Tracks</dt><dd class="mono">${esc(c.tracks.join(', '))}</dd></div>
         <div><dt>Product</dt><dd><span class="tag tag-nisar">NISAR ${esc(c.product)}</span></dd></div>
+        ${c.analysis ? `<div><dt>We analyse</dt><dd>
+          Track ${esc(c.analysis.track)} ${c.analysis.direction === 'A' ? 'ascending' : 'descending'} only
+          (${c.passes.filter((p) => p.track === c.analysis.track && p.direction === c.analysis.direction).length} passes)
+          <span class="evidence-caption">${esc(c.analysis.note)}</span>
+          ${trapChip(c.analysis.trap)}</dd></div>` : ''}
       </dl>
       <button class="primary-btn" id="open-btn">Open mystery</button>
       <p class="panel-note" id="open-note" hidden></p>`;
     root.querySelector('#back-btn').addEventListener('click', onBack);
     root.querySelector('#open-btn').addEventListener('click', () => onOpen(c.id));
+    wireTrapChips(root);
   }
 
   function note(text) {
