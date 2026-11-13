@@ -1,0 +1,55 @@
+{
+  "about": "The five case files, in mystery order (each one teaches the next radar idea). Centres and boxes are lat/lon in degrees; box = [west, south, east, north]. A case's mystery file holds its steps; its numbers file only exists once its measurements are done.",
+  "cases": [
+    {
+      "id": "jebel-ali",
+      "name": "Jebel Ali",
+      "place": "Dubai, United Arab Emirates",
+      "centre": [24.99, 55.02],
+      "box": [54.95, 24.93, 55.12, 25.06],
+      "question": "What appeared here between June and October 2026?",
+      "mysteryFile": "cases/jebel-ali.json",
+      "numbersFile": "cases/jebel-ali.numbers.json"
+    },
+    {
+      "id": "big-sur",
+      "name": "Big Sur",
+      "place": "California, United States",
+      "centre": [35.95, -121.50],
+      "box": [-121.85, 35.80, -121.25, 36.35],
+      "question": "Which burned slopes above Highway 1 move first when the rain comes?",
+      "mysteryFile": null,
+      "numbersFile": "cases/big-sur.numbers.json"
+    },
+    {
+      "id": "tonle-sap",
+      "name": "Tonle Sap",
+      "place": "Cambodia",
+      "centre": [12.80, 104.20],
+      "box": [104.0, 12.6, 104.4, 13.0],
+      "question": "How much forest went underwater that ordinary water maps missed?",
+      "mysteryFile": null,
+      "numbersFile": "cases/tonle-sap.numbers.json"
+    },
+    {
+      "id": "jakarta",
+      "name": "Jakarta",
+      "place": "Indonesia",
+      "centre": [-6.11, 106.85],
+      "box": [106.70, -6.20, 107.00, -6.05],
+      "question": "Is the ground really dropping, or is it the air?",
+      "mysteryFile": null,
+      "numbersFile": "cases/jakarta.numbers.json"
+    },
+    {
+      "id": "al-ain",
+      "name": "Al Ain",
+      "place": "Abu Dhabi, United Arab Emirates",
+      "centre": [24.49, 55.55],
+      "box": [55.45, 24.40, 55.65, 24.58],
+      "question": "Which farms went quiet — and is that normal?",
+      "mysteryFile": null,
+      "numbersFile": "cases/al-ain.numbers.json"
+    }
+  ]
+}

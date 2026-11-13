@@ -1,0 +1,1655 @@
+{
+ "generated": "2026-11-13T20:39Z",
+ "window": {
+  "start": "2026-06-01",
+  "end": "2026-11-10"
+ },
+ "source": "NASA CMR granule search (cmr.earthdata.nasa.gov), public metadata, no login",
+ "cases": {
+  "jebel-ali": {
+   "name": "Jebel Ali, Dubai",
+   "product": "GCOV",
+   "collections": [
+    "C2854338529-ASF",
+    "C3622241360-ASF"
+   ],
+   "box": [
+    54.95,
+    24.93,
+    55.12,
+    25.06
+   ],
+   "files": 40,
+   "passes": [
+    {
+     "date": "2026-06-18",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-19",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-26",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-06-30",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-01",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-08",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-12",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-13",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-20",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-24",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-25",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-13",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-08-17",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-18",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-25",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-08-29",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-30",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-06",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-10",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-11",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-18",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-22",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-23",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-30",
+     "track": "006",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-10-04",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-05",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-16",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-17",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-28",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-29",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    }
+   ]
+  },
+  "big-sur": {
+   "name": "Big Sur, California",
+   "product": "GCOV",
+   "collections": [
+    "C2854338529-ASF",
+    "C3622241360-ASF"
+   ],
+   "box": [
+    -121.85,
+    35.8,
+    -121.25,
+    36.35
+   ],
+   "files": 44,
+   "passes": [
+    {
+     "date": "2026-06-05",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-05",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-11",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-17",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-23",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-24",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-29",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-29",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-05",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-06",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-11",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-11",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-17",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-18",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-23",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-23",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-10",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-11",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-16",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-16",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-22",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-23",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-28",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-28",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-03",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-04",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-09",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-09",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-15",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-16",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-21",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-21",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-27",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-03",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-03",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-09",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-10",
+     "track": "143",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-15",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-15",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-21",
+     "track": "135",
+     "direction": "A",
+     "frame": "020",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-27",
+     "track": "042",
+     "direction": "D",
+     "frame": "070",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-27",
+     "track": "042",
+     "direction": "D",
+     "frame": "071",
+     "modes": [
+      "4005"
+     ]
+    }
+   ]
+  },
+  "tonle-sap": {
+   "name": "Tonle Sap, Cambodia",
+   "product": "GCOV",
+   "collections": [
+    "C2854338529-ASF",
+    "C3622241360-ASF"
+   ],
+   "box": [
+    104.0,
+    12.6,
+    104.4,
+    13.0
+   ],
+   "files": 22,
+   "passes": [
+    {
+     "date": "2026-06-19",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-06-24",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-01",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-06",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-13",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-18",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-07-25",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-08-11",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-08-18",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-08-23",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-08-30",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-04",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-11",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-16",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-23",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-09-28",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-10-05",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-10-10",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-10-17",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-10-22",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-10-29",
+     "track": "083",
+     "direction": "A",
+     "frame": "008",
+     "modes": [
+      "2005"
+     ]
+    },
+    {
+     "date": "2026-11-03",
+     "track": "148",
+     "direction": "D",
+     "frame": "082",
+     "modes": [
+      "2005"
+     ]
+    }
+   ]
+  },
+  "jakarta": {
+   "name": "Jakarta, Indonesia",
+   "product": "GUNW",
+   "collections": [
+    "C2854335566-ASF"
+   ],
+   "box": [
+    106.7,
+    -6.2,
+    107.0,
+    -6.05
+   ],
+   "files": 27,
+   "passes": [
+    {
+     "date": "2026-06-26",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-06-27",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-06-27",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-08",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-08",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-09",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-09",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-20",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-20",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-21",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-07-21",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-13",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-13",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-14",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-14",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-25",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-25",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-26",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-08-26",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-06",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-07",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-07",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-18",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-19",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-19",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-09-30",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-10-01",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-10-01",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-10-12",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-10-13",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "modes": [
+      "4000"
+     ]
+    },
+    {
+     "date": "2026-10-13",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "modes": [
+      "4000"
+     ]
+    }
+   ],
+   "pairs": [
+    {
+     "reference": "2026-06-26",
+     "secondary": "2026-07-08",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-06-27",
+     "secondary": "2026-07-09",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-06-27",
+     "secondary": "2026-07-09",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-08",
+     "secondary": "2026-07-20",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-08",
+     "secondary": "2026-07-20",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-09",
+     "secondary": "2026-07-21",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-09",
+     "secondary": "2026-07-21",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-20",
+     "secondary": "2026-08-13",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-20",
+     "secondary": "2026-08-13",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-21",
+     "secondary": "2026-08-14",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-07-21",
+     "secondary": "2026-08-14",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-13",
+     "secondary": "2026-08-25",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-13",
+     "secondary": "2026-08-25",
+     "track": "010",
+     "direction": "A",
+     "frame": "175",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-14",
+     "secondary": "2026-08-26",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-14",
+     "secondary": "2026-08-26",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-25",
+     "secondary": "2026-09-06",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-26",
+     "secondary": "2026-09-07",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-08-26",
+     "secondary": "2026-09-07",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-06",
+     "secondary": "2026-09-18",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-07",
+     "secondary": "2026-09-19",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-07",
+     "secondary": "2026-09-19",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-18",
+     "secondary": "2026-09-30",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-19",
+     "secondary": "2026-10-01",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-19",
+     "secondary": "2026-10-01",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-09-30",
+     "secondary": "2026-10-12",
+     "track": "010",
+     "direction": "A",
+     "frame": "174",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-10-01",
+     "secondary": "2026-10-13",
+     "track": "018",
+     "direction": "D",
+     "frame": "091",
+     "mode": "4000"
+    },
+    {
+     "reference": "2026-10-01",
+     "secondary": "2026-10-13",
+     "track": "018",
+     "direction": "D",
+     "frame": "092",
+     "mode": "4000"
+    }
+   ]
+  },
+  "al-ain": {
+   "name": "Al Ain, UAE",
+   "product": "GCOV",
+   "collections": [
+    "C2854338529-ASF",
+    "C3622241360-ASF"
+   ],
+   "box": [
+    55.45,
+    24.4,
+    55.65,
+    24.58
+   ],
+   "files": 32,
+   "passes": [
+    {
+     "date": "2026-06-18",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-19",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-06-30",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-01",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-12",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-13",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-24",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-07-25",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-17",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-18",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-29",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-08-30",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-10",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-11",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-22",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-09-23",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-04",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-05",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-16",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "2005",
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-17",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-28",
+     "track": "056",
+     "direction": "A",
+     "frame": "014",
+     "modes": [
+      "4005"
+     ]
+    },
+    {
+     "date": "2026-10-29",
+     "track": "078",
+     "direction": "D",
+     "frame": "076",
+     "modes": [
+      "4005"
+     ]
+    }
+   ]
+  }
+ }
+}

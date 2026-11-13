@@ -1,8 +1,16 @@
-// OmniSAR entry point. Starts each part of the app in order.
+// OmniSAR entry point. Loads the case data, starts each part, and connects them:
+//   pick a case (beacon or list) -> camera flies there, panel shows its card, timeline shows its passes
+//   timeline crosses a pass date -> that case's beacon pulses
 
 import { createGlobe } from './globe.js';
+import { loadCases } from './cases.js';
+import { createMarkers } from './markers.js';
+import { createTimeline } from './timeline.js';
+import { createPanel } from './panel.js';
 
 const params = new URLSearchParams(location.search);
+const HOME_DISTANCE = 3.2;
+const CASE_DISTANCE = 1.45;
 
 // Show "Palette N" in the title bar only when a palette was chosen in the URL,
 // so the screenshots say which palette they are.
@@ -19,12 +27,15 @@ function startView() {
   if (at.length === 3 && at.every(Number.isFinite)) {
     return { lat: at[0], lon: at[1], distance: Math.min(5, Math.max(1.25, at[2])) };
   }
-  return { lat: 22, lon: 45, distance: 3.2 };
+  return { lat: 22, lon: 45, distance: HOME_DISTANCE };
 }
 
 async function start() {
   const area = document.getElementById('globe-area');
   const placeholder = document.getElementById('globe-placeholder');
+
+  const data = await loadCases();
+  const byId = Object.fromEntries(data.cases.map((c) => [c.id, c]));
 
   let globe;
   try {
@@ -44,7 +55,42 @@ async function start() {
     `· colours: NASA Blue Marble · heights: AWS Terrarium`;
   area.appendChild(note);
 
-  window.omnisar = { globe };   // handy for poking at things in the browser console
+  const panel = createPanel(document.getElementById('panel-inner'), data.cases, {
+    onPick: selectCase,
+    onBack: backToGlobe,
+    onOpen: openMystery,
+  });
+  const markers = createMarkers(globe, data.cases, { onSelect: selectCase });
+  const timeline = createTimeline(document.getElementById('timeline'), data.cases, {
+    onCross: (id) => markers.pulse(id),
+  });
+
+  function selectCase(id) {
+    const c = byId[id];
+    globe.flyTo(c.centre[0], c.centre[1], CASE_DISTANCE);
+    panel.showCase(c);
+    timeline.setCase(c);
+  }
+
+  function backToGlobe() {
+    // pull back out to the home distance, staying above the same part of the world
+    const dir = globe.camera.position.clone().normalize();
+    const lat = Math.asin(dir.y) * 180 / Math.PI;
+    const lon = Math.atan2(-dir.z, dir.x) * 180 / Math.PI;
+    globe.flyTo(lat, lon, HOME_DISTANCE, 1.2);
+    panel.showHome();
+    timeline.setCase(null);
+  }
+
+  function openMystery(id) {
+    // The walkthrough engine arrives in the next step
+    panel.note('This mystery’s walkthrough is not ready yet.');
+  }
+
+  // ?case=<id> opens straight onto a case (for testing and screenshots)
+  if (byId[params.get('case')]) selectCase(params.get('case'));
+
+  window.omnisar = { globe, data, selectCase };   // handy for poking at things in the browser console
 }
 
 start();

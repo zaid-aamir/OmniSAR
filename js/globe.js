@@ -165,9 +165,43 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     renderer.render(scene, camera);
   });
 
+  // --- Smooth camera flight to a place ---
+  // The camera swings around the globe along a great circle (slerp of its direction)
+  // while its distance changes, so it never cuts through the Earth.
+  let flight = null;
+  function flyTo(lat, lon, distance = 1.6, seconds = 1.6) {
+    controls.autoRotate = false;
+    flight = {
+      fromDir: camera.position.clone().normalize(),
+      toDir: latLonToVector(lat, lon),
+      fromDist: camera.position.length(),
+      toDist: distance,
+      start: performance.now(),
+      ms: seconds * 1000,
+    };
+    controls.enabled = false;     // no dragging mid-flight
+  }
+  const qFrom = new THREE.Quaternion();
+  const qStep = new THREE.Quaternion();
+  frameCallbacks.push(() => {
+    if (!flight) return;
+    const t = Math.min(1, (performance.now() - flight.start) / flight.ms);
+    const ease = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;   // slow-fast-slow
+    qFrom.setFromUnitVectors(flight.fromDir, flight.toDir);
+    qStep.identity().slerp(qFrom, ease);
+    const dist = flight.fromDist + (flight.toDist - flight.fromDist) * ease;
+    camera.position.copy(flight.fromDir).applyQuaternion(qStep).multiplyScalar(dist);
+    camera.lookAt(0, 0, 0);
+    if (t === 1) {
+      flight = null;
+      controls.enabled = true;
+    }
+  });
+
   return {
     scene, camera, controls, renderer, meta,
     blockCount: cells.length,
     onFrame: (fn) => frameCallbacks.push(fn),
+    flyTo,
   };
 }
