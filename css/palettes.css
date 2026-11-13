@@ -1,0 +1,92 @@
+/* The nine palettes from Zaid's references (Color Palletes/1-9).
+   Each palette sets the same five roles; style.css only ever uses these variables.
+     --bg       page background (always dark: data reads best on dark)
+     --surface  panels and bars
+     --text     main text
+     --accent   buttons, highlights, active things
+     --accent-2 second highlight
+   Softer shades (--muted, --line) are mixed from these in one place below.
+   Where a palette has no dark colour (P7, P9), the background is that palette's
+   colour mixed down with black, so the hue still comes from the palette.
+
+   DATA colours are NOT here: they stay fixed whatever the palette (see style.css). */
+
+:root,
+[data-palette="4"] {            /* P4  0B0C10 1F2833 C5C6C7 66FCF1 45A29E — default */
+  --bg: #0B0C10;
+  --surface: #1F2833;
+  --text: #C5C6C7;
+  --accent: #66FCF1;
+  --accent-2: #45A29E;
+}
+
+[data-palette="1"] {            /* P1  D83F87 2A1B3D 44318D E98074 A4B3B6 */
+  --bg: #2A1B3D;
+  --surface: color-mix(in srgb, #44318D 45%, #2A1B3D);
+  --text: color-mix(in srgb, #A4B3B6 55%, #ffffff);
+  --accent: #E98074;
+  --accent-2: #D83F87;
+}
+
+[data-palette="2"] {            /* P2  003135 024950 964734 0FA4AF AFDDE5 */
+  --bg: #003135;
+  --surface: #024950;
+  --text: #AFDDE5;
+  --accent: #0FA4AF;
+  --accent-2: #964734;
+}
+
+[data-palette="3"] {            /* P3  212A31 2E3944 124E66 748D92 D3D9D4 */
+  --bg: #212A31;
+  --surface: #2E3944;
+  --text: #D3D9D4;
+  --accent: #748D92;
+  --accent-2: #124E66;
+}
+
+[data-palette="5"] {            /* P5  2C3531 116466 D9B08C FFCB9A D1E8E2 */
+  --bg: #2C3531;
+  --surface: color-mix(in srgb, #116466 55%, #2C3531);
+  --text: #D1E8E2;
+  --accent: #FFCB9A;
+  --accent-2: #D9B08C;
+}
+
+[data-palette="6"] {            /* P6  2F4454 2E151B DA7B93 376E6F 1C3334 */
+  --bg: #1C3334;
+  --surface: #2F4454;
+  --text: color-mix(in srgb, #DA7B93 18%, #ffffff);
+  --accent: #DA7B93;
+  --accent-2: #376E6F;
+}
+
+[data-palette="7"] {            /* P7  5680E9 84CEEB 5AB9EA C1C8E4 8860D0 (light palette, background mixed down) */
+  --bg: color-mix(in srgb, #5680E9 14%, #06070c);
+  --surface: color-mix(in srgb, #5680E9 28%, #0b0d16);
+  --text: #C1C8E4;
+  --accent: #84CEEB;
+  --accent-2: #8860D0;
+}
+
+[data-palette="8"] {            /* P8  F8E9A1 F76C6C A8D0E6 374785 24305E */
+  --bg: #24305E;
+  --surface: #374785;
+  --text: #A8D0E6;
+  --accent: #F76C6C;
+  --accent-2: #F8E9A1;
+}
+
+[data-palette="9"] {            /* P9  B23850 3B8BEB E7E3D4 C4DBF6 8590AA (light palette, background mixed down) */
+  --bg: color-mix(in srgb, #8590AA 16%, #07080b);
+  --surface: color-mix(in srgb, #8590AA 26%, #0d0f14);
+  --text: #E7E3D4;
+  --accent: #3B8BEB;
+  --accent-2: #B23850;
+}
+
+/* Softer shades, mixed from the palette so every palette gets them for free */
+:root {
+  --muted: color-mix(in srgb, var(--text) 62%, var(--bg));
+  --line: color-mix(in srgb, var(--text) 14%, var(--bg));
+  --surface-2: color-mix(in srgb, var(--surface) 70%, var(--bg));
+}

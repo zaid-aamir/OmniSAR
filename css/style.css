@@ -1,0 +1,165 @@
+/* OmniSAR layout and components.
+   Colours come only from palettes.css variables, except the DATA colours below,
+   which never change with the palette so a map always means the same thing. */
+
+:root {
+  /* Fixed data colours (same in every palette) */
+  --data-nisar: #22D3EE;        /* NISAR tag / source badge: always cyan */
+  --data-pending: #E0B44C;      /* "evidence pending" / "under investigation" */
+  --data-unverified: #8A8F98;   /* grey: unverified tips (EONET, later) */
+
+  --font-ui: "Segoe UI", "Inter", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  --font-data: "Cascadia Mono", "Consolas", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --topbar-h: 56px;
+  --timeline-h: 92px;
+  --panel-w: 380px;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;            /* the app fills the window; panels scroll inside */
+}
+
+/* ---------- Title bar ---------- */
+.topbar {
+  height: var(--topbar-h);
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+
+/* A small square "pixel" mark, echoing the one-block-one-pixel globe */
+.brand-mark {
+  width: 14px; height: 14px;
+  background: var(--accent);
+  box-shadow: 5px 5px 0 0 var(--accent-2);
+  border-radius: 2px;
+}
+
+.brand-name { font-weight: 700; font-size: 19px; letter-spacing: 0.2px; }
+
+.tagline { margin: 0; color: var(--muted); font-size: 14px; }
+
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.tag {
+  font-family: var(--font-data);
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.tag-nisar { color: var(--data-nisar); border-color: color-mix(in srgb, var(--data-nisar) 45%, transparent); }
+
+.palette-chip {
+  font-family: var(--font-data);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- Main layout: globe | panel, timeline under the globe ---------- */
+.layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr var(--panel-w);
+  grid-template-rows: 1fr var(--timeline-h);
+  grid-template-areas:
+    "globe    panel"
+    "timeline panel";
+}
+
+.globe-area {
+  grid-area: globe;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.globe-area canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+.globe-placeholder {
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  color: var(--muted);
+  font-family: var(--font-data);
+  font-size: 13px;
+}
+
+/* ---------- Side panel (the mystery lives here) ---------- */
+.panel {
+  grid-area: panel;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--surface-2);
+  border-left: 1px solid var(--line);
+}
+
+.panel-inner { padding: 22px 22px 28px; }
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--font-data);
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.panel-title { margin: 0 0 10px; font-size: 22px; line-height: 1.25; }
+
+.panel-text { margin: 0 0 14px; color: var(--muted); }
+
+/* ---------- Timeline bar ---------- */
+.timeline {
+  grid-area: timeline;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  padding: 12px 20px;
+}
+
+.timeline-label {
+  font-family: var(--font-data);
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- Narrow screens: stack the panel under the globe ---------- */
+@media (max-width: 860px) {
+  body { overflow: auto; }
+  .tagline { display: none; }
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: 60vh var(--timeline-h) auto;
+    grid-template-areas: "globe" "timeline" "panel";
+  }
+  .panel { border-left: 0; border-top: 1px solid var(--line); }
+}

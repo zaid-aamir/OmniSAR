@@ -1,0 +1,19 @@
+# Big raw radar files and local data never go in the repo
+*.h5
+*.h5.part
+*.nc
+*.tif
+*.tiff
+data_raw/
+
+# Planning documents live outside the repo
+CLAUDE.md
+*.pdf
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+__pycache__/
+*.pyc
+.vscode/
