@@ -3,10 +3,15 @@
 // A thin handle sits on the panel's left edge. You can:
 //   - drag it with the mouse, a pen or a finger,
 //   - focus it with Tab and press ← (wider) or → (narrower), 20 px a step; Home / End = narrowest / widest,
-//   - double-click it to go back to the normal width.
+//   - double-click it to go back to the normal width of the current mode.
 // The width is clamped between `min` px and `maxFraction` of the window, and saved in the browser
 // (localStorage) so it is the same after a reload. If the browser blocks storage, it still works,
 // it just doesn't remember.
+//
+// Two modes, each with its own remembered width (setMode, called when a case terrain opens/closes):
+//   'globe'   normal width = the CSS width; saved under storageKey
+//   'terrain' normal width = terrainFraction (40%) of the window; saved under storageKey + '.terrain'
+// Switching mode animates the column (the layout's grid-template-columns transition, ~250 ms).
 //
 // How it works: the page layout is a grid whose right column is `var(--panel-w)`. We only change that
 // one CSS variable on the layout. The globe and terrain canvases already watch their own box
@@ -15,14 +20,16 @@
 
 const STEP = 20;
 
-export function makeResizable(panelEl, { min = 280, maxFraction = 0.6, storageKey } = {}) {
+export function makeResizable(panelEl, { min = 280, maxFraction = 0.6, storageKey, terrainFraction = 0.4 } = {}) {
   const layout = panelEl?.closest('.layout');
-  if (!layout) return { reset() {} };
+  if (!layout) return { reset() {}, setMode() {}, get mode() { return 'globe'; } };
 
   // The normal width = whatever --panel-w was before we touched it (read once, here).
   // We keep it as written (it may be a CSS formula like clamp(...)), so "reset" brings back the exact original.
   const originalInline = layout.style.getPropertyValue('--panel-w');
-  let chosen = null;                // the width the player chose (px), or null = the normal width
+  let mode = 'globe';
+  const keys = { globe: storageKey, terrain: storageKey ? `${storageKey}.terrain` : null };
+  const chosenBy = { globe: null, terrain: null };   // the width the player chose per mode (px), or null = normal
   let applied = null;               // the width on screen now (the choice, squeezed into the window)
 
   // --- the handle ---
@@ -32,7 +39,7 @@ export function makeResizable(panelEl, { min = 280, maxFraction = 0.6, storageKe
   handle.setAttribute('aria-orientation', 'vertical');
   handle.setAttribute('aria-label', 'Resize the case panel');
   handle.setAttribute('tabindex', '0');
-  handle.title = 'Drag to resize (or ← → keys). Double-click: normal width.';
+  handle.title = 'Drag to resize (or ← → keys). Double-click: normal width (40% while a case terrain is open).';
   if (panelEl.id) handle.setAttribute('aria-controls', panelEl.id);
   if (panelEl.parentElement === layout) layout.insertBefore(handle, panelEl);   // tab order: handle, then panel
   else layout.appendChild(handle);
@@ -64,32 +71,51 @@ export function makeResizable(panelEl, { min = 280, maxFraction = 0.6, storageKe
     applied = Math.round(clamp(px));
     layout.style.setProperty('--panel-w', `${applied}px`);
     updateAria();
-    if (choose) { chosen = applied; store(applied); }
+    if (choose) { chosenBy[mode] = applied; store(applied); }
+  }
+
+  // Show the current mode's width: the player's choice, else the mode's normal width
+  function applyMode() {
+    const c = chosenBy[mode];
+    if (c !== null) apply(c, { choose: false });
+    else if (mode === 'terrain') apply(terrainFraction * window.innerWidth, { choose: false });
+    else {
+      applied = null;
+      if (originalInline) layout.style.setProperty('--panel-w', originalInline);
+      else layout.style.removeProperty('--panel-w');
+      updateAria();
+    }
   }
 
   // --- storage (always in try/catch: private windows or blocked storage must not break the page) ---
-  function load() {
-    if (!storageKey) return null;
+  function load(key) {
+    if (!key) return null;
     try {
-      const v = Number(window.localStorage.getItem(storageKey));
+      const v = Number(window.localStorage.getItem(key));
       return Number.isFinite(v) && v > 0 ? v : null;
     } catch { return null; }
   }
   function store(px) {
-    if (!storageKey) return;
-    try { window.localStorage.setItem(storageKey, String(Math.round(px))); } catch { /* not remembered, still works */ }
+    if (!keys[mode]) return;
+    try { window.localStorage.setItem(keys[mode], String(Math.round(px))); } catch { /* not remembered, still works */ }
   }
   function forget() {
-    if (!storageKey) return;
-    try { window.localStorage.removeItem(storageKey); } catch { /* nothing to clear */ }
+    if (!keys[mode]) return;
+    try { window.localStorage.removeItem(keys[mode]); } catch { /* nothing to clear */ }
   }
 
+  // double-click: back to the current mode's normal width (and forget that mode's saved choice)
   function reset() {
-    chosen = applied = null;
-    if (originalInline) layout.style.setProperty('--panel-w', originalInline);
-    else layout.style.removeProperty('--panel-w');
+    chosenBy[mode] = null;
     forget();
-    updateAria();
+    applyMode();
+  }
+
+  function setMode(next) {
+    if (next !== 'globe' && next !== 'terrain') return;
+    if (next === mode) return;
+    mode = next;
+    applyMode();
   }
 
   // --- pointer drag (pointer capture: the drag keeps working even if the pointer leaves the handle) ---
@@ -143,16 +169,13 @@ export function makeResizable(panelEl, { min = 280, maxFraction = 0.6, storageKe
   let resizeFrame = 0;
   window.addEventListener('resize', () => {
     cancelAnimationFrame(resizeFrame);
-    resizeFrame = requestAnimationFrame(() => {
-      if (chosen !== null) apply(chosen, { choose: false });
-      else updateAria();
-    });
+    resizeFrame = requestAnimationFrame(() => applyMode());
   });
 
-  // --- start: use the saved width if there is one ---
-  const saved = load();
-  if (saved !== null) { apply(saved, { choose: false }); chosen = saved; }
-  else updateAria();
+  // --- start: the saved widths, if any (the page starts in globe mode) ---
+  chosenBy.globe = load(keys.globe);
+  chosenBy.terrain = load(keys.terrain);
+  applyMode();
 
-  return { reset };
+  return { reset, setMode, get mode() { return mode; } };
 }

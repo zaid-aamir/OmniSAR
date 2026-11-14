@@ -1,12 +1,8 @@
 /* Case terrain over time (js/caseterrain.js): the large pass label and the cyan "changed" key */
 .terrain-view { container-type: inline-size; }
 
-/* bottom centre, between the stepper (left) and the legend (right), like a caption */
-.terrain-pass {
-  left: 50%; bottom: 64px; transform: translateX(-50%);
-  width: max-content; max-width: min(480px, calc(100% - 600px));
-  text-align: center; pointer-events: none; padding: 8px 16px; z-index: 4;
-}
+/* in the bottom bar, between the stepper and the legend (css/terrainlayout.css) */
+.terrain-pass { text-align: center; padding: 8px 16px; }
 .terrain-pass p { margin: 0; }
 .tp-main { font: 600 22px/1.25 var(--font-data); color: var(--text); letter-spacing: 0.2px; }
 .tp-sub { margin-top: 2px !important; font-size: 13px; color: var(--text); }
@@ -21,11 +17,3 @@
 @keyframes tp-pop { from { transform: scale(1.08); color: var(--accent); } }
 @media (prefers-reduced-motion: reduce) { .tp-main.is-new { animation: none; } }
 
-/* narrow terrain (phone, or a wide panel): the label sits above the stepper, full width */
-@container (max-width: 1000px) {
-  .terrain-pass { left: 12px; right: 12px; transform: none; width: auto; max-width: none; bottom: 96px; }
-  .tp-main { font-size: 18px; }
-}
-@container (max-width: 640px) {
-  .terrain-pass { bottom: 160px; }
-}

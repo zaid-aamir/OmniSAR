@@ -333,16 +333,17 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
   position: absolute; background: color-mix(in srgb, var(--surface) 88%, transparent);
   border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 12px;
 }
-.terrain-top { top: 12px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+/* where each overlay sits: css/terrainlayout.css (one grid with named regions) */
+.terrain-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .terrain-top .eyebrow { margin: 0; }
 .terrain-layer { margin: 2px 0 0; font-weight: 600; }
-.terrain-stepper { top: 78px; left: 12px; display: flex; align-items: center; gap: 10px; font: 12px var(--font-data); }
-.terrain-legend { right: 12px; bottom: 44px; width: 260px; font-size: 12px; }
+.terrain-stepper { display: flex; align-items: center; gap: 10px; font: 12px var(--font-data); }
+.terrain-legend { font-size: 12px; }
 .legend-title { margin: 0 0 6px; color: var(--muted); }
 .legend-bar { height: 10px; border-radius: 3px; }
 .legend-ticks { display: flex; justify-content: space-between; font: 11px var(--font-data); color: var(--muted); margin-top: 3px; }
 .legend-note { margin: 6px 0 0; color: var(--data-pending); font-size: 11px; }
-.terrain-note { position: absolute; left: 12px; bottom: 8px; right: 290px; margin: 0; padding: 6px 10px; font: 11px var(--font-data); color: var(--text); background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line); border-radius: 6px; pointer-events: none; }
+.terrain-note { margin: 0; font: 11px/1.45 var(--font-data); color: var(--text); }
 .terrain-tip {
   position: absolute; z-index: 6; pointer-events: none; display: grid; gap: 2px; max-width: 280px;
   background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font-size: 12px;

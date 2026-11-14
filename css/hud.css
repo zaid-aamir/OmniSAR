@@ -39,7 +39,7 @@ body {
 @keyframes idle-glow { 50% { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 70%, transparent)); } }
 
 /* ---------- Layout: the globe / terrain gets the room; the panel folds into a rail ---------- */
-.layout { transition: grid-template-columns 280ms var(--ease); }
+.layout { transition: grid-template-columns 250ms var(--ease); }
 .layout.panel-collapsed { grid-template-columns: 1fr 44px; }
 .globe-area { background: transparent; }
 
@@ -146,11 +146,8 @@ body {
   .mode-live .topbar-right .tag-nisar { display: none; }
 }
 
-/* ---------- Case terrain HUD: compact, at the edges ---------- */
-.terrain-top { right: auto; max-width: min(640px, calc(100% - 24px)); padding: 8px 10px 8px 14px; }
-.terrain-stepper { top: auto; bottom: 48px; left: 12px; }
-.terrain-legend { bottom: 48px; }
-.terrain-note { bottom: 8px; }
+/* ---------- Case terrain HUD (positions: css/terrainlayout.css) ---------- */
+.terrain-top { padding: 8px 10px 8px 14px; }
 .terrain-layer { font-size: 15px; }
 
 /* ---------- Panel boot-up: a scan line sweeps down, the content fades up ---------- */

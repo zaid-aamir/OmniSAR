@@ -102,13 +102,17 @@ async function start() {
   // Case terrain: the local blocky view of a case box (covers the globe while open)
   const terrain = createCaseTerrain(area);
   // The side panel can be made wider or narrower (drag its left edge, or ←/→ on the handle)
-  makeResizable(document.getElementById('panel'), { min: 280, maxFraction: 0.6, storageKey: 'omnisar.panelW' });
+  // While a case terrain is open the panel uses its own width (40% of the window by default, or what the
+  // player dragged it to with the terrain open); it goes back to the globe width when the terrain closes.
+  const resizer = makeResizable(document.getElementById('panel'), { min: 280, maxFraction: 0.6, storageKey: 'omnisar.panelW', terrainFraction: 0.4 });
+  window.addEventListener('omnisar:terrain', (e) => resizer.setMode(e.detail?.open ? 'terrain' : 'globe'));
 
   const app = MODE === 'live'
     ? startLive({ area, panelEl, panelRoot, data, globe, hud, terrain })
     : startClassic({ area, data, byId, globe, hud, terrain });
 
   // the app's own controls, used by the tour and by tests (and handy in the browser console)
+  app.resizer = resizer;                      // panel widths per mode (tests and the console)
   window.omnisar = app;
 }
 

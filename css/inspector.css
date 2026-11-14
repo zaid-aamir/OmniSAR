@@ -1,5 +1,5 @@
 /* "What did the radar hit?" block inspector (js/inspector.js) */
-.inspector { top: 12px; right: 12px; width: min(300px, calc(100% - 24px)); max-height: calc(100% - 200px); overflow-y: auto;
+.inspector { width: min(300px, 60cqw); overflow-y: auto;   /* docked in the side region: css/terrainlayout.css */
   font-size: 13px; z-index: 7; animation: boot-in 220ms var(--ease, ease) backwards; }
 .inspector[hidden] { display: none; }
 .insp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
