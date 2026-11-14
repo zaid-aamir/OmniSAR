@@ -1,7 +1,11 @@
 // The blocky globe: one flat-shaded block per grid cell, drawn as TWO InstancedMeshes
-// (land and ocean: the GPU draws ~41,000 copies of the same box in two calls, each copy with its
+// (land and ocean: the GPU draws every copy of the same box in two calls, each copy with its
 // own position, size and colour). Colours = NASA Blue Marble, heights = AWS Terrarium elevation,
-// both prepared by tools/build_globe_assets.py into assets/globe/.
+// both prepared by tools/build_globe_assets.py into assets/globe/<resolution>/:
+//   0p5 = 0.5 degree cells (~165,000 blocks, Terrarium zoom 4), the default
+//   1p0 = 1 degree cells (~41,000 blocks, zoom 3): ?globe=1 forces it, ?globe=0.5 forces 0.5.
+//   If the speed check below measures under 45 fps in the first ~3 s on the 0.5 globe (and nothing
+//   was forced), the globe rebuilds itself at 1 degree once (logged in the console).
 //
 // Every block is still one real data cell. The lights, the atmosphere glow and the stars
 // (js/globefx.js) are visual only: they add depth, never new colours or new data.
@@ -15,8 +19,8 @@ import { createAtmosphere, createStars, cssToColour } from './globefx.js';
 
 const EARTH_RADIUS_M = 6371000;
 const BASE_DEPTH = 0.02;   // how far each block reaches below sea level (globe radius = 1)
-const GAP = 0.86;          // block width (east-west) as a share of its cell: the 14% gap shows as a thin dark edge
-const GAP_NS = 0.95;       // north-south the rows nearly touch: rows have different block counts, so wide gaps
+const GAP = 0.93;          // block width (east-west) as a share of its cell: the 7% gap shows as a thin dark edge
+const GAP_NS = 0.97;       // north-south the rows nearly touch: rows have different block counts, so wide gaps
                            // between them looked like dark seam lines (polish list, 14 Nov)
 const SIDE_SHADE = 0.74;   // block sides are drawn this much darker than the top, so each block reads as a cube
 const ATMOSPHERE_RADIUS = 1.06;   // outside the tallest block (1 + 5426 m × 40 / 6371 km ≈ 1.034)
@@ -34,13 +38,16 @@ export function latLonToVector(lat, lon, radius = 1) {
   );
 }
 
-async function loadAssets() {
-  const meta = await (await fetch('assets/globe/globe.json')).json();
-  const heights = new Int16Array(await (await fetch('assets/globe/height.bin')).arrayBuffer());
+async function loadAssets(res) {
+  const base = `assets/globe/${res}/`;
+  const metaRes = await fetch(base + 'globe.json');
+  if (!metaRes.ok) throw new Error(`globe assets ${res} missing`);
+  const meta = await metaRes.json();
+  const heights = new Int16Array(await (await fetch(base + 'height.bin')).arrayBuffer());
 
   // Read the colour PNG's pixels through an invisible canvas
   const img = new Image();
-  img.src = 'assets/globe/colour.png';
+  img.src = base + 'colour.png';
   await img.decode();
   const canvas = document.createElement('canvas');
   canvas.width = meta.cols;
@@ -172,9 +179,17 @@ function makeBlockMaterial({ roughness, metalness = 0, lift = 0, hooks = [] }) {
 }
 
 export async function createGlobe(container, start = { lat: 22, lon: 45, distance: 3.2 }) {
-  const { meta, heights, pixels } = await loadAssets();
-  const cells = layoutCells(meta);
   const params = new URLSearchParams(location.search);
+  const forcedRes = params.get('globe') === '1' ? '1p0' : params.get('globe') === '0.5' ? '0p5' : null;
+  let res = forcedRes || '0p5';
+  let assets;
+  try { assets = await loadAssets(res); } catch (err) {
+    if (forcedRes) throw err;
+    res = '1p0';                                    // the 0.5 files are missing: use the 1 degree globe
+    assets = await loadAssets(res);
+  }
+  let { meta, heights, pixels } = assets;
+  let cells = layoutCells(meta);
   let fxLow = params.get('fx') === 'low';
 
   // --- Scene, camera, renderer ---
@@ -211,16 +226,6 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
   }
 
   // --- The blocks: land and ocean in two meshes, so the ocean can be smoother (a soft glint) ---
-  const exaggeration = meta.heightExaggeration;
-  const toRadius = (h) => 1 + (Math.max(0, h) / EARTH_RADIUS_M) * exaggeration;
-  const isOcean = (c) => {
-    const p = c.index * 4;
-    return heights[c.index] <= 0 && pixels[p + 2] > pixels[p] + 10;   // at sea level AND blue in Blue Marble
-  };
-  const groups = {
-    land: cells.filter((c) => !isOcean(c)),
-    ocean: cells.filter(isOcean),
-  };
   const shaderHooks = [];   // extra shader edits added later with addShaderHook()
   const materials = {
     land: makeBlockMaterial({ roughness: 0.95, hooks: shaderHooks }),     // matte
@@ -233,9 +238,23 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
   const third = new THREE.Vector3();
   const size = new THREE.Vector3();
   const colour = new THREE.Color();
-  const cellRad = THREE.MathUtils.degToRad(meta.cellDeg);
   const meshes = {};
 
+  // Build (or rebuild, at another resolution) the two block meshes. The materials stay the same, so
+  // shader hooks added by other files (the red alert ripples) keep working after a rebuild.
+  function buildBlocks() {
+  const exaggeration = meta.heightExaggeration;
+  const toRadius = (h) => 1 + (Math.max(0, h) / EARTH_RADIUS_M) * exaggeration;
+  const isOcean = (c) => {
+    const p = c.index * 4;
+    return heights[c.index] <= 0 && pixels[p + 2] > pixels[p] + 10;   // at sea level AND blue in Blue Marble
+  };
+  const groups = {
+    land: cells.filter((c) => !isOcean(c)),
+    ocean: cells.filter(isOcean),
+  };
+  const cellRad = THREE.MathUtils.degToRad(meta.cellDeg);
+  for (const old of Object.values(meshes)) { scene.remove(old); old.geometry.dispose(); }
   for (const [name, list] of Object.entries(groups)) {
     const mesh = new THREE.InstancedMesh(makeBlockGeometry(), materials[name], list.length);   // own copy: holds its own aoData
     mesh.name = `${name} blocks`;
@@ -264,6 +283,8 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     scene.add(mesh);
     meshes[name] = mesh;
   }
+  }
+  buildBlocks();
 
   // A dark ball just under the blocks: what you see through the gaps
   const core = new THREE.Mesh(
@@ -302,7 +323,7 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
   resize();
 
   // --- Speed check: after a short warm-up, measure ~2 s of drawing; under ~50 fps -> switch to the light mode ---
-  const fx = { level: fxLow ? 'low (?fx=low)' : 'full', fps: null };
+  const fx = { level: fxLow ? 'low (?fx=low)' : 'full', fps: null, resolution: forcedRes ? `${meta.cellDeg}° (?globe=)` : `${meta.cellDeg}°` };
   let lastTime = null;
   let warm = 0, total = 0, frames = 0;
   function watchSpeed(time) {
@@ -310,11 +331,26 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     const gap = lastTime === null ? null : time - lastTime;
     lastTime = time;
     if (gap === null || gap > 1000) return;    // first frame, or the tab was hidden / the view was paused
-    if (warm < 500) { warm += gap; return; }    // ignore the first half second (shaders still warming up)
+    if (warm < 1000) { warm += gap; return; }   // ignore the first second (shaders and page start-up); measure 1 s -> 3 s
     total += gap;
     frames += 1;
     if (total < 2000) return;
     fx.fps = Math.round((frames * 1000) / total);
+    // under 45 fps on the 0.5 degree globe (not forced): rebuild once at 1 degree, then measure again
+    if (fx.fps < 45 && res === '0p5' && !forcedRes) {
+      const measured = fx.fps;
+      res = '1p0';
+      console.info(`globe: ${measured} fps with 0.5° blocks, switching to the 1° globe`);
+      loadAssets(res).then((a) => {
+        ({ meta, heights, pixels } = a);
+        cells = layoutCells(meta);
+        buildBlocks();
+        fx.resolution = `1° (auto, measured ${measured} fps at 0.5°)`;
+        fx.fps = null; warm = 0; total = 0; frames = 0; lastTime = null;   // measure again at 1°
+        window.dispatchEvent(new CustomEvent('omnisar:globe', { detail: { cellDeg: meta.cellDeg } }));
+      }).catch((err) => console.warn('globe: could not load the 1° globe', err));
+      return;
+    }
     if (fx.fps < 50 && !fxLow) {
       fxLow = true;
       fx.level = `low (auto, measured ${fx.fps} fps)`;
@@ -406,8 +442,9 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
   }
 
   return {
-    scene, camera, controls, renderer, meta, fx,
-    blockCount: cells.length,
+    scene, camera, controls, renderer, fx,
+    get meta() { return meta; },
+    get blockCount() { return cells.length; },
     blockMaterials: Object.values(materials),   // [land, ocean]: the two block materials (read-only use, please)
     addShaderHook,
     onFrame: (fn) => frameCallbacks.push(fn),

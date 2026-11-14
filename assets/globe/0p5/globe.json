@@ -1,13 +1,14 @@
 {
-  "cellDeg": 1.0,
-  "rows": 180,
-  "cols": 360,
+  "cellDeg": 0.5,
+  "rows": 360,
+  "cols": 720,
   "order": "row 0 = northernmost (90N), column 0 = westernmost (180W)",
   "heightFile": "height.bin (little-endian int16, metres, sea and below-sea-level = 0)",
   "heightExaggeration": 40,
-  "maxHeightM": 5426,
+  "maxHeightM": 5715,
   "sources": {
     "colour": "NASA GIBS, BlueMarble_ShadedRelief_Bathymetry (WMS, EPSG:4326)",
-    "height": "AWS Terrain Tiles (Terrarium), zoom 3, cell-averaged"
-  }
+    "height": "AWS Terrain Tiles (Terrarium), zoom 4, cell-averaged"
+  },
+  "resolution": "0.5 degree cells (360 x 720)"
 }

@@ -1,13 +1,16 @@
 """
-Build the small data files the blocky globe needs. Run once:  py tools/build_globe_assets.py
+Build the small data files the blocky globe needs. Run once per resolution:
+  py tools/build_globe_assets.py                      -> 1.0 degree cells, Terrarium zoom 3, assets/globe/1p0/
+  py tools/build_globe_assets.py --cell 0.5 --zoom 4  -> 0.5 degree cells, Terrarium zoom 4, assets/globe/0p5/
+(The globe loads 0p5 by default and falls back to 1p0 on a slow computer: js/globe.js.)
 
 What it does
   1. Downloads NASA's Blue Marble picture of Earth from GIBS (one image, whole world, no login).
-  2. Downloads the 64 AWS Terrarium elevation tiles at zoom 3 (heights in metres, encoded in RGB).
+  2. Downloads the AWS Terrarium elevation tiles (64 at zoom 3, 256 at zoom 4; heights in metres, in RGB).
   3. Puts both on the SAME grid: one cell per CELL_DEG degrees of latitude/longitude.
      Colour = average colour of the cell. Height = average height of the cell, with sea and
      anything below sea level set to 0 (oceans are drawn flat).
-  4. Saves into assets/globe/:
+  4. Saves into assets/globe/<1p0 or 0p5>/:
        colour.png   one pixel per cell (row 0 = 90N, column 0 = 180W)
        height.bin   one 16-bit whole number (metres) per cell, same order as colour.png
        globe.json   grid size, height exaggeration, and where the data came from
@@ -15,6 +18,7 @@ What it does
 Needs: numpy, Pillow   (py -m pip install numpy pillow)
 """
 
+import argparse
 import io
 import json
 import math
@@ -26,7 +30,8 @@ from PIL import Image
 
 CELL_DEG = 1.0              # grid cell size in degrees (2.0 if the globe is too slow)
 HEIGHT_EXAGGERATION = 40    # mountains drawn this many times taller than real, so they show up
-TERRARIUM_ZOOM = 3          # 8 x 8 tiles of 256 px = 2048 px around the world (~20 km at the equator)
+TERRARIUM_ZOOM = 3          # 8 x 8 tiles of 256 px = 2048 px around the world (~20 km at the equator);
+                            # zoom 4 (4096 px, ~10 km) for 0.5 degree cells
 
 GIBS_URL = (
     "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap"
@@ -36,7 +41,7 @@ GIBS_URL = (
 TERRARIUM_URL = "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT_DIR = os.path.join(HERE, "..", "assets", "globe")
+OUT_DIR = os.path.join(HERE, "..", "assets", "globe", "1p0")
 
 
 def download(url):
@@ -64,6 +69,7 @@ def build_height(rows, cols):
     mosaic = np.zeros((size, size), dtype=np.float64)
     print(f"Downloading {n * n} Terrarium tiles (zoom {TERRARIUM_ZOOM}) ...")
     for ty in range(n):
+        print(f"  tile row {ty + 1} of {n}", flush=True)
         for tx in range(n):
             png = download(TERRARIUM_URL.format(z=TERRARIUM_ZOOM, x=tx, y=ty))
             t = np.asarray(Image.open(io.BytesIO(png)).convert("RGB"), dtype=np.float64)
@@ -95,6 +101,13 @@ def build_height(rows, cols):
 
 
 def main():
+    global CELL_DEG, TERRARIUM_ZOOM, OUT_DIR
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--cell", type=float, default=CELL_DEG, help="cell size in degrees (1.0 or 0.5)")
+    ap.add_argument("--zoom", type=int, default=TERRARIUM_ZOOM, help="Terrarium zoom (3 for 1.0, 4 for 0.5)")
+    args = ap.parse_args()
+    CELL_DEG, TERRARIUM_ZOOM = args.cell, args.zoom
+    OUT_DIR = os.path.join(HERE, "..", "assets", "globe", "1p0" if CELL_DEG == 1.0 else str(CELL_DEG).replace(".", "p"))
     rows, cols = int(180 / CELL_DEG), int(360 / CELL_DEG)
     os.makedirs(OUT_DIR, exist_ok=True)
 
@@ -116,12 +129,13 @@ def main():
             "colour": "NASA GIBS, BlueMarble_ShadedRelief_Bathymetry (WMS, EPSG:4326)",
             "height": f"AWS Terrain Tiles (Terrarium), zoom {TERRARIUM_ZOOM}, cell-averaged",
         },
+        "resolution": f"{CELL_DEG} degree cells ({rows} x {cols})",
     }
     with open(os.path.join(OUT_DIR, "globe.json"), "w") as f:
         json.dump(meta, f, indent=2)
 
     total = sum(os.path.getsize(os.path.join(OUT_DIR, p)) for p in os.listdir(OUT_DIR))
-    print(f"Done: {rows} x {cols} cells, highest cell {meta['maxHeightM']} m, {total / 1024:.0f} KB in assets/globe/")
+    print(f"Done: {rows} x {cols} cells, highest cell {meta['maxHeightM']} m, {total / 1024:.0f} KB in {os.path.relpath(OUT_DIR, os.path.join(HERE, '..'))}")
 
 
 if __name__ == "__main__":

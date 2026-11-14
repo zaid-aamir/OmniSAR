@@ -92,9 +92,12 @@ async function start() {
   // Corner note: be upfront that mountains are stretched and how big a block is
   const note = document.createElement('div');
   note.className = 'globe-note';
-  note.textContent =
+  // (re-written if the globe drops to 1° blocks on a slow computer: js/globe.js)
+  const writeNote = () => { note.textContent =
     `Heights exaggerated ×${globe.meta.heightExaggeration} · one block ≈ ${globe.meta.cellDeg}° ` +
-    `· colours: NASA Blue Marble · heights: AWS Terrarium · glow, stars, lighting: visual only`;
+    `· colours: NASA Blue Marble · heights: AWS Terrarium · glow, stars, lighting: visual only`; };
+  writeNote();
+  window.addEventListener('omnisar:globe', writeNote);
   area.appendChild(note);
 
   const hud = createHud(data.cases);          // panel frame + the top bar's DAY readout
