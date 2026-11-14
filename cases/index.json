@@ -5,6 +5,7 @@
       "id": "jebel-ali",
       "name": "Jebel Ali",
       "place": "Dubai, United Arab Emirates",
+      "sea": "The Gulf",
       "centre": [
         24.99,
         55.02
@@ -29,6 +30,7 @@
       "id": "big-sur",
       "name": "Big Sur",
       "place": "California, United States",
+      "sea": "Pacific Ocean",
       "centre": [
         35.95,
         -121.5
@@ -77,6 +79,7 @@
       "id": "jakarta",
       "name": "Jakarta",
       "place": "Indonesia",
+      "sea": "Java Sea (Jakarta Bay)",
       "centre": [
         -6.11,
         106.85

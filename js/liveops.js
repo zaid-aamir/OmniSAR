@@ -436,11 +436,13 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       const cont = fb.querySelector('.lo-continue');
       cont.focus({ preventScroll: true });
       fb.scrollIntoView?.({ block: 'nearest' });
+      if (card.bin === 'trap') terrain.replayFreeze?.(true);     // the change replay holds on AFTER while a trap card shows
       await run.waitFor((done) => {
         const t = setTimeout(done, right ? S.rightHoldMs : S.wrongHoldMs);
         cont.onclick = done;
         return () => clearTimeout(t);
       });
+      terrain.replayFreeze?.(false);
     }
 
     // ----- the case's own last question before its verdict -----

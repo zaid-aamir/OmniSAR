@@ -1,0 +1,39 @@
+{
+  "about": "Change Replay (js/replay.js): which layers each case terrain loops through and which rule outlines the changed blocks. Pass DATES are not written here: they come from the case's numbers file (the verdict's own passes = its NASA files minus quality_control.excluded_passes) and the grid's dated layers of 'unit'. Thresholds come from the numbers file's method block ('method:' keys). Captions are templates: {m:<measured label>} = that measured value + unit, {method:<key>} = a method number, {badge}, {badge_reason}, {first}/{last}/{date} = the replayed pass dates ('15 Sep'). A missing value makes the whole caption disappear, never a made-up number.",
+  "cases": {
+    "big-sur": {
+      "unit": "dB",
+      "change": { "layer": "burn", "gte": 50, "outline": "outlined: blocks at least half burned by the verdict’s rule" },
+      "caption": "HV fell ≥ {method:burn_db|abs} dB on {m:Burned (NISAR HV fell ≥ 2 dB)}: burned forest"
+    },
+    "jebel-ali": {
+      "unit": "dB",
+      "change": { "layer": "change", "gte_method": "X_db", "outline": "outlined: blocks whose HH rose ≥ {method:X_db} dB after the background was removed" },
+      "caption": "HH rose ≥ {method:X_db} dB on {m:New structures (HH rose ≥ 3 dB)}: new structures, by the radar rule (photo check pending)",
+      "trap": {
+        "button": "Show the trap",
+        "label": "Trap 8: interference, not construction",
+        "change": { "diff_abs_method": "X_db", "outline": "outlined: blocks whose raw HH changed ≥ {method:X_db} dB between the two single passes" },
+        "caption": "Trap 8 · {last}: {qc}"
+      }
+    },
+    "tonle-sap": {
+      "unit": "%",
+      "stepCaption": "Open water {date}: {m:Open water {date}}",
+      "change": { "diff_abs_gte": 50, "outline": "outlined: blocks where at least half the block switched between dry and water" },
+      "caption": "Open water {m:Open water {first}} → {m:Open water {last}} · flooded forest {last}: {m:Flooded forest {last} (L-band only)}"
+    },
+    "jakarta": {
+      "unit": "mm",
+      "sink": { "maxWorldM": 300 },
+      "stepCaption": "{layer}",
+      "change": { "last_lte_method": "sinking_mm", "outline": "outlined: blocks that moved down ≥ {method:sinking_mm|abs} mm by the last date" },
+      "caption": "Fastest-sinking district: {m:Fastest-sinking district (2 km)} · badge {badge}: {badge_reason}"
+    },
+    "al-ain": {
+      "unit": "dB",
+      "change": { "diff_abs_method": "crop_present_db", "outline": "outlined: blocks whose HV changed ≥ {method:crop_present_db} dB (the crop-present step)" },
+      "caption": "Pivots on {last}: A {m:Pivot A} · B {m:Pivot B} · C {m:Pivot C} · D {m:Pivot D} (crop present at ≥ +{method:crop_present_db} dB over the desert)"
+    }
+  }
+}

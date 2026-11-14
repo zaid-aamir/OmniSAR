@@ -1,0 +1,51 @@
+/* Change Replay controls (js/replay.js) live in the terrain's bottom bar (css/terrainlayout.css),
+   between the stepper and the pass banner. The trap label docks in the main region, top-left. */
+
+.tv-bar-extra { display: flex; min-width: 0; }
+.tv-bar-extra:not(:has(> :not([hidden]))) { display: none; }      /* nothing to show: no gap either */
+
+.tv-overlay .rp { display: flex; align-items: center; gap: 6px; padding: 4px 8px; }
+.rp[hidden] { display: none !important; }
+.rp .ghost-btn { min-width: 32px; min-height: 30px; padding: 0 8px; font: 600 12px var(--font-data); }
+.rp-play { color: var(--accent); }
+.rp.is-paused .rp-play { color: var(--text); }
+
+/* the scrubber: a range input over tick marks at the start of each phase */
+.rp-scrub { position: relative; width: 104px; height: 30px; display: flex; align-items: center; }
+.rp-range { position: relative; z-index: 1; width: 100%; margin: 0; accent-color: var(--accent); background: transparent; cursor: pointer; }
+.rp-range:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rp-marks { position: absolute; left: 0; right: 0; top: 50%; height: 12px; margin-top: -6px; pointer-events: none; }
+.rp-mark { position: absolute; top: 0; width: 2px; height: 12px; margin-left: -1px; border-radius: 1px; background: color-mix(in srgb, var(--text) 40%, transparent); }
+.rp-mark-change { background: #66fcf1; }          /* fixed data cyan, like the outline */
+.rp-mark-fade { opacity: 0.45; }
+
+.rp-trap { color: var(--ui-wrong); border-color: color-mix(in srgb, var(--ui-wrong) 55%, transparent) !important; white-space: nowrap; }
+.rp-trap[aria-pressed="true"] { background: color-mix(in srgb, var(--ui-wrong) 18%, transparent); }
+.rp-trap[hidden] { display: none; }
+
+/* "Trap 8: interference, not construction": big and obvious, top-left of the terrain's free region */
+.tv-overlay .tv-main > .rp-label {
+  top: 0; left: 0; max-width: min(420px, 100%); padding: 8px 12px;
+  font: 700 15px/1.3 var(--font-data); color: #fff;
+  background: color-mix(in srgb, var(--alert) 30%, var(--surface-2));
+  border: 2px solid var(--alert); border-radius: 8px;
+}
+.rp-label[hidden] { display: none; }
+/* one floating thing at a time in the free region: the label steps aside for the SI panel and the popover */
+.tv-overlay:has(.si-panel:not([hidden])) .rp-label,
+.tv-overlay:has(.tv-pop:not([hidden])) .rp-label { display: none; }
+
+/* sea and no-data entries in the legend (and in the Source popover when the legend is compact) */
+.legend-extra { display: flex; align-items: center; gap: 6px; margin: 4px 0 0; font-size: 11px; color: var(--muted); }
+.sw-sea, .sw-hatch { flex: none; width: 14px; height: 10px; border-radius: 2px; border: 1px solid var(--line-strong); }
+.sw-sea { background: #0b2a40; }
+.sw-hatch { background: repeating-linear-gradient(45deg, #171a1f 0 2px, #383c44 2px 4px); }
+@container terrain (max-width: 899px) {
+  .terrain-legend .legend-extra { display: none; }
+}
+
+@container terrain (max-width: 639px) {
+  .rp-scrub { width: 72px; }
+  .tv-overlay .rp { gap: 4px; padding: 4px 6px; }
+  .rp-trap { padding: 0 6px; }
+}
