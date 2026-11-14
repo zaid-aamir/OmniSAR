@@ -1,0 +1,832 @@
+{
+ "case": "big-sur",
+ "generated": "2026-11-14T01:03Z",
+ "measured": [
+  {
+   "label": "Burned (NISAR HV fell ≥ 2 dB)",
+   "value": 40.4,
+   "unit": "km²",
+   "note": "Patches of 5 ha or more, 17 Jul vs 15 Sep. Radar-distorted slopes are counted separately below."
+  },
+  {
+   "label": "Burned on slopes ≥ 23°",
+   "value": 16.2,
+   "unit": "km²",
+   "note": "23° is the slope term of the USGS post-fire debris-flow likelihood model (Staley et al. 2016, 2017). Slope from Terrarium heights (~30 m)."
+  },
+  {
+   "label": "Burn on radar-distorted slopes (low confidence)",
+   "value": 3.4,
+   "unit": "km²",
+   "note": "Layover, shadow or steep slopes facing away from the satellite (17% of land). Trap 9: not counted above."
+  },
+  {
+   "label": "S01: burned steep area near Highway 1",
+   "value": "259 m",
+   "unit": "from the road",
+   "note": "10.0 ha, mean slope 31.8°, HV -4.2 dB, centre 35.8967 N, 121.4537 W"
+  },
+  {
+   "label": "S02: burned steep area near Highway 1",
+   "value": "931 m",
+   "unit": "from the road",
+   "note": "5.9 ha, mean slope 28.3°, HV -2.8 dB, centre 35.8991 N, 121.4481 W"
+  },
+  {
+   "label": "S03: burned steep area near Highway 1",
+   "value": "1.2 km",
+   "unit": "from the road",
+   "note": "8.9 ha, mean slope 30.6°, HV -2.7 dB, centre 35.9017 N, 121.4449 W"
+  },
+  {
+   "label": "Rain on the scar since 26 Aug",
+   "value": 27.6,
+   "unit": "mm",
+   "note": "1 day(s) with ≥ 10 mm, 26 Aug to 2026-11-10 (77 days with data). NASA POWER (MERRA-2), regional, not per slope. Measured rain, not a forecast."
+  },
+  {
+   "label": "Surface wetness (GWETTOP)",
+   "value": 0.3,
+   "unit": "(0 = dry, 1 = saturated)",
+   "note": "Latest day with data: 2026-11-10. NASA POWER (MERRA-2), regional, not per slope."
+  },
+  {
+   "label": "Passes compared",
+   "value": "1 before · 1 after",
+   "unit": "",
+   "note": "Single passes per side: the 3×3 filtering and 5 ha patch rule keep speckle out."
+  }
+ ],
+ "check": {
+  "label": "Independent check",
+  "text": "NIFC fire perimeters (Timber + Plaskett): 86% of our burned area lies inside them, and we detect 20% of the perimeter area (on land the radar sees without distortion). Timber: 0% detected, median HV change inside +0.1 dB (perimeter mapped 2026-10-09). Plaskett: 34% detected, median HV change inside -1.0 dB (perimeter mapped 2026-09-15). Where HV barely changed, our radar rule finds no canopy loss; the radar alone can't say why (for example a low-severity fire that left the canopy standing, or a fire that grew after our 15 Sep pass)."
+ },
+ "badge": "Moderate",
+ "badge_reason": "A = 86% of our burn inside the perimeters, B = 20% of the perimeters detected (rule: both ≥ 60% Strong, one Moderate)",
+ "sources": [
+  "NISAR_L2_PR_GCOV_025_135_A_020_4005_DHDH_A_20260717T131718_20260717T131753_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GCOV_030_135_A_020_4005_DHDH_A_20260915T131716_20260915T131750_P05023_N_F_J_001.h5"
+ ],
+ "custody_extra": [],
+ "method": {
+  "declared": "2026-11-14T04:50+04:00, before any Big Sur change map was computed",
+  "inputs": "NISAR L2 GCOV, track 135, ascending, frame 020, mode 4005 (10 m), finished files only",
+  "before": "2026-07-17 (NIFC discovery dates: Timber 9 Aug 2026, Plaskett 26 Aug 2026)",
+  "after": "2026-09-15; 2026-10-21 joins only if finished AND NASA POWER rain in the 7 days before it is < 5 mm (wet soil brightens HV and would hide burn); otherwise it is shown as an exhibit, not used",
+  "wet_rule_mm": 5.0,
+  "after_value": "per-pixel median in dB of the usable after passes",
+  "layers": [
+   "HHHH",
+   "HVHV",
+   "mask"
+  ],
+  "valid_pixel": "mask 1-254, HH > 0, HV > 0; land = AWS Terrarium height > 0 m (sea left out)",
+  "multilook": 3,
+  "speckle_filter": "3x3 block mean in linear power -> 30 m pixels; then the HV change (dB) is smoothed with a 3x3 moving mean that needs >= 5 of 9 valid pixels",
+  "burn_rule": "smoothed HV change (after - before) <= -2.0 dB",
+  "burn_db": -2.0,
+  "burn_reason": "about 6 sigma of the smoothed noise (~0.3 dB); L-band HV falls where canopy is lost (Tanase et al. 2010, IEEE TGRS 48(10))",
+  "min_patch_px": 56,
+  "min_patch": "8-connected patches of burn pixels >= 56 px (5.04 ha); patches found over all land, then split into unflagged (headline) and flagged (low confidence)",
+  "interference_check": "whole frame sampled on a 40x40 grid of 32x32-pixel windows; an after pass is flagged if |box median change - frame median change| >= 1.5 dB in HH or HV vs the before pass; a flagged after pass is not used",
+  "interference_limit_db": 1.5,
+  "geometry": "GCOV has no layover/shadow layer (shadowMaskingApplied = False). LOS unit vector + incidence angle from the file's radarGrid (0 m height layer, nearest cell); Terrarium heights on the 30 m grid; s = dh/du, u = horizontal direction toward the satellite. Layover if atan(-s) >= incidence; shadow if atan(s) >= 90 - incidence; steep facing away if atan(s) >= 20 deg. Flagged pixels are left out of the headline area and the check; their burn is reported separately as low confidence (trap 9)",
+  "facing_away_deg": 20.0,
+  "steep_deg": 23.0,
+  "steep_source": "USGS post-fire debris-flow likelihood model: 'proportion of upslope area classified as high or moderate soil burn severity and with gradients >= 23 deg' (USGS Landslide Hazards Program, Scientific Background; Staley et al. 2016, USGS OFR 2016-1106; Staley et al. 2017, Geomorphology 278:149-162)",
+  "slope_from": "AWS Terrarium zoom-12 heights (~31 m here) sampled at each 30 m pixel centre; central differences",
+  "check": "NIFC perimeters (Timber + Plaskett) rasterised on the 30 m grid (pixel centre inside), over valid unflagged land. A = % of our burn inside the perimeters; B = % of the perimeter area we detect",
+  "badge_rule": "Strong if A >= 60% and B >= 60%; Moderate if one of them is >= 60%; Weak otherwise",
+  "badge_limit": 0.6,
+  "highway": "OpenStreetMap via the Overpass API: highway ways whose ref is CA 1 / SR 1 inside the box; line densified to <= 15 m",
+  "steep_areas": "8-connected clusters of burned AND steep pixels >= 56 px (5 ha), ranked by the shortest distance from any of their pixels to Highway 1; top 3 reported",
+  "rain": "NASA POWER daily PRECTOTCORR (mm/day) and GWETTOP (0-1) at the box centre (36.075 N, 121.55 W), 1 Jul -> today; totals since 26 Aug. Labelled 'NASA POWER (MERRA-2), regional, not per slope' (trap 17). Measured rain only, never a forecast",
+  "power_label": "NASA POWER (MERRA-2), regional, not per slope"
+ },
+ "results": {
+  "burn_km2": 40.4,
+  "burn_steep_km2": 16.17,
+  "burn_low_confidence_km2": 3.44,
+  "burn_all_patches_km2": 43.84,
+  "candidate_pixels_km2_before_patch_rule": 49.44,
+  "check": {
+   "A_burn_inside_perimeters": 0.863,
+   "B_perimeter_detected": 0.2,
+   "per_fire": [
+    {
+     "fire": "Timber",
+     "discovered": "2026-08-09",
+     "perimeter_date": "2026-10-09",
+     "nifc_acres": 25350,
+     "perimeter_km2_usable": 71.6,
+     "detected_km2": 0.3,
+     "detected_share": 0.004,
+     "median_hv_change_db": 0.07,
+     "median_hv_before_db": -12.2
+    },
+    {
+     "fire": "Plaskett",
+     "discovered": "2026-08-26",
+     "perimeter_date": "2026-09-15",
+     "nifc_acres": 29993,
+     "perimeter_km2_usable": 102.6,
+     "detected_km2": 34.6,
+     "detected_share": 0.337,
+     "median_hv_change_db": -1.02,
+     "median_hv_before_db": -11.75
+    }
+   ]
+  },
+  "geometry": {
+   "flagged_share_of_land": 0.167,
+   "layover_px": 5094,
+   "shadow_px": 672,
+   "facing_away_px": 414933,
+   "incidence_deg": [
+    39.2,
+    43.0
+   ],
+   "los_east_north_median": [
+    0.633,
+    0.178
+   ]
+  },
+  "steep_areas_top3": [
+   {
+    "area_ha": 10.0,
+    "lat": 35.89665,
+    "lon": -121.45373,
+    "distance_to_hwy1_m": 259,
+    "mean_slope_deg": 31.8,
+    "mean_hv_change_db": -4.22,
+    "inside_perimeter_share": 1.0,
+    "id": "S01"
+   },
+   {
+    "area_ha": 5.9,
+    "lat": 35.89905,
+    "lon": -121.4481,
+    "distance_to_hwy1_m": 931,
+    "mean_slope_deg": 28.3,
+    "mean_hv_change_db": -2.75,
+    "inside_perimeter_share": 1.0,
+    "id": "S02"
+   },
+   {
+    "area_ha": 8.9,
+    "lat": 35.90168,
+    "lon": -121.44489,
+    "distance_to_hwy1_m": 1206,
+    "mean_slope_deg": 30.6,
+    "mean_hv_change_db": -2.74,
+    "inside_perimeter_share": 1.0,
+    "id": "S03"
+   }
+  ],
+  "steep_areas_count": 73,
+  "interference": [
+   {
+    "pass": "2026-09-15",
+    "compared_with": "2026-07-17",
+    "HH": {
+     "box_median_change_db": 0.34,
+     "frame_median_change_db": 0.41,
+     "anomaly_over_box": false
+    },
+    "HV": {
+     "box_median_change_db": -0.04,
+     "frame_median_change_db": 0.17,
+     "anomaly_over_box": false
+    },
+    "anomaly_over_box": false
+   }
+  ],
+  "excluded_passes": [],
+  "pass_medians": [
+   {
+    "date": "2026-07-17",
+    "hv_box_median_db": -13.49,
+    "hh_box_median_db": -8.33
+   },
+   {
+    "date": "2026-09-15",
+    "hv_box_median_db": -13.53,
+    "hh_box_median_db": -8.04
+   }
+  ],
+  "dark_not_burned": {
+   "dark_limit_db": -22.76,
+   "dark_outside_perimeters": 1.0,
+   "dark_not_darker_since_july": 0.988
+  },
+  "speckle": {
+   "raw_10m_spread_db": 2.35,
+   "filtered_spread_db": 0.32
+  },
+  "rain": {
+   "label": "NASA POWER (MERRA-2), regional, not per slope",
+   "since_26_aug_mm": 27.6,
+   "days_with_data": 77,
+   "days_ge_10mm": 1,
+   "rain_17jul_15sep_mm": 1.0,
+   "latest_gwettop": {
+    "date": "2026-11-10",
+    "precip_mm": 0.0,
+    "gwettop": 0.3
+   },
+   "series": [
+    {
+     "date": "2026-08-26",
+     "precip_mm": 0.0,
+     "gwettop": 0.12,
+     "cumulative_mm": 0.0
+    },
+    {
+     "date": "2026-08-27",
+     "precip_mm": 0.84,
+     "gwettop": 0.13,
+     "cumulative_mm": 0.8
+    },
+    {
+     "date": "2026-08-28",
+     "precip_mm": 0.14,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-08-29",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-08-30",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-08-31",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-01",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-02",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-03",
+     "precip_mm": 0.01,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-04",
+     "precip_mm": 0.01,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-05",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-06",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-07",
+     "precip_mm": 0.0,
+     "gwettop": 0.15,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-08",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-09",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-10",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-11",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-12",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-13",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-14",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-15",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-16",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-17",
+     "precip_mm": 0.0,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-18",
+     "precip_mm": 0.01,
+     "gwettop": 0.14,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-19",
+     "precip_mm": 0.03,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.0
+    },
+    {
+     "date": "2026-09-20",
+     "precip_mm": 0.02,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-21",
+     "precip_mm": 0.03,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-22",
+     "precip_mm": 0.02,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-23",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-24",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-25",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-26",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-27",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-28",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-29",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-09-30",
+     "precip_mm": 0.0,
+     "gwettop": 0.13,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-01",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-02",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-03",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-04",
+     "precip_mm": 0.0,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-05",
+     "precip_mm": 0.0,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-06",
+     "precip_mm": 0.0,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-07",
+     "precip_mm": 0.0,
+     "gwettop": 0.19,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-08",
+     "precip_mm": 0.0,
+     "gwettop": 0.19,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-09",
+     "precip_mm": 0.0,
+     "gwettop": 0.19,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-10",
+     "precip_mm": 0.01,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.1
+    },
+    {
+     "date": "2026-10-11",
+     "precip_mm": 0.1,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.2
+    },
+    {
+     "date": "2026-10-12",
+     "precip_mm": 0.07,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-13",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-14",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-15",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-16",
+     "precip_mm": 0.0,
+     "gwettop": 0.21,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-17",
+     "precip_mm": 0.0,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-18",
+     "precip_mm": 0.0,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-19",
+     "precip_mm": 0.0,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.3
+    },
+    {
+     "date": "2026-10-20",
+     "precip_mm": 0.32,
+     "gwettop": 0.2,
+     "cumulative_mm": 1.6
+    },
+    {
+     "date": "2026-10-21",
+     "precip_mm": 6.05,
+     "gwettop": 0.31,
+     "cumulative_mm": 7.7
+    },
+    {
+     "date": "2026-10-22",
+     "precip_mm": 14.69,
+     "gwettop": 0.49,
+     "cumulative_mm": 22.4
+    },
+    {
+     "date": "2026-10-23",
+     "precip_mm": 0.3,
+     "gwettop": 0.39,
+     "cumulative_mm": 22.7
+    },
+    {
+     "date": "2026-10-24",
+     "precip_mm": 0.0,
+     "gwettop": 0.36,
+     "cumulative_mm": 22.7
+    },
+    {
+     "date": "2026-10-25",
+     "precip_mm": 0.0,
+     "gwettop": 0.34,
+     "cumulative_mm": 22.7
+    },
+    {
+     "date": "2026-10-26",
+     "precip_mm": 0.02,
+     "gwettop": 0.33,
+     "cumulative_mm": 22.7
+    },
+    {
+     "date": "2026-10-27",
+     "precip_mm": 0.0,
+     "gwettop": 0.32,
+     "cumulative_mm": 22.7
+    },
+    {
+     "date": "2026-10-28",
+     "precip_mm": 0.02,
+     "gwettop": 0.31,
+     "cumulative_mm": 22.7
+    },
+    {
+     "date": "2026-10-29",
+     "precip_mm": 0.77,
+     "gwettop": 0.32,
+     "cumulative_mm": 23.5
+    },
+    {
+     "date": "2026-10-30",
+     "precip_mm": 0.85,
+     "gwettop": 0.35,
+     "cumulative_mm": 24.3
+    },
+    {
+     "date": "2026-10-31",
+     "precip_mm": 0.71,
+     "gwettop": 0.35,
+     "cumulative_mm": 25.0
+    },
+    {
+     "date": "2026-11-01",
+     "precip_mm": 1.81,
+     "gwettop": 0.38,
+     "cumulative_mm": 26.8
+    },
+    {
+     "date": "2026-11-02",
+     "precip_mm": 0.0,
+     "gwettop": 0.36,
+     "cumulative_mm": 26.8
+    },
+    {
+     "date": "2026-11-03",
+     "precip_mm": 0.75,
+     "gwettop": 0.36,
+     "cumulative_mm": 27.6
+    },
+    {
+     "date": "2026-11-04",
+     "precip_mm": 0.02,
+     "gwettop": 0.36,
+     "cumulative_mm": 27.6
+    },
+    {
+     "date": "2026-11-05",
+     "precip_mm": 0.02,
+     "gwettop": 0.34,
+     "cumulative_mm": 27.6
+    },
+    {
+     "date": "2026-11-06",
+     "precip_mm": 0.0,
+     "gwettop": 0.33,
+     "cumulative_mm": 27.6
+    },
+    {
+     "date": "2026-11-07",
+     "precip_mm": 0.0,
+     "gwettop": 0.32,
+     "cumulative_mm": 27.6
+    },
+    {
+     "date": "2026-11-08",
+     "precip_mm": 0.03,
+     "gwettop": 0.31,
+     "cumulative_mm": 27.7
+    },
+    {
+     "date": "2026-11-09",
+     "precip_mm": 0.0,
+     "gwettop": 0.3,
+     "cumulative_mm": 27.7
+    },
+    {
+     "date": "2026-11-10",
+     "precip_mm": 0.0,
+     "gwettop": 0.3,
+     "cumulative_mm": 27.7
+    },
+    {
+     "date": "2026-11-11",
+     "precip_mm": null,
+     "gwettop": null,
+     "cumulative_mm": 27.7
+    },
+    {
+     "date": "2026-11-12",
+     "precip_mm": null,
+     "gwettop": null,
+     "cumulative_mm": 27.7
+    },
+    {
+     "date": "2026-11-13",
+     "precip_mm": null,
+     "gwettop": null,
+     "cumulative_mm": 27.7
+    },
+    {
+     "date": "2026-11-14",
+     "precip_mm": null,
+     "gwettop": null,
+     "cumulative_mm": 27.7
+    }
+   ]
+  },
+  "highway": {
+   "query": "[out:json][timeout:90];way[\"highway\"][\"ref\"~\"(^|;) *(CA|SR) *1 *(;|$)\"](35.8,-121.85,36.35,-121.25);out geom;",
+   "cache": "research\\cache\\osm_highway1_bigsur.json",
+   "from_cache": true,
+   "osm_timestamp": "2026-11-14T00:56:51Z",
+   "ways": 68
+  },
+  "cband_picture": {
+   "date": "2026-09-12",
+   "url": "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?SERVICE=WMS&REQUEST=GetMap&VERSION=1.3.0&LAYERS=OPERA_L2_Radiometric_Terrain_Corrected_SAR_Sentinel-1&CRS=EPSG%3A4326&BBOX=35.79303063598231%2C-121.8577979376152%2C36.35713207281462%2C-121.23803705792893&WIDTH=620&HEIGHT=698&FORMAT=image%2Fpng&TIME=2026-09-12",
+   "note": "picture tile for comparison only (trap 13)"
+  }
+ },
+ "files": {
+  "overlay": "assets/cases/big-sur/burn_overlay.png",
+  "overlay_corners_latlon": {
+   "nw": [
+    36.357132,
+    -121.849716
+   ],
+   "ne": [
+    36.349677,
+    -121.238037
+   ],
+   "sw": [
+    35.800336,
+    -121.857798
+   ],
+   "se": [
+    35.793031,
+    -121.250412
+   ]
+  },
+  "grid": "assets/cases/big-sur/grid.json"
+ },
+ "provenance": {
+  "nasa_files": [
+   {
+    "file": "NISAR_L2_PR_GCOV_025_135_A_020_4005_DHDH_A_20260717T131718_20260717T131753_P05023_N_F_J_001.h5",
+    "date": "2026-07-17",
+    "start": "2026-07-17T13:17:18.000000000",
+    "direction": "Ascending",
+    "track": 135,
+    "frame": 20,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   },
+   {
+    "file": "NISAR_L2_PR_GCOV_030_135_A_020_4005_DHDH_A_20260915T131716_20260915T131750_P05023_N_F_J_001.h5",
+    "date": "2026-09-15",
+    "start": "2026-09-15T13:17:16.000000000",
+    "direction": "Ascending",
+    "track": 135,
+    "frame": 20,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   }
+  ],
+  "collection": "NISAR L2 GCOV (ASF DAAC)",
+  "layers": [
+   "/science/LSAR/GCOV/grids/frequencyA/HHHH",
+   "/science/LSAR/GCOV/grids/frequencyA/HVHV",
+   "/science/LSAR/GCOV/grids/frequencyA/mask",
+   "/science/LSAR/GCOV/metadata/radarGrid/{losUnitVectorX,losUnitVectorY,incidenceAngle}"
+  ],
+  "box_lonlat": [
+   -121.85,
+   35.8,
+   -121.25,
+   36.35
+  ],
+  "box_rows_cols": [
+   20365,
+   26546,
+   17191,
+   22685
+  ],
+  "projection_epsg": 32610,
+  "pixel_m_after_filter": 30.0,
+  "number_of_looks_native": 4.786715984344482,
+  "other_sources": {
+   "perimeters": "research/bigsur_fire_perimeters_NIFC.geojson (NIFC WFIGS interagency perimeters: Timber, Plaskett)",
+   "heights": "AWS Terrarium elevation tiles, zoom 12 (s3.amazonaws.com/elevation-tiles-prod)",
+   "highway": "OpenStreetMap contributors, Overpass API (ODbL); query in results.highway.query; OSM data as of 2026-11-14T00:56:51Z",
+   "rain": "NASA POWER daily API, https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR,GWETTOP&community=AG&longitude=-121.55&latitude=36.075&start=20260701&end=20261114&format=JSON"
+  },
+  "steps": [
+   "read only the box rows/columns, in strips",
+   "mask invalid pixels",
+   "3x3 multilook (linear power)",
+   "dB",
+   "interference check (whole-frame sample)",
+   "HV change after - before",
+   "3x3 moving mean",
+   "Terrarium heights -> slope, land mask",
+   "radar geometry from the file's LOS vector -> layover / shadow / facing-away flags",
+   "burn = HV change <= -2 dB, patches >= 5 ha",
+   "NIFC perimeter check -> badge",
+   "Highway 1 distance ranking",
+   "NASA POWER rain since the fire"
+  ],
+  "script": "tools/process_big_sur.py",
+  "script_version": "1.1",
+  "script_sha256": "c8978b7bfd17c9272c6e41898baca0efa5e648777235136fdede49b0c4924d48",
+  "helpers_sha256": "d71853edabb0fb095ed99c2470163d6f05bd3687c088343e553c6e298e2c51c6"
+ }
+}

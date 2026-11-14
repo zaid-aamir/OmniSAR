@@ -1,0 +1,556 @@
+{
+  "id": "big-sur",
+  "format": 1,
+  "about": "Mystery file for Big Sur. All text is pre-written; every choice has its own reply. Evidence images, caption numbers and correct answers are filled in by tools/process_big_sur.py from our analysis. src null = 'Evidence pending'.",
+  "numbersFile": "cases/big-sur.numbers.json",
+  "tip": {
+    "title": "Two fires above a coast road",
+    "text": [
+      "In August 2026 two wildfires burned the steep Santa Lucia Mountains above Highway 1 in Big Sur, California: the Timber fire from 9 August and the Plaskett fire from 26 August.",
+      "NISAR imaged the area on 17 July, before both fires, and again on 15 September. Its L-band radar sees through smoke and cloud.",
+      "Your question: which burned slopes above Highway 1 lost their cover, and has rain started to fall on them? Steep mountains will try to fool the radar."
+    ]
+  },
+  "steps": [
+    {
+      "type": "tip"
+    },
+    {
+      "type": "choice",
+      "choice": "channel"
+    },
+    {
+      "type": "choice",
+      "choice": "band"
+    },
+    {
+      "type": "choice",
+      "choice": "slopes"
+    },
+    {
+      "type": "choice",
+      "choice": "noisy"
+    },
+    {
+      "type": "evidence",
+      "title": "The evidence so far",
+      "text": "Each card comes from our own processing of the NISAR files, the fire perimeters, elevation data or NASA rain data. Sort them: real change, or a trap?"
+    },
+    {
+      "type": "toggles",
+      "title": "Interrogate the evidence",
+      "text": "Each switch changes how the radar evidence is processed, so you can see which 'burns' survive."
+    },
+    {
+      "type": "graph",
+      "title": "Cause and effect",
+      "text": "Fill in the hidden links. Each link is something we measured, or something a published source says."
+    },
+    {
+      "type": "choice",
+      "choice": "what-can-we-say"
+    },
+    {
+      "type": "verdict"
+    },
+    {
+      "type": "lesson"
+    }
+  ],
+  "choices": {
+    "channel": {
+      "prompt": "Fire burns away leaves and branches. Which radar echo should show where the plant cover was lost?",
+      "options": [
+        {
+          "text": "HH (the direct echo) should get brighter.",
+          "correct": false,
+          "reply": "HH mostly comes from the ground and from corners such as walls. Burning removes canopy, which is what HV is sensitive to. HH can rise or fall after a fire depending on the ground underneath, so it's a poor burn detector on its own."
+        },
+        {
+          "text": "HV (the cross-polarised 'canopy' echo) should fall.",
+          "correct": true,
+          "reply": "Right. HV appears when the beam bounces around inside a jumble of branches and twigs and comes back twisted. Burn the canopy and there is less to bounce around in, so HV drops. That is the rule we use: HV fell by 2 dB or more."
+        },
+        {
+          "text": "Just look for the darkest areas after the fire.",
+          "correct": false,
+          "trap": 11,
+          "reply": "Dark has more than one cause. Bare rock, smooth grassland and calm water all look dark without any fire. Only a CHANGE from before to after shows a burn."
+        }
+      ]
+    },
+    "band": {
+      "prompt": "Why use NISAR's L-band radar here instead of a C-band radar like Sentinel-1?",
+      "options": [
+        {
+          "text": "L-band's 24 cm waves go through the leaves and bounce off branches and trunks, so HV tracks the woody canopy that fire destroys. C-band's 5.6 cm waves mostly bounce off the top leaves.",
+          "correct": true,
+          "reply": "Exactly. Longer waves reach deeper into vegetation, so L-band notices when the branches themselves are gone, not just the outer leaves."
+        },
+        {
+          "text": "C-band radar can't see through smoke.",
+          "correct": false,
+          "reply": "Both radars see through smoke and cloud: their waves are far longer than smoke particles. The difference is how deep each wavelength reaches into the vegetation."
+        },
+        {
+          "text": "L-band images are always sharper.",
+          "correct": false,
+          "reply": "Sharpness depends on how the radar and the processing are designed, not on the band. The real difference is penetration: long L-band waves reach the branches, short C-band waves stop near the top of the canopy."
+        }
+      ]
+    },
+    "slopes": {
+      "prompt": "Some steep slopes show big brightness changes. Before calling them burned, what should you check?",
+      "options": [
+        {
+          "text": "Nothing: steep ground just burns more.",
+          "correct": false,
+          "trap": 9,
+          "reply": "Steep slopes fool radar. The satellite looks at the mountains from one side (from the east here). Slopes facing away from it get little energy or fall into radar shadow; slopes facing it get squashed together (layover). Brightness there depends on geometry, so a change can be fake."
+        },
+        {
+          "text": "Whether the slope faces away from the satellite, sits in radar shadow, or is squashed by layover. Those changes are set apart as low confidence.",
+          "correct": true,
+          "reply": "Right. We work out each pixel's slope direction from elevation data and the satellite's look direction stored in the NISAR file. Distorted slopes are kept out of the headline number and reported separately."
+        },
+        {
+          "text": "Only count slopes that face the ocean.",
+          "correct": false,
+          "reply": "Facing the ocean isn't the point; what matters is facing the satellite. NISAR looks from the east on this pass, so the problem slopes are the ones facing west, away from it, plus any too steep for the viewing angle."
+        }
+      ]
+    },
+    "noisy": {
+      "prompt": "One 10 m pixel's HV dropped by 5 dB between the two passes. Is that a burned spot?",
+      "options": [
+        {
+          "text": "Yes: a 5 dB drop is a big change.",
+          "correct": false,
+          "trap": 10,
+          "reply": "Single radar pixels jump around from pass to pass even when nothing changed: that graininess is called speckle. One pixel from one pass proves nothing."
+        },
+        {
+          "text": "Not from one pixel. Average blocks of pixels first, then only trust patches of several hectares.",
+          "correct": true,
+          "reply": "Right. We average 3×3 pixels into 30 m cells, smooth the change, and only keep burned patches of 5 hectares or more. Noise stays scattered; a real burn forms a large patch."
+        }
+      ]
+    },
+    "what-can-we-say": {
+      "prompt": "Some burned steep slopes sit right above Highway 1, and rain has started to fall since the fire. What can you say?",
+      "options": [
+        {
+          "text": "A debris flow will hit Highway 1 this winter.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "That's a forecast. Debris flows depend on how hard the rain falls over minutes, on soil and burn severity on each slope, and more. Our radar shows where the canopy was lost, not what will happen. Official warnings come from agencies such as the USGS and the National Weather Service."
+        },
+        {
+          "text": "This fire was started deliberately.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "Radar can't see how a fire started or who started it. It only measures how the ground scatters microwaves before and after."
+        },
+        {
+          "text": "These burned steep slopes near the road lost their canopy and have now had rain, so they rank high for a closer look. That's a screening level, not a forecast.",
+          "correct": true,
+          "reply": "That is exactly as far as the evidence goes. Burned ground on steep slopes is what post-fire debris-flow models start from (USGS uses slopes of 23° and steeper). We rank where to look first; we don't predict an event."
+        }
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "id": "hv-drop",
+      "title": "HV fell inside the fire area",
+      "kind": "image",
+      "src": "assets/cases/big-sur/ev-hv-drop.png",
+      "caption": "NISAR HV (the canopy echo) fell by 2 dB or more over 40 km² between 17 Jul and 15 Sep. 86% of that lies inside the official fire perimeters.",
+      "source": "NISAR GCOV, track 135 ascending",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    },
+    {
+      "id": "geometry",
+      "title": "Big changes on some steep slopes",
+      "kind": "image",
+      "src": "assets/cases/big-sur/ev-geometry.png",
+      "caption": "On 17% of the land the radar's view is distorted: slopes facing away from the satellite, radar shadow or layover. Brightness changes there can be geometry, not fire, so we set them apart (3.4 km² of 'burn').",
+      "source": "NISAR GCOV look geometry + AWS Terrarium heights",
+      "bin": "trap",
+      "trap": 9,
+      "pending": false
+    },
+    {
+      "id": "dark",
+      "title": "Dark ground after the fire",
+      "kind": "image",
+      "src": "assets/cases/big-sur/ev-dark.png",
+      "caption": "The darkest tenth of land in HV after the fire (≤ -23 dB): 100% of it is outside the fire perimeters, and 99% did not get darker since July. Dark ground is often just smooth or bare, not burned; only the change counts. Both dates were dry (1.0 mm of rain between them, NASA POWER), so wet soil didn't change the brightness either.",
+      "source": "NISAR GCOV, track 135 ascending",
+      "bin": "trap",
+      "trap": 11,
+      "pending": false
+    },
+    {
+      "id": "speckle",
+      "title": "Single pixels that 'changed' a lot",
+      "kind": "image",
+      "src": "assets/cases/big-sur/ev-speckle.png",
+      "caption": "Outside the fire, single 10 m pixels from one pass each 'change' with a spread of 2.3 dB, enough to fake a burn. Filtered to 30 m and smoothed, the spread drops to 0.3 dB.",
+      "source": "NISAR GCOV, track 135 ascending",
+      "bin": "trap",
+      "trap": 10,
+      "pending": false
+    },
+    {
+      "id": "steep-hwy",
+      "title": "Burned steep slopes near Highway 1",
+      "kind": "image",
+      "src": "assets/cases/big-sur/ev-steep-hwy.png",
+      "caption": "16 km² of the burn is on slopes of 23° or more. Nearest to Highway 1: S01 259 m away (10.0 ha); S02 931 m away (5.9 ha); S03 1206 m away (8.9 ha).",
+      "source": "NISAR GCOV + AWS Terrarium + OpenStreetMap",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    },
+    {
+      "id": "rain",
+      "title": "Rain since the fire",
+      "kind": "image",
+      "src": "assets/cases/big-sur/ev-rain.png",
+      "caption": "27.6 mm of rain has fallen at the box centre since Plaskett started on 26 Aug (NASA POWER, regional, not per slope). Measured rain only, not a forecast.",
+      "source": "NASA POWER (MERRA-2), regional",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    }
+  ],
+  "toggles": [
+    {
+      "id": "channel",
+      "label": "HH change ↔ HV change",
+      "trap": 4,
+      "explains": "The fire scars stand out in HV, the canopy echo. HH reacts much less, because it mostly comes from the ground.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/big-sur/tg-hh.png",
+          "label": "HH change"
+        },
+        "on": {
+          "src": "assets/cases/big-sur/tg-hv.png",
+          "label": "HV change"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "speckle",
+      "label": "Raw 10 m pixels ↔ Filtered and smoothed",
+      "trap": 10,
+      "explains": "Raw pixels from one pass each are grainy (speckle). Averaging and smoothing removes the grain; a real burn survives as a patch.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/big-sur/tg-raw.png",
+          "label": "Raw 10 m pixels"
+        },
+        "on": {
+          "src": "assets/cases/big-sur/tg-filtered.png",
+          "label": "Filtered + smoothed"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "geometry",
+      "label": "Distorted slopes counted ↔ set apart",
+      "trap": 9,
+      "explains": "Slopes facing away from the satellite, in radar shadow or squashed by layover can change brightness just from geometry. Setting them apart keeps them out of the headline number.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/big-sur/tg-geom-off.png",
+          "label": "All burn patches"
+        },
+        "on": {
+          "src": "assets/cases/big-sur/tg-geom-on.png",
+          "label": "Distorted slopes set apart"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "band",
+      "label": "L-band (NISAR) ↔ C-band (Sentinel-1)",
+      "trap": 13,
+      "explains": "Longer L-band waves reach the branches; shorter C-band waves mostly bounce off the top leaves. The C-band image is a NASA picture tile (trap 13), shown for comparison only.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/big-sur/tg-lband.png",
+          "label": "L-band NISAR"
+        },
+        "on": {
+          "src": "assets/cases/big-sur/tg-cband.png",
+          "label": "C-band Sentinel-1 (2026-09-12)"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "direction",
+      "label": "One direction ↔ Mixed directions",
+      "trap": 7,
+      "explains": "Mixing ascending and descending passes makes slopes look changed when only the viewing side changed.",
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Big Sur: we only analyse ascending track 135. Comparing passes from opposite directions is trap 7, and in steep mountains it is especially misleading."
+    },
+    {
+      "id": "coherence",
+      "label": "Coherence mask off ↔ on",
+      "trap": 15,
+      "explains": "Coherence shows where the radar signal stayed stable between two passes.",
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Big Sur: we have no NISAR interferograms of this box, only radar images (GCOV)."
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "fire",
+        "label": "Wildfires burn the slopes",
+        "detail": "The Timber fire (from 9 Aug 2026) and the Plaskett fire (from 26 Aug 2026). Their official mapped perimeters are our independent check. Radar can't tell how a fire started.",
+        "source": "Published sources",
+        "basis": "published",
+        "citation": [
+          {
+            "outlet": "NIFC (US National Interagency Fire Center) Open Data",
+            "date": "2026",
+            "title": "WFIGS Interagency Fire Perimeters: Timber and Plaskett",
+            "url": "https://data-nifc.opendata.arcgis.com/"
+          }
+        ],
+        "hidden": false,
+        "opens": {
+          "layer": "assets/cases/big-sur/ev-check.png",
+          "chart": null,
+          "badge": "NIFC fire perimeters",
+          "check": true
+        }
+      },
+      {
+        "id": "canopy",
+        "label": "Canopy lost: HV falls",
+        "detail": "Measured by comparing NISAR HV (the canopy echo) on 17 July with after the fires: HV fell by 2 dB or more over the burned area.",
+        "source": "NISAR L-band GCOV, HV",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "What happens to NISAR's HV echo where fire burns away the canopy?",
+        "options": [
+          {
+            "text": "HV falls",
+            "correct": true,
+            "reply": "Yes. HV comes from the beam bouncing around inside branches. Fewer branches, less HV."
+          },
+          {
+            "text": "HV rises",
+            "correct": false,
+            "reply": "HV rises when vegetation grows or the ground gets wet. A fire removes the canopy that makes HV."
+          },
+          {
+            "text": "HV stays the same",
+            "correct": false,
+            "reply": "Losing most of the branches changes how the beam scatters, so HV can't stay the same."
+          }
+        ],
+        "opens": {
+          "layer": "assets/cases/big-sur/ev-hv-drop.png",
+          "chart": {
+            "title": "Median HV brightness of the land in the box, per pass",
+            "path": "results.pass_medians",
+            "x": "date",
+            "y": "hv_box_median_db",
+            "label": "Box median HV",
+            "unit": "dB"
+          },
+          "badge": "numbers"
+        }
+      },
+      {
+        "id": "steep",
+        "label": "Bare steep slopes",
+        "detail": "Measured from AWS Terrarium elevation: burned ground on slopes of 23° or more. 23° is the slope term the USGS post-fire debris-flow likelihood model uses.",
+        "source": "AWS Terrarium elevation + NISAR burn map",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "Why does it matter that some of the burned ground is steep?",
+        "options": [
+          {
+            "text": "Without plants and roots, loose soil on steep slopes is easier for heavy rain to wash downhill",
+            "correct": true,
+            "reply": "Right. That's why post-fire models look at burned steep ground. It raises the screening level; it doesn't predict an event."
+          },
+          {
+            "text": "Steep slopes burn hotter, so radar sees them better",
+            "correct": false,
+            "reply": "Radar actually sees steep slopes worse (trap 9). Steepness matters for what water and soil do after the fire."
+          },
+          {
+            "text": "It doesn't matter",
+            "correct": false,
+            "reply": "It does: the same burn on flat ground and on a steep slope above a road are very different places to keep an eye on."
+          }
+        ],
+        "opens": {
+          "layer": "assets/cases/big-sur/ev-steep-hwy.png",
+          "chart": null,
+          "badge": "AWS Terrarium"
+        }
+      },
+      {
+        "id": "rain",
+        "label": "Rain falls on the scar",
+        "detail": "Measured daily rain at the box centre since Plaskett started (26 Aug). NASA POWER (MERRA-2), regional, not per slope.",
+        "source": "NASA POWER (MERRA-2), regional, not per slope",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "What does NASA POWER rain data tell us about one particular slope?",
+        "options": [
+          {
+            "text": "Only roughly: it's a regional value about 50 km across, not the rain on each slope",
+            "correct": true,
+            "reply": "Exactly (trap 17). It tells us the region got wet, not how hard it rained on one hillside in a given minute."
+          },
+          {
+            "text": "Exactly how much rain fell on each slope",
+            "correct": false,
+            "reply": "POWER's grid cells are tens of kilometres wide, far bigger than one slope. Treat it as regional."
+          },
+          {
+            "text": "When the next storm will come",
+            "correct": false,
+            "reply": "We only use measured past rain. Nothing here is a forecast."
+          }
+        ],
+        "opens": {
+          "layer": "assets/cases/big-sur/ev-rain.png",
+          "chart": {
+            "title": "Rain since 26 Aug (cumulative), NASA POWER, regional",
+            "path": "results.rain.series",
+            "x": "date",
+            "y": "cumulative_mm",
+            "label": "Cumulative rain",
+            "unit": "mm",
+            "zero": true
+          },
+          "badge": "NASA POWER, regional"
+        }
+      },
+      {
+        "id": "wetness",
+        "label": "The region's topsoil gets wetter",
+        "detail": "NASA POWER surface soil wetness (GWETTOP, 0 = dry, 1 = saturated) at the box centre. Region only, not per slope.",
+        "source": "NASA POWER (MERRA-2), regional, not per slope",
+        "basis": "measured",
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": {
+            "title": "Surface soil wetness since 26 Aug, NASA POWER, regional",
+            "path": "results.rain.series",
+            "x": "date",
+            "y": "gwettop",
+            "label": "GWETTOP",
+            "unit": "0-1"
+          },
+          "badge": "NASA POWER, regional"
+        }
+      },
+      {
+        "id": "screening",
+        "label": "Higher screening level",
+        "detail": "Burned, steep, rained-on slopes close to a road rank higher for a closer look. This is a screening level for where to look first, not an alert or a forecast. Official post-fire hazard assessments come from the USGS.",
+        "source": "Published sources",
+        "basis": "published",
+        "citation": [
+          {
+            "outlet": "USGS Landslide Hazards Program",
+            "date": "2018",
+            "title": "Scientific Background: post-fire debris-flow likelihood model (slopes ≥ 23°)",
+            "url": "https://www.usgs.gov/programs/landslide-hazards/science/scientific-background"
+          },
+          {
+            "outlet": "Staley et al., USGS Open-File Report 2016-1106",
+            "date": "2016",
+            "title": "Updated logistic regression equations for the calculation of post-fire debris-flow likelihood in the western United States",
+            "url": "https://pubs.usgs.gov/publication/ofr20161106"
+          },
+          {
+            "outlet": "Staley et al., Geomorphology 278:149–162",
+            "date": "2017",
+            "title": "Prediction of spatially explicit rainfall intensity–duration thresholds for post-fire debris-flow generation in the western United States",
+            "url": "https://pubs.usgs.gov/publication/70188478"
+          }
+        ],
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": "Screening, not a forecast"
+        }
+      }
+    ],
+    "edges": [
+      [
+        "fire",
+        "canopy"
+      ],
+      [
+        "canopy",
+        "steep"
+      ],
+      [
+        "steep",
+        "rain"
+      ],
+      [
+        "rain",
+        "wetness"
+      ],
+      [
+        "wetness",
+        "screening"
+      ]
+    ]
+  },
+  "verdict": {
+    "pending": "Evidence pending — this case's measurements are being processed.",
+    "cantProve": [
+      "How or why the fires started, or who started them.",
+      "Whether or when a debris flow or landslide will happen: that needs rain intensity, soils and official models.",
+      "How much rain fell on any single slope: NASA POWER is regional."
+    ]
+  },
+  "lesson": {
+    "title": "What this case teaches about radar",
+    "points": [
+      {
+        "head": "HV and canopy",
+        "text": "HV is the 'twisted' echo: the beam goes out horizontal and comes back vertical after bouncing around inside branches and leaves. Lots of canopy, lots of HV. When fire removes the canopy, HV falls. That drop is how NISAR maps a burn scar through smoke, cloud and night."
+      },
+      {
+        "head": "L-band vs C-band",
+        "text": "NISAR's L-band waves are 24 cm long; Sentinel-1's C-band waves are 5.6 cm. Long waves slip past leaves and bounce off branches and trunks, so L-band responds to the woody structure that a fire destroys. Short C-band waves mostly bounce off the outer leaves."
+      },
+      {
+        "head": "Mountains bend the picture",
+        "text": "Radar looks sideways. Slopes facing away from the satellite get little energy or fall into shadow; slopes facing it get squashed (layover). We work out where that happens from elevation data and the look direction stored in the NISAR file, and don't trust changes there."
+      }
+    ]
+  }
+}
