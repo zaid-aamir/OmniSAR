@@ -14,7 +14,7 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
-import { esc, setShown } from './util.js';
+import { esc, setShown, reducedMotion } from './util.js';
 import { colourFor, legendGradient } from './datacolours.js';
 
 const GAP = 0.88;            // block width as a share of its cell (the gap reads as a thin dark edge)
@@ -92,7 +92,7 @@ export function createCaseTerrain(container) {
   controls.screenSpacePanning = false;
 
   let grid = null, mesh = null, layerIndex = 0, cells = [], exaggeration = 1, onGlobe = null, running = false;
-  let sliderDate = null, onLayerDate = null;
+  let sliderDate = null, onLayerDate = null, isOpenNow = false;
   const colour = new THREE.Color();
 
   function resize() {
@@ -258,14 +258,16 @@ export function createCaseTerrain(container) {
     // Show a case's terrain. Returns false if the case has no grid yet (globe stays).
     async open(caseInfo, gridPath, { onBackToGlobe, onLayerDate: onDate, date } = {}) {
       if (!gridPath) return false;
-      view.hidden = false;                                   // show the view at once, with a loading line
+      isOpenNow = true;
+      setShown(view, true);                                  // cross-fade in at once, with a loading line
       $('tv-case').textContent = `${caseInfo.name} · case terrain`;
       $('tv-layer').innerHTML = '<span class="loading-text">Loading case terrain</span>';
       try {
         grid = await fetch(gridPath).then((r) => r.json());
       } catch (err) {
         console.error(err);
-        view.hidden = true;
+        isOpenNow = false;
+        setShown(view, false);
         return false;
       }
       layerIndex = Math.max(0, grid.layers.findIndex((l) => l.id === grid.default_layer));
@@ -273,7 +275,6 @@ export function createCaseTerrain(container) {
       onLayerDate = onDate;
       sliderDate = date || null;
       $('tv-case').textContent = `${caseInfo.name} · case terrain`;
-      view.hidden = false;
       running = true;
       resize();
       build();
@@ -284,11 +285,14 @@ export function createCaseTerrain(container) {
       return true;
     },
     close() {
-      view.hidden = true;
-      running = false;
+      if (!isOpenNow) return;
+      isOpenNow = false;
+      // cross-fade out over the globe, which is already drawing again underneath
+      setShown(view, false);
+      setTimeout(() => { if (!isOpenNow) running = false; }, reducedMotion() ? 0 : 260);
       $('tv-tip').hidden = true;
     },
-    get isOpen() { return !view.hidden; },
+    get isOpen() { return isOpenNow; },
     showDate,
     // the dates of the single-pass layers (for the timeline's "processed pass" ticks)
     get layerDates() { return grid ? [...new Set(grid.layers.filter(isDated).map((l) => l.date))].sort() : []; },

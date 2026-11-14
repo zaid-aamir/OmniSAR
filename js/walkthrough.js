@@ -10,6 +10,7 @@ import { mountMinigame } from './minigame.js';
 import { mountGraph } from './graph.js';
 import { openCustody } from './custody.js';
 import { recordCase } from './progress.js';
+import { countUpAll, stamp } from './motion.js';
 
 // Why "Next" is still disabled on a step (shown next to the button)
 const WAIT_REASON = {
@@ -118,6 +119,8 @@ export function runWalkthrough(root, mystery, { onExit }) {
     else if (focus === 'title') root.querySelector('.wt-title')?.focus({ preventScroll: true });
     else restoreFocus(root, key, '.wt-title');
     if (step.type === 'verdict' && focus === 'title') {
+      // the real numbers count up to their value, then the evidence badge stamps in
+      countUpAll(root, { then: () => stamp(root.querySelector('.badge-line .tag')) });
       const n = m.numbers;
       announce(n ? `Verdict for ${m.info.name}. Evidence: ${n.badge || 'no badge'}.` : `Verdict for ${m.info.name}: evidence pending.`);
     }
@@ -212,7 +215,9 @@ export function runWalkthrough(root, mystery, { onExit }) {
     const n = mystery.numbers;
     const body = n ? `
       <dl class="facts">
-        ${n.measured.map((x) => `<div><dt>${esc(x.label)}</dt><dd><strong>${esc(x.value)}</strong> ${esc(x.unit || '')}${x.note ? `<br><span class="evidence-caption">${esc(x.note)}</span>` : ''}</dd></div>`).join('')}
+        ${n.measured.map((x) => `<div><dt>${esc(x.label)}</dt><dd><strong>${typeof x.value === 'number'
+          ? `<span class="sr-only">${esc(x.value)}</span><span data-count="${esc(x.value)}" aria-hidden="true">${esc(x.value)}</span>`
+          : esc(x.value)}</strong> ${esc(x.unit || '')}${x.note ? `<br><span class="evidence-caption">${esc(x.note)}</span>` : ''}</dd></div>`).join('')}
         ${n.check ? `<div><dt>${esc(n.check.label)}</dt><dd>${esc(n.check.text)}</dd></div>` : ''}
       </dl>
       ${n.badge ? `<p class="badge-line"><span class="tag tag-nisar">Evidence: ${esc(n.badge)}</span> <span class="evidence-caption">${esc(n.badge_reason || '')}</span></p>` : ''}

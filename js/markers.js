@@ -18,6 +18,9 @@ const PULSE_MS = 1400;
 const HIT_PX = 22;            // how close (in screen pixels) the pointer must be to hover a beacon
 const TIP_WIDTH = 0.005;
 const TIP_HEIGHT = 0.06;
+const PING_MS = 2400;         // soft radar ping: one ring every PING_EVERY ms, growing and fading
+const PING_EVERY = 4200;
+const reduceMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 function cssColour(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -42,6 +45,7 @@ export function createMarkers(globe, cases, { onSelect, onTip }) {
   globe.scene.add(group);
 
   const box = new THREE.BoxGeometry(1, 1, 1);
+  const pingGeometry = new THREE.RingGeometry(0.86, 1, 48).rotateX(-Math.PI / 2);   // flat, in the beacon's ground plane
   const beacons = cases.map((c) => {
     const [lat, lon] = c.centre;
     const colour = c.status === 'measured' ? measured : pending;
@@ -64,9 +68,16 @@ export function createMarkers(globe, cases, { onSelect, onTip }) {
     ring.visible = false;
     const ringBase = orientedMatrix(lat, lon, new THREE.Vector3(1, 1, 1), 0.006);
 
-    group.add(column, foot, ring);
+    // the idle radar ping: a thin, faint ring that grows from the beacon's foot and fades (decoration only)
+    const ping = new THREE.Mesh(pingGeometry, new THREE.MeshBasicMaterial({
+      color: colour, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide,
+    }));
+    ping.matrixAutoUpdate = false;
+    ping.visible = false;
+
+    group.add(column, foot, ring, ping);
     return {
-      id: c.id, name: c.name, column, ring, ringBase, pulseStart: -1,
+      id: c.id, name: c.name, column, ring, ringBase, pulseStart: -1, ping,
       top: latLonToVector(lat, lon, 1.002 + COLUMN_HEIGHT),
       normal: latLonToVector(lat, lon),
     };
@@ -94,6 +105,16 @@ export function createMarkers(globe, cases, { onSelect, onTip }) {
   const ringScale = new THREE.Matrix4();
   globe.onFrame(() => {
     const now = performance.now();
+    const still = reduceMotion();
+    beacons.forEach((b, k) => {
+      const t = ((now + k * 830) % PING_EVERY) / PING_MS;   // staggered, so the beacons don't ping together
+      b.ping.visible = !still && t < 1;
+      if (!b.ping.visible) return;
+      const s = 0.01 + 0.032 * t;
+      ringScale.makeScale(s, 1, s);
+      b.ping.matrix.multiplyMatrices(b.ringBase, ringScale);
+      b.ping.material.opacity = 0.42 * Math.pow(1 - t, 1.6);
+    });
     for (const b of beacons) {
       if (b.pulseStart < 0) continue;
       const t = (now - b.pulseStart) / PULSE_MS;

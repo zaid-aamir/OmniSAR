@@ -9,6 +9,7 @@
 
 import { esc, focusKey, restoreFocus } from './util.js';
 import { loadTraps, openTrap } from './trapcard.js';
+import { flash } from './motion.js';
 
 export async function mountMinigame(host, mystery, { onChange }) {
   const traps = await loadTraps();
@@ -19,6 +20,7 @@ export async function mountMinigame(host, mystery, { onChange }) {
   const nameChoices = [...new Set([...cards.filter((c) => c.trap).map((c) => c.trap), 10, 13])].sort((a, b) => a - b);
   const feedback = {};          // card id -> last message
   let naming = null;            // card id waiting for a trap name
+  let effect = null;            // { id, cls }: snap (filed right) or shake (wrong), played after the redraw
 
   function cardHTML(e) {
     const done = mystery.isCardSolved(e.id);
@@ -58,6 +60,10 @@ export async function mountMinigame(host, mystery, { onChange }) {
         <h3 class="wt-sub">Not in the game yet</h3>
         ${pending.map((e) => `<article class="evidence-card"><h3>${esc(e.title)}</h3><div class="pending-box">Evidence pending</div><p class="evidence-caption">${esc(e.caption)}</p></article>`).join('')}` : ''}`;
     wire();
+    if (effect) {
+      flash(host.querySelector(`[data-card="${CSS.escape(effect.id)}"]`), effect.cls);
+      effect = null;
+    }
     onChange?.();                          // first, so "Next" is enabled before we may focus it
     // if the focused button vanished (card filed), go to the next card that still needs sorting;
     // when every card is filed, go to the "Next" button
@@ -76,6 +82,7 @@ export async function mountMinigame(host, mystery, { onChange }) {
     }
     const r = mystery.answerCard(id, bin, null);
     naming = null;
+    effect = { id, cls: r.correct ? 'is-snapped' : 'is-shaking' };
     if (r.correct) {
       feedback[id] = { ok: true, text: 'Right: this is a real change, backed by the evidence on the card.' };
     } else if (card.bin === 'trap') {
@@ -90,6 +97,7 @@ export async function mountMinigame(host, mystery, { onChange }) {
   function name(id, trapId) {
     const card = cards.find((c) => c.id === id);
     const r = mystery.answerCard(id, 'trap', trapId);
+    effect = { id, cls: r.correct ? 'is-snapped' : 'is-shaking' };
     if (r.correct) {
       naming = null;
       feedback[id] = { ok: true, text: `Right: trap #${card.trap}, ${trapTitle(card.trap)}.` };

@@ -1,0 +1,214 @@
+/* OmniSAR "mission control" look, layered on top of style.css.
+   Rules: readable first, data first. Data colours, the NISAR-cyan tags and the badge colours
+   are NOT touched here (they live in style.css and never change). Decoration (grid texture,
+   corner brackets, glows) stays in empty areas and frames, never on top of data.
+   Every animation uses only transform/opacity and is switched off by prefers-reduced-motion
+   (see the end of style.css and js/motion.js). */
+
+:root {
+  --topbar-h: 48px;
+  --timeline-h: 90px;
+  --panel-w: clamp(320px, 26vw, 400px);
+  --radius: 6px;
+  --hud-line: color-mix(in srgb, var(--accent) 42%, transparent);
+  --hud-faint: color-mix(in srgb, var(--accent) 7%, transparent);
+  --glass: color-mix(in srgb, var(--surface-2) 88%, transparent);
+  --glass-strong: color-mix(in srgb, var(--surface-2) 94%, transparent);
+  --glow: 0 0 0 1px var(--hud-line), 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+/* ---------- Background: a faint grid, only in the empty page areas ---------- */
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--hud-faint) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hud-faint) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ---------- Top bar: slim ---------- */
+.topbar {
+  gap: 18px; padding: 0 16px;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  border-bottom: 1px solid var(--hud-line);
+}
+.brand-name { font-size: 18px; letter-spacing: 0.4px; }
+.brand-mark { animation: idle-glow 4s ease-in-out infinite; }           /* the one idle glow in the bar */
+.tagline { font: 12px var(--font-data); letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+@keyframes idle-glow { 50% { box-shadow: 5px 5px 0 0 var(--accent-2), 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); } }
+
+/* ---------- Layout: the globe / terrain gets the room; the panel folds into a rail ---------- */
+.layout { transition: grid-template-rows 240ms ease, grid-template-columns 280ms var(--ease); }
+.layout.panel-collapsed { grid-template-columns: 1fr 44px; }
+.globe-area { background: transparent; }
+
+/* Shared HUD frame: thin cyan hairline + corner brackets + translucent dark glass */
+.panel, .terrain-hud, .timeline, .trap-card, .terrain-note, .beacon-label, .terrain-tip {
+  --b: var(--accent);
+  background-color: var(--glass);
+  background-image:
+    linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b)),
+    linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b)),
+    linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b)),
+    linear-gradient(var(--b), var(--b)), linear-gradient(var(--b), var(--b));
+  background-size: 12px 1px, 1px 12px, 12px 1px, 1px 12px, 12px 1px, 1px 12px, 12px 1px, 1px 12px;
+  background-position: top left, top left, top right, top right, bottom left, bottom left, bottom right, bottom right;
+  background-repeat: no-repeat;
+}
+.beacon-label, .terrain-tip, .terrain-note { background-size: 6px 1px, 1px 6px, 6px 1px, 1px 6px, 6px 1px, 1px 6px, 6px 1px, 1px 6px; }
+.terrain-hud, .terrain-note, .beacon-label, .terrain-tip, .trap-dialog {
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-color: var(--hud-line); border-radius: var(--radius);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel, .terrain-hud, .timeline, .trap-card, .terrain-note, .beacon-label, .terrain-tip { background-color: var(--surface-2); }
+}
+
+/* ---------- Side panel ---------- */
+.panel { position: relative; border-left: 1px solid var(--hud-line); background-attachment: scroll; }
+.panel-bar, .panel-foot {
+  position: sticky; z-index: 4; display: flex; align-items: center; gap: 10px;
+  padding: 0 12px 0 6px; background: var(--glass-strong);
+}
+.panel-bar { top: 0; height: 44px; border-bottom: 1px solid var(--line); }
+.panel-foot { bottom: 0; min-height: 34px; padding: 6px 14px; border-top: 1px solid var(--line); }
+.panel-inner { padding: 18px 20px 24px; }
+.hud-readout { font: 11px var(--font-data); letter-spacing: 1.2px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hud-readout b { color: var(--text); font-weight: 600; }
+.hud-right { margin-left: auto; }
+.panel-toggle {
+  flex: 0 0 auto; width: 32px; height: 32px; display: grid; place-items: center;
+  font: 16px var(--font-data); color: var(--accent);
+  background: transparent; border: 1px solid var(--line-strong); border-radius: 4px; cursor: pointer;
+  transition: box-shadow 160ms ease, transform 120ms ease;
+}
+.panel-toggle:hover { box-shadow: var(--glow); }
+.panel-toggle:active { transform: scale(.94); }
+.sort-bins { top: 44px; }                                   /* sticks under the panel bar */
+
+/* folded: only the rail with its button stays */
+.panel-collapsed .panel { overflow: hidden; }
+.panel-collapsed .panel-inner, .panel-collapsed .panel-foot, .panel-collapsed .hud-readout { opacity: 0; visibility: hidden; }
+.panel-collapsed .panel-bar { border-bottom: 0; padding: 0 5px; background: transparent; }
+.panel-inner, .panel-foot, .hud-readout { transition: opacity 200ms ease, visibility 0s linear 0s; }
+.panel-collapsed :is(.panel-inner, .panel-foot, .hud-readout) { transition: opacity 120ms ease, visibility 0s linear 120ms; }
+
+.panel-title { font-size: 22px; letter-spacing: 0.1px; }
+.eyebrow { font-size: 11px; letter-spacing: 1.6px; }
+.facts dt { font: 11px var(--font-data); letter-spacing: 0.8px; text-transform: uppercase; }
+.wt-progress { height: 2px; }
+.wt-progress span { box-shadow: 0 0 8px var(--accent); transition: width 300ms var(--ease); }
+.wt-sub { font: 600 12px var(--font-data); letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+
+/* cards and rows: flat glass with a hairline */
+.case-row, .option, .sort-card, .evidence-card, .toggle-row, .reply, .graph-node {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border-radius: var(--radius);
+}
+.case-num { font-weight: 700; }
+
+/* ---------- Buttons: hover glow, press feedback ---------- */
+.primary-btn {
+  font: 600 13px var(--font-data); letter-spacing: 1.2px; text-transform: uppercase;
+  border-radius: 4px; padding: 11px 18px; min-height: 40px;
+  transition: box-shadow 160ms ease, transform 120ms ease, filter 160ms ease;
+}
+.ghost-btn, .tl-btn, .option, .case-row, .trap-chip, .link-btn, .graph-node {
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 120ms ease, color 160ms ease;
+}
+.primary-btn:hover:not(:disabled) { box-shadow: 0 0 0 1px var(--accent), 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent); filter: none; }
+:is(.ghost-btn, .tl-btn, .option, .case-row, .trap-chip):hover:not(:disabled) { border-color: var(--accent); box-shadow: var(--glow); }
+:is(.primary-btn, .ghost-btn, .tl-btn, .option, .case-row, .trap-chip, .link-btn):active:not(:disabled) { transform: scale(.97); }
+.ghost-btn, .tl-btn { border-radius: 4px; }
+.tl-btn { font-size: 12px; padding: 0 10px; }
+
+/* ---------- Timeline: slim bottom bar ---------- */
+.timeline { padding: 6px 16px 4px; border-top: 1px solid var(--hud-line); }
+.tl-head { margin-bottom: 2px; gap: 12px; }
+.tl-track { height: 46px; }
+.tl-date { color: var(--accent); }
+
+/* ---------- Case terrain HUD: compact, at the edges ---------- */
+.terrain-top { right: auto; max-width: min(640px, calc(100% - 24px)); padding: 8px 10px 8px 14px; }
+.terrain-stepper { top: auto; bottom: 48px; left: 12px; }
+.terrain-legend { bottom: 48px; }
+.terrain-note { bottom: 8px; }
+.terrain-layer { font-size: 15px; }
+
+/* ---------- Panel boot-up: a scan line sweeps down, the content fades up ---------- */
+.panel.is-booting::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 44px; height: 2px; pointer-events: none; z-index: 5;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 12px var(--accent);
+  animation: sweep 380ms var(--ease) forwards;
+}
+@keyframes sweep { from { transform: translateY(0); opacity: 1; } to { transform: translateY(420px); opacity: 0; } }
+.panel-inner.is-booting { animation: boot-in 300ms var(--ease) backwards; }
+@keyframes boot-in { from { opacity: 0; transform: translateY(8px); } }
+.word { display: inline-block; animation: word-in 240ms var(--ease) backwards; }
+@keyframes word-in { from { opacity: 0; transform: translateY(5px); } }
+
+/* ---------- View cross-fades (globe <-> terrain) ---------- */
+.terrain-view.can-hide { transition: opacity 260ms ease; }
+.terrain-view.can-hide.is-hiding { opacity: 0; transform: none; }
+
+/* ---------- Minigame: lift + tilt while dragged, snap when filed, shake when wrong ---------- */
+.sort-card { transition: transform 180ms var(--ease), box-shadow 180ms ease, opacity 180ms ease; }
+.sort-card:not(.is-filed):hover { transform: translateY(-2px); }
+.sort-card.dragging { opacity: .9; transform: translateY(-6px) rotate(-2.5deg) scale(1.02);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, .45), 0 0 0 1px var(--accent); }
+.sort-bin { transition: transform 160ms ease, border-color 160ms ease, background-color 160ms ease; }
+.sort-bin.over { transform: scale(1.03); }
+.sort-card.is-snapped { animation: snap 340ms var(--ease); }
+@keyframes snap { 0% { transform: scale(.94); box-shadow: 0 0 0 1px var(--data-nisar), 0 0 22px color-mix(in srgb, var(--data-nisar) 60%, transparent); }
+                  60% { transform: scale(1.015); } 100% { transform: none; box-shadow: none; } }
+.sort-card.is-shaking { animation: shake 360ms ease; }
+@keyframes shake { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+
+/* ---------- Graph: links draw in, nodes appear in order, a predicted node pulses ---------- */
+.graph-intro .graph-link { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 420ms ease-out 120ms forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.graph-intro .graph-node { animation: node-in 280ms var(--ease) backwards; animation-delay: calc(var(--i, 0) * 55ms); }
+@keyframes node-in { from { opacity: 0; transform: translate(-50%, -50%) scale(.86); } }
+.graph-node.is-pulsing { animation: node-pulse 620ms ease-out; }
+@keyframes node-pulse {
+  0% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 0 color-mix(in srgb, var(--data-nisar) 70%, transparent); }
+  35% { transform: translate(-50%, -50%) scale(1.06); }
+  100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 16px transparent; }
+}
+
+/* ---------- Verdict: the badge stamps in after the numbers count up ---------- */
+.badge-line .tag.is-stamped { display: inline-block; animation: stamp 360ms cubic-bezier(.3, 1.6, .5, 1) backwards; }
+@keyframes stamp { from { opacity: 0; transform: scale(1.8) rotate(-8deg); } }
+
+/* ---------- Trap cards flip open; dialogs fade ---------- */
+.trap-dialog { border: 1px solid var(--hud-line); background: transparent; }
+.trap-dialog[open]:not(.custody-dialog) .trap-card { animation: flip-in 380ms var(--ease) backwards; transform-origin: 50% 50%; }
+@keyframes flip-in { from { opacity: 0; transform: perspective(900px) rotateY(-80deg); } }
+.custody-dialog[open] .trap-card { animation: boot-in 280ms var(--ease) backwards; }
+.trap-dialog[open]::backdrop { background: rgba(2, 4, 8, .66); animation: fade 240ms ease backwards; }
+@keyframes fade { from { opacity: 0; } }
+.trap-card h3 { font-family: var(--font-data); font-size: 12px; letter-spacing: 1.2px; }
+
+/* ---------- Narrow screens: panel stacks under the globe, no rail ---------- */
+@media (max-width: 860px) {
+  .panel-toggle { display: none; }
+  .layout.panel-collapsed { grid-template-columns: 1fr; }
+}
+
+/* Scrolling to a control (keyboard focus, or the browser) never hides it under the sticky bar/foot */
+.panel { scroll-padding: 52px 0 48px; }
+
+/* The panel is a column: bar on top, content, and the foot readout pinned to the bottom */
+.panel { display: flex; flex-direction: column; }
+.panel-inner { flex: 1 0 auto; }
+#hud-date { white-space: normal; line-height: 1.5; }
+
+/* Boxes floating over the 3D views use the stronger glass: even over the brightest yellow
+   data blocks, muted text keeps ≥ 4.5:1 contrast (12% see-through is too much there) */
+.terrain-hud, .terrain-note, .terrain-tip, .beacon-label { background-color: var(--glass-strong); }
+
+/* The sticky bar and foot are solid, so scrolled text never shows through them */
+.panel-bar, .panel-foot { background: var(--surface-2); }
+.panel-collapsed .panel-bar { background: transparent; }

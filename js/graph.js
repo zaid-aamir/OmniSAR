@@ -7,6 +7,7 @@
 
 import { esc, focusKey, restoreFocus } from './util.js';
 import { citationLinks, sourceTag } from './walkthrough.js';
+import { flash } from './motion.js';
 
 function get(obj, path) {
   return path.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
@@ -52,6 +53,8 @@ export function mountGraph(host, mystery, { onChange }) {
   const { nodes, edges } = mystery.data.graph;
   let selected = null;
   const replies = {};
+  let intro = true;             // the first drawing: links draw in, nodes appear one by one
+  let pulse = null;             // a node that was just predicted correctly
 
   function nodeOpen(n) { return !n.hidden || mystery.solved.has(`node:${n.id}`); }
 
@@ -102,7 +105,7 @@ export function mountGraph(host, mystery, { onChange }) {
     const W = 320, step = 92, H = nodes.length * step;
     const pos = Object.fromEntries(nodes.map((n, i) => [n.id, { x: W / 2, y: 40 + i * step }]));
     host.innerHTML = `
-      <div class="graph-wrap">
+      <div class="graph-wrap ${intro ? 'graph-intro' : ''}">
         <svg class="graph-svg" viewBox="0 0 ${W} ${H}" aria-hidden="true">
           <defs><filter id="glow"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
           ${edges.map(([a, b]) => `<line class="graph-link ${nodeOpen(nodes.find((n) => n.id === b)) ? 'lit' : ''}" x1="${pos[a].x}" y1="${pos[a].y}" x2="${pos[b].x}" y2="${pos[b].y}"/>`).join('')}
@@ -110,7 +113,7 @@ export function mountGraph(host, mystery, { onChange }) {
         <div class="graph-nodes">
           ${nodes.map((n) => `
             <button class="graph-node basis-${esc(n.basis)} ${nodeOpen(n) ? 'open' : 'hidden-node'} ${selected === n.id ? 'selected' : ''}"
-                    style="top:${pos[n.id].y}px" data-pick="${esc(n.id)}" aria-expanded="${selected === n.id}"
+                    style="top:${pos[n.id].y}px; --i:${nodes.indexOf(n)}" data-pick="${esc(n.id)}" aria-expanded="${selected === n.id}"
                     ${nodeOpen(n) ? '' : 'aria-label="Hidden link: predict it"'}>
               ${nodeOpen(n) ? esc(n.label) : '?'}
             </button>`).join('')}
@@ -123,9 +126,12 @@ export function mountGraph(host, mystery, { onChange }) {
     host.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => { selected = b.dataset.pick; render(); }));
     host.querySelectorAll('[data-node]').forEach((b) => b.addEventListener('click', () => {
       replies[b.dataset.node] = mystery.answerNode(b.dataset.node, Number(b.dataset.i));
+      if (replies[b.dataset.node].correct) pulse = b.dataset.node;
       render();
     }));
     restoreFocus(host, key, `[data-pick="${CSS.escape(selected || '')}"]`);
+    if (pulse) { flash(host.querySelector(`[data-pick="${CSS.escape(pulse)}"]`), 'is-pulsing'); pulse = null; }
+    intro = false;
     onChange?.();
   }
 

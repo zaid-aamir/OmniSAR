@@ -10,6 +10,7 @@ import { createPanel } from './panel.js';
 import { loadMystery } from './engine.js';
 import { runWalkthrough } from './walkthrough.js';
 import { createCaseTerrain } from './caseterrain.js';
+import { createHud } from './hud.js';
 
 const params = new URLSearchParams(location.search);
 const HOME_DISTANCE = 3.2;
@@ -58,6 +59,7 @@ async function start() {
     `· colours: NASA Blue Marble · heights: AWS Terrarium · glow, stars, lighting: visual only`;
   area.appendChild(note);
 
+  const hud = createHud(data.cases);          // panel frame: collapse button + real status readouts
   const panel = createPanel(document.getElementById('panel-inner'), data.cases, {
     onPick: selectCase,
     onBack: backToGlobe,
@@ -70,6 +72,7 @@ async function start() {
     onCross: (id) => markers.pulse(id),
     onDay: (iso) => {
       markers.setDate(iso);
+      hud.setDate(iso);
       if (terrain.isOpen) terrain.showDate(iso);     // the open case terrain follows the slider
     },
   });
@@ -96,6 +99,8 @@ async function start() {
     globe.flyTo(c.centre[0], c.centre[1], CASE_DISTANCE);
     panel.showCase(c);
     timeline.setCase(c);
+    hud.setCase(c);
+    hud.expand();                                   // a picked case always shows its card
   }
 
   function backToGlobe() {
@@ -107,6 +112,7 @@ async function start() {
     globe.flyTo(lat, lon, HOME_DISTANCE, 1.2);
     panel.showHome();
     timeline.setCase(null);
+    hud.setCase(null);
   }
 
   async function openMystery(id) {
