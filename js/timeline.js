@@ -8,6 +8,8 @@
 //    brighter "layer" ticks mark the passes we actually processed, and setDate() lets the
 //    terrain's ◀ ▶ stepper move the slider back, so the two always agree.
 
+import { setShown, announce } from './util.js';
+
 const DAY = 86400000;
 const START = Date.UTC(2026, 5, 1);    // 1 Jun 2026 (months count from 0)
 const END = Date.UTC(2026, 10, 10);    // 10 Nov 2026
@@ -28,9 +30,9 @@ export function createTimeline(root, cases, { onCross, onDay }) {
       <span class="tl-date" id="tl-date"></span>
       <span class="tl-case" id="tl-case">Pick a case to see its passes</span>
       <span class="tl-buttons">
-        <button class="tl-btn" id="tl-back" title="Back 12 days (one NISAR repeat)">◀ 12 d</button>
-        <button class="tl-btn" id="tl-play" title="Play">▶ Play</button>
-        <button class="tl-btn" id="tl-fwd" title="Forward 12 days (one NISAR repeat)">12 d ▶</button>
+        <button class="tl-btn" id="tl-back" title="Back 12 days (one NISAR repeat)" aria-label="Back 12 days, one NISAR repeat">◀ 12 d</button>
+        <button class="tl-btn" id="tl-play" title="Play" aria-label="Play the timeline" aria-pressed="false">▶ Play</button>
+        <button class="tl-btn" id="tl-fwd" title="Forward 12 days (one NISAR repeat)" aria-label="Forward 12 days, one NISAR repeat">12 d ▶</button>
       </span>
     </div>
     <div class="tl-track">
@@ -66,6 +68,18 @@ export function createTimeline(root, cases, { onCross, onDay }) {
   let current = 0;
   let selected = null;
 
+  // Screen readers hear the date once the slider settles (not every day while it moves or plays)
+  let sayTimer = null;
+  function sayDate() {
+    clearTimeout(sayTimer);
+    sayTimer = setTimeout(() => {
+      if (timer || root.hidden) return;
+      const iso = new Date(START + current * DAY).toISOString().slice(0, 10);
+      const gap = iso >= GAP[0] && iso <= GAP[1] ? ', inside NASA’s data gap' : '';
+      announce(`Timeline date ${fmt(current)}${gap}`);
+    }, 700);
+  }
+
   // Header text: the case's pass count, or the pass details when the slider sits on a pass date
   function updateCaseText() {
     if (!selected) {
@@ -94,7 +108,9 @@ export function createTimeline(root, cases, { onCross, onDay }) {
     onDay?.(new Date(START + day * DAY).toISOString().slice(0, 10));
     slider.value = day;
     dateEl.textContent = fmt(day);
+    slider.setAttribute('aria-valuetext', fmt(day));
     updateCaseText();
+    sayDate();
   }
 
   slider.addEventListener('input', () => setDay(Number(slider.value)));
@@ -103,11 +119,20 @@ export function createTimeline(root, cases, { onCross, onDay }) {
 
   // Play: one day every 80 ms (about 13 seconds for the whole window)
   let timer = null;
-  function stop() { clearInterval(timer); timer = null; playBtn.textContent = '▶ Play'; }
+  function stop() {
+    if (!timer) return;
+    clearInterval(timer); timer = null;
+    playBtn.textContent = '▶ Play';
+    playBtn.setAttribute('aria-label', 'Play the timeline');
+    playBtn.setAttribute('aria-pressed', 'false');
+    sayDate();
+  }
   playBtn.addEventListener('click', () => {
     if (timer) return stop();
     if (current >= TOTAL_DAYS) setDay(0);
     playBtn.textContent = '❚❚ Pause';
+    playBtn.setAttribute('aria-label', 'Pause the timeline');
+    playBtn.setAttribute('aria-pressed', 'true');
     timer = setInterval(() => {
       if (current >= TOTAL_DAYS) return stop();
       setDay(current + 1);
@@ -121,7 +146,11 @@ export function createTimeline(root, cases, { onCross, onDay }) {
     setDate(iso) { if (dayOf(iso) !== current) setDay(dayOf(iso)); },
     get date() { return new Date(START + current * DAY).toISOString().slice(0, 10); },
     // Show or hide the whole bar (hidden when it would change nothing in the open view)
-    setVisible(show) { root.hidden = !show; if (!show) stop(); },
+    setVisible(show) {
+      if (!show) stop();
+      // if focus was on the slider or a button, hand it to the panel heading
+      setShown(root, show, { focusTo: () => document.querySelector('#panel-inner h1, #panel-inner h2') });
+    },
     // Brighter ticks for the passes that have a processed terrain layer (or none with null)
     setLayerTicks(dates) {
       layerTicksEl.innerHTML = '';

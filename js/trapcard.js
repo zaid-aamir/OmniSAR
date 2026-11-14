@@ -2,7 +2,7 @@
 // can never prove). Text comes from cases/traps.json. Any part of the app can call
 // openTrap(8) or openTrap('who-why'), and trapChip(8) makes a small button that opens it.
 
-import { esc } from './util.js';
+import { esc, announce } from './util.js';
 
 let trapsPromise = null;
 export function loadTraps() {
@@ -35,7 +35,7 @@ export async function openTrap(id) {
   d.innerHTML = `
     <article class="trap-card">
       <p class="eyebrow">${isLimit ? 'What radar can’t prove' : `Trap #${t.id} · ${esc(data.buckets[t.bucket])}`}</p>
-      <h2 class="trap-title">${esc(t.title)}</h2>
+      <h2 class="trap-title" id="trap-title">${esc(t.title)}</h2>
       <h3>What fools you</h3><p>${esc(t.fools)}</p>
       <h3>How we proved it</h3><p>${esc(t.proof)}</p>
       ${t.citation?.length ? `<p class="trap-cite">Source: ${t.citation.map((c) => (/^https:\/\//.test(c.url)
@@ -46,7 +46,9 @@ export async function openTrap(id) {
       <button class="primary-btn" id="trap-close">Got it</button>
     </article>`;
   d.querySelector('#trap-close').addEventListener('click', () => d.close());
+  d.setAttribute('aria-labelledby', 'trap-title');
   d.showModal();
+  announce(`${isLimit ? 'What radar can’t prove' : `Trap card ${t.id}`} opened: ${t.title}`);
 }
 
 // HTML for a small button that opens a trap card. Wire it up with wireTrapChips(root).

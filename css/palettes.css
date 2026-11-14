@@ -84,9 +84,12 @@
   --accent-2: #B23850;
 }
 
-/* Softer shades, mixed from the palette so every palette gets them for free */
+/* Softer shades, mixed from the palette so every palette gets them for free.
+   --muted is strong enough for 4.5:1 text contrast on panels and cards (WCAG AA, checked for P4);
+   --line is for quiet dividers only; --line-strong outlines controls (3:1 against their background). */
 :root {
-  --muted: color-mix(in srgb, var(--text) 62%, var(--bg));
+  --muted: color-mix(in srgb, var(--text) 78%, var(--bg));
   --line: color-mix(in srgb, var(--text) 14%, var(--bg));
+  --line-strong: color-mix(in srgb, var(--text) 55%, var(--bg));
   --surface-2: color-mix(in srgb, var(--surface) 70%, var(--bg));
 }

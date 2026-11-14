@@ -535,3 +535,50 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
   box-shadow: 0 0 6px color-mix(in srgb, var(--data-nisar) 70%, transparent); }
 /* when the timeline would change nothing it is hidden, and its row closes up */
 .layout:has(> .timeline[hidden]) { grid-template-rows: 1fr 0; }
+
+/* ---------- Contextual controls + accessibility (WCAG 2.1 AA) ---------- */
+/* Text only for screen readers (the live region that announces verdicts, trap cards, dates) */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* One clearly visible focus ring for everything you can reach with the keyboard */
+:where(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--data-nisar); outline-offset: 2px; }
+:where(h1, h2, .reply)[tabindex="-1"]:focus { outline: none; }   /* headings get focus only to start reading there */
+.terrain-view:focus-visible { outline-offset: -3px; }
+
+/* Control borders that can be seen (3:1); quiet --line stays for dividers */
+.ghost-btn, .option, .tl-btn, .case-row, .toggle-row:has(input) { border-color: var(--line-strong); }
+.trap-chip { border-color: var(--line-strong); }
+
+/* Click targets at least 32 x 32 px */
+.link-btn, .trap-chip, .tl-btn { min-height: 32px; display: inline-flex; align-items: center; }
+.link-btn { padding: 0 4px; margin-left: -4px; }
+a.tag.cite { display: inline-block; padding-top: 6px; padding-bottom: 6px; }
+.toggle { min-height: 32px; }
+.toggle input { width: 18px; height: 18px; }
+.tl-slider { top: 4px; height: 32px; }
+
+/* "Next" stays visible while it can't be used yet, with the reason next to it */
+.wt-nav { align-items: center; }
+.wt-nav > .primary-btn { margin-left: auto; }
+.wt-why { margin-left: auto; font: 12px var(--font-data); color: var(--muted); text-align: right; }
+.wt-why + .primary-btn { margin-left: 0; }
+.wt-why[hidden] { display: none; }
+
+/* Toggles that have no real layer for this case: plain text, not dead switches */
+.toggle-unavailable { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+.toggle-unavailable strong { color: var(--text); font-weight: 600; }
+
+/* Hiding a control: short fade + slide, then it is removed (js/util.js setShown) */
+.can-hide { transition: opacity 200ms ease, transform 200ms ease; }
+.can-hide.is-hiding { opacity: 0; transform: translateY(8px); pointer-events: none; }
+.terrain-stepper.can-hide.is-hiding { transform: translateY(-8px); }
+/* the timeline's row closes smoothly when the bar hides, so the globe grows instead of jumping */
+.layout { transition: grid-template-rows 240ms ease; }
+.timeline { overflow: hidden; min-height: 0; }
+.layout:has(> .timeline.is-hiding) { grid-template-rows: 1fr 0; }
+
+/* Less motion when the operating system asks for it */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

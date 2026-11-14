@@ -5,6 +5,14 @@
 
 import { STATUS_TEXT } from './cases.js';
 import { esc } from './util.js';
+
+// After the panel redraws, the button that had focus is gone: move focus to the new heading
+// (only when focus was in the panel or nowhere, so we never steal it from the globe or timeline)
+function focusHeading(root) {
+  const a = document.activeElement;
+  if (a && a !== document.body && !root.contains(a) && a.isConnected) return;
+  root.querySelector('h1')?.focus({ preventScroll: true });
+}
 import { trapChip, wireTrapChips } from './trapcard.js';
 import { caseProgress, finishedCount, resetProgress } from './progress.js';
 
@@ -15,11 +23,12 @@ export function statusChip(status) {
 export function createPanel(root, cases, { onPick, onBack, onOpen }) {
   let tipCount = 0;
   const ids = cases.map((c) => c.id);
+  let started = false;
   function showHome() {
     const done = finishedCount(ids);
     root.innerHTML = `
       <p class="eyebrow">Case files</p>
-      <h1 class="panel-title">Pick a mystery on the globe</h1>
+      <h1 class="panel-title" tabindex="-1">Pick a mystery on the globe</h1>
       <p class="panel-text">
         Each marker is a real place with a real question about how the ground changed.
         Fly in, sort the evidence, and decide what NISAR radar can — and can't — prove.
@@ -42,6 +51,8 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.querySelectorAll('.case-row').forEach((btn) =>
       btn.addEventListener('click', () => onPick(btn.dataset.id)));
     root.querySelector('#end-btn')?.addEventListener('click', showEnd);
+    if (started) focusHeading(root);
+    started = true;
   }
 
   // End screen: every finished case with its badge, the lessons and the traps the player met
@@ -54,7 +65,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.innerHTML = `
       <button class="link-btn" id="back-btn">← Back to globe</button>
       <p class="eyebrow">Your investigation</p>
-      <h1 class="panel-title">${done.length === cases.length ? 'All five cases solved' : `${done.length} of ${cases.length} cases solved`}</h1>
+      <h1 class="panel-title" tabindex="-1">${done.length === cases.length ? 'All five cases solved' : `${done.length} of ${cases.length} cases solved`}</h1>
       <p class="panel-text">You met ${caught.size + fell.size} different traps and caught ${caught.size} of them without falling for them.
         OmniSAR has ${17} numbered traps in all; each card says how we proved it with real data.</p>
       ${caught.size ? `<p class="panel-text"><span class="recap-ok">✓ Caught:</span> ${chips(caught)}</p>` : ''}
@@ -73,6 +84,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.querySelector('#reset-btn').addEventListener('click', () => { resetProgress(); showHome(); });
     wireTrapChips(root);
     root.closest('.panel')?.scrollTo({ top: 0 });       // a new view always starts at its top
+    focusHeading(root);
   }
 
   function showCase(c) {
@@ -81,7 +93,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.innerHTML = `
       <button class="link-btn" id="back-btn">← Back to globe</button>
       <p class="eyebrow">Case file · ${esc(c.place)}</p>
-      <h1 class="panel-title">${esc(c.name)}</h1>
+      <h1 class="panel-title" tabindex="-1">${esc(c.name)}</h1>
       <p class="case-question">“${esc(c.question)}”</p>
       <dl class="facts">
         <div><dt>Status</dt><dd>${statusChip(c.status)}</dd></div>
@@ -101,6 +113,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.querySelector('#open-btn').addEventListener('click', () => onOpen(c.id));
     wireTrapChips(root);
     root.closest('.panel')?.scrollTo({ top: 0 });
+    focusHeading(root);
   }
 
   // An unverified tip from NASA EONET: title, date, source links, and a clear "no check yet"
@@ -108,7 +121,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.innerHTML = `
       <button class="link-btn" id="back-btn">← Back to globe</button>
       <p class="eyebrow">Unverified tip · NASA EONET</p>
-      <h1 class="panel-title">${esc(t.title)}</h1>
+      <h1 class="panel-title" tabindex="-1">${esc(t.title)}</h1>
       <dl class="facts">
         <div><dt>Type</dt><dd>${esc(t.category)}</dd></div>
         <div><dt>Date</dt><dd>${esc(t.date)}</dd></div>
@@ -120,6 +133,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
         ${/^https:\/\//.test(t.link || '') ? `<a class="tag cite" href="${esc(t.link)}" target="_blank" rel="noopener noreferrer">EONET record</a>` : ''}</p>`;
     root.querySelector('#back-btn').addEventListener('click', onBack);
     root.closest('.panel')?.scrollTo({ top: 0 });
+    focusHeading(root);
   }
 
   function setTipCount(n) {

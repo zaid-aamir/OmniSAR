@@ -14,7 +14,7 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
-import { esc } from './util.js';
+import { esc, setShown } from './util.js';
 import { colourFor, legendGradient } from './datacolours.js';
 
 const GAP = 0.88;            // block width as a share of its cell (the gap reads as a thin dark edge)
@@ -147,8 +147,11 @@ export function createCaseTerrain(container) {
     $('tv-tip').hidden = true;                 // an old tooltip would show the previous layer's value
     $('tv-layer').textContent = layer.label;
     $('tv-step').textContent = `Layer ${layerIndex + 1} of ${grid.layers.length} · ${layer.date}`;
+    // at either end the button stays visible but disabled, and says why
     $('tv-prev').disabled = layerIndex === 0;
     $('tv-next').disabled = layerIndex === grid.layers.length - 1;
+    $('tv-prev').title = layerIndex === 0 ? 'This is the first layer' : 'Previous layer';
+    $('tv-next').title = layerIndex === grid.layers.length - 1 ? 'This is the last layer' : 'Next layer';
     const [lo, hi] = layer.scale;
     $('tv-legend').innerHTML = `
       <p class="legend-title">${esc(layer.what)}</p>
@@ -274,6 +277,8 @@ export function createCaseTerrain(container) {
       running = true;
       resize();
       build();
+      // the ◀ ▶ stepper is only shown when there are at least two layers to step between
+      setShown(view.querySelector('.terrain-stepper'), grid.layers.length > 1, { focusTo: view });
       // the slider jumps to the opening layer's pass (a non-pass layer leaves the slider alone)
       if (isDated(grid.layers[layerIndex])) onLayerDate?.(grid.layers[layerIndex].date);
       return true;

@@ -4,12 +4,19 @@
 // fell into), then the player tries again. The game rules themselves live in engine.js; the
 // sorting game, the cause-and-effect graph and the chain of custody have their own files.
 
-import { esc } from './util.js';
+import { esc, announce, focusKey, restoreFocus } from './util.js';
 import { trapChip, wireTrapChips } from './trapcard.js';
 import { mountMinigame } from './minigame.js';
 import { mountGraph } from './graph.js';
 import { openCustody } from './custody.js';
 import { recordCase } from './progress.js';
+
+// Why "Next" is still disabled on a step (shown next to the button)
+const WAIT_REASON = {
+  choice: 'Pick the right answer to go on',
+  evidence: 'File every card to go on',
+  graph: 'Predict every “?” to go on',
+};
 
 const STEP_NAMES = {
   tip: 'The tip', choice: 'Your call', evidence: 'Sort the evidence', toggles: 'Interrogate',
@@ -60,26 +67,33 @@ export function runWalkthrough(root, mystery, { onExit }) {
   function updateNav() {
     const next = root.querySelector('#wt-next');
     if (next) next.disabled = !mystery.isStepDone();
+    const why = root.querySelector('#wt-why');
+    if (why) why.hidden = mystery.isStepDone();
   }
 
-  function render() {
+  // focus = 'title' (a new step: start reading at its heading), 'reply' (an answer: read the reply),
+  // or nothing (keep focus on the same control, e.g. a toggle)
+  function render(focus = null) {
     const m = mystery;
     const step = m.step;
+    const key = focusKey(root);
+    const done = m.isStepDone();
     root.innerHTML = `
       <button class="link-btn" id="wt-exit">← Case card</button>
       <p class="eyebrow">${esc(m.info.name)} · Step ${m.stepIndex + 1} of ${m.steps.length} · ${esc(STEP_NAMES[step.type] || step.type)}</p>
       <div class="wt-progress"><span style="width:${((m.stepIndex + 1) / m.steps.length) * 100}%"></span></div>
       <div class="wt-body">${renderStep(step)}</div>
       <div class="wt-nav">
-        <button class="ghost-btn" id="wt-back" ${m.stepIndex === 0 ? 'disabled' : ''}>← Back</button>
+        ${m.stepIndex === 0 ? '' : '<button class="ghost-btn" id="wt-back">← Back</button>'}
         ${m.isLast
           ? '<button class="primary-btn" id="wt-finish">Finish case</button>'
-          : `<button class="primary-btn" id="wt-next" ${m.isStepDone() ? '' : 'disabled'}>Next →</button>`}
+          : `${WAIT_REASON[step.type] ? `<span class="wt-why" id="wt-why" ${done ? 'hidden' : ''}>${esc(WAIT_REASON[step.type])}</span>` : ''}
+             <button class="primary-btn" id="wt-next" ${done ? '' : 'disabled'} ${WAIT_REASON[step.type] ? 'aria-describedby="wt-why"' : ''}>Next →</button>`}
       </div>`;
 
     root.querySelector('#wt-exit').addEventListener('click', () => onExit());
-    root.querySelector('#wt-back').addEventListener('click', () => { m.back(); render(); });
-    root.querySelector('#wt-next')?.addEventListener('click', () => { m.next(); render(); });
+    root.querySelector('#wt-back')?.addEventListener('click', () => { m.back(); render('title'); });
+    root.querySelector('#wt-next')?.addEventListener('click', () => { m.next(); render('title'); });
     root.querySelector('#wt-finish')?.addEventListener('click', () => {
       const s = trapSummary(m);
       recordCase(m.info.id, { ...s, badge: m.numbers?.badge || null, lessons: m.data.lesson.points.map((p) => p.head) });
@@ -88,7 +102,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
 
     root.querySelectorAll('[data-choice]').forEach((btn) => btn.addEventListener('click', () => {
       lastAnswer[`choice:${btn.dataset.choice}`] = m.answerChoice(btn.dataset.choice, Number(btn.dataset.i));
-      render();
+      render('reply');
     }));
     root.querySelectorAll('[data-toggle]').forEach((box) => box.addEventListener('change', () => {
       toggleState[box.dataset.toggle] = box.checked;
@@ -98,7 +112,15 @@ export function runWalkthrough(root, mystery, { onExit }) {
     if (step.type === 'evidence') mountMinigame(root.querySelector('#wt-mini'), m, { onChange: () => { updateNav(); wireTrapChips(root); } });
     if (step.type === 'graph') mountGraph(root.querySelector('#wt-graph'), m, { onChange: updateNav });
     wireTrapChips(root);
-    root.closest('.panel')?.scrollTo({ top: 0 });
+    if (focus !== 'reply') root.closest('.panel')?.scrollTo({ top: 0 });
+    // keyboard focus never stays on a control that the redraw removed
+    if (focus === 'reply') root.querySelector('.reply')?.focus();
+    else if (focus === 'title') root.querySelector('.wt-title')?.focus({ preventScroll: true });
+    else restoreFocus(root, key, '.wt-title');
+    if (step.type === 'verdict' && focus === 'title') {
+      const n = m.numbers;
+      announce(n ? `Verdict for ${m.info.name}. Evidence: ${n.badge || 'no badge'}.` : `Verdict for ${m.info.name}: evidence pending.`);
+    }
   }
 
   // ---------- one renderer per step type ----------
@@ -106,9 +128,9 @@ export function runWalkthrough(root, mystery, { onExit }) {
     switch (step.type) {
       case 'tip': return renderTip();
       case 'choice': return renderChoice(step.choice);
-      case 'evidence': return `<h2 class="wt-title">${esc(step.title)}</h2><p class="panel-text">${esc(step.text)}</p><div id="wt-mini"></div>`;
+      case 'evidence': return `<h2 class="wt-title" tabindex="-1">${esc(step.title)}</h2><p class="panel-text">${esc(step.text)}</p><div id="wt-mini"></div>`;
       case 'toggles': return renderToggles(step);
-      case 'graph': return `<h2 class="wt-title">${esc(step.title)}</h2><p class="panel-text">${esc(step.text)}</p><div id="wt-graph"></div>`;
+      case 'graph': return `<h2 class="wt-title" tabindex="-1">${esc(step.title)}</h2><p class="panel-text">${esc(step.text)}</p><div id="wt-graph"></div>`;
       case 'verdict': return renderVerdict();
       case 'lesson': return renderLesson();
       default: return `<p class="panel-text">Unknown step type: ${esc(step.type)}</p>`;
@@ -118,7 +140,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
   function renderTip() {
     const tip = mystery.data.tip;
     return `
-      <h2 class="wt-title">${esc(tip.title)}</h2>
+      <h2 class="wt-title" tabindex="-1">${esc(tip.title)}</h2>
       <p class="case-question">“${esc(mystery.info.question)}”</p>
       ${tip.text.map((p) => `<p class="panel-text">${esc(p)}</p>`).join('')}`;
   }
@@ -129,7 +151,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
     const solved = mystery.solved.has(`choice:${choiceId}`);
     const answer = lastAnswer[`choice:${choiceId}`];
     return `
-      <h2 class="wt-title">${esc(c.prompt)}</h2>
+      <h2 class="wt-title" tabindex="-1">${esc(c.prompt)}</h2>
       <div class="options">
         ${c.options.map((o, i) => {
           const tried = mystery.tried.has(`choice:${choiceId}:${i}`);
@@ -144,37 +166,44 @@ export function runWalkthrough(root, mystery, { onExit }) {
   function renderReply(option) {
     const trapId = option.trap ?? option.limit ?? null;
     return `
-      <div class="reply ${option.correct ? 'reply-right' : 'reply-wrong'}">
+      <div class="reply ${option.correct ? 'reply-right' : 'reply-wrong'}" tabindex="-1" role="status">
         <p class="reply-head">${option.correct ? 'Correct' : 'Not quite — try again'}</p>
         <p>${esc(option.reply)}</p>
         ${trapId != null ? `<p class="reply-trap">You met ${trapChip(trapId, typeof trapId === 'number' ? `Trap #${trapId} — open the card` : 'What radar can’t prove — open the card')}</p>` : ''}
       </div>`;
   }
 
-  // Toggles: each one swaps between two REAL images made from our data. A toggle that can't
-  // be real for this case is switched off, with the reason written next to it.
+  // Toggles: each one swaps between two REAL images made from our data. Only toggles that have
+  // both real layers for this case are shown as switches; the others would do nothing, so they
+  // are listed underneath as plain text with the reason (the reason itself is part of the lesson).
   function renderToggles(step) {
+    const ready = (t) => !t.disabled && t.layers?.off?.src && t.layers?.on?.src;
+    const live = mystery.data.toggles.filter(ready);
+    const off = mystery.data.toggles.filter((t) => !ready(t));
     return `
-      <h2 class="wt-title">${esc(step.title)}</h2>
+      <h2 class="wt-title" tabindex="-1">${esc(step.title)}</h2>
       <p class="panel-text">${esc(step.text)}</p>
       <div class="toggle-list">
-        ${mystery.data.toggles.map((t) => {
-          const ready = !t.disabled && t.layers?.off?.src && t.layers?.on?.src;
+        ${live.map((t) => {
           const on = !!toggleState[t.id];
-          const shown = ready ? (on ? t.layers.on : t.layers.off) : null;
+          const shown = on ? t.layers.on : t.layers.off;
           return `
-            <div class="toggle-row ${ready ? '' : 'is-off'}">
+            <div class="toggle-row">
               <label class="toggle">
-                <input type="checkbox" data-toggle="${esc(t.id)}" ${ready ? '' : 'disabled'} ${on ? 'checked' : ''}>
+                <input type="checkbox" data-toggle="${esc(t.id)}" ${on ? 'checked' : ''}>
                 <span>${esc(t.label)}</span>
               </label>
-              ${shown ? `<figure class="toggle-fig"><img src="${esc(shown.src)}" alt="${esc(shown.label)}"><figcaption>Showing: <strong>${esc(shown.label)}</strong></figcaption></figure>` : ''}
+              <figure class="toggle-fig"><img src="${esc(shown.src)}" alt="${esc(shown.label)}"><figcaption>Showing: <strong>${esc(shown.label)}</strong></figcaption></figure>
               <p class="evidence-caption">${esc(t.explains)}</p>
-              ${t.disabled ? `<p class="toggle-reason">${esc(t.disabled)}</p>` : ''}
-              <p class="toggle-meta">${!ready && !t.disabled ? '<span class="pending-text">Layers pending</span>' : ''} ${t.trap ? trapChip(t.trap) : ''}</p>
+              ${t.trap ? `<p class="toggle-meta">${trapChip(t.trap)}</p>` : ''}
             </div>`;
         }).join('')}
-      </div>`;
+      </div>
+      ${off.length ? `
+        <h3 class="wt-sub">Not available for this case</h3>
+        <ul class="toggle-unavailable">
+          ${off.map((t) => `<li><strong>${esc(t.label)}</strong>: ${esc(t.disabled || 'layers pending')} ${t.trap ? trapChip(t.trap) : ''}</li>`).join('')}
+        </ul>` : ''}`;
   }
 
   // Verdict: real numbers only. No numbers file listed in results.json -> "evidence pending".
@@ -190,7 +219,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
       <button class="ghost-btn" id="wt-custody">Chain of custody: every file, step and threshold</button>`
       : `<div class="pending-box pending-verdict">${esc(v.pending)}</div>`;
     return `
-      <h2 class="wt-title">Verdict</h2>
+      <h2 class="wt-title" tabindex="-1">Verdict</h2>
       <p class="case-question">“${esc(mystery.info.question)}”</p>
       ${body}
       <h3 class="wt-sub">What the radar can't prove</h3>
@@ -204,7 +233,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
     const s = trapSummary(mystery);
     const chips = (list) => list.map((t) => trapChip(t, typeof t === 'number' ? `Trap #${t}` : 'What radar can’t prove')).join(' ');
     return `
-      <h2 class="wt-title">What you learned</h2>
+      <h2 class="wt-title" tabindex="-1">What you learned</h2>
       <p class="eyebrow">${esc(l.title)}</p>
       ${l.points.map((p) => `<h3 class="wt-sub">${esc(p.head)}</h3><p class="panel-text">${esc(p.text)}</p>`).join('')}
       <h3 class="wt-sub">Traps in this case</h3>
@@ -214,5 +243,5 @@ export function runWalkthrough(root, mystery, { onExit }) {
       <p class="evidence-caption">Press “Finish case” to save this case to your investigation.</p>`;
   }
 
-  render();
+  render('title');   // the "Open mystery" button is gone: start at the first step's heading
 }

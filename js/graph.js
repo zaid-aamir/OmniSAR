@@ -110,7 +110,8 @@ export function mountGraph(host, mystery, { onChange }) {
         <div class="graph-nodes">
           ${nodes.map((n) => `
             <button class="graph-node basis-${esc(n.basis)} ${nodeOpen(n) ? 'open' : 'hidden-node'} ${selected === n.id ? 'selected' : ''}"
-                    style="top:${pos[n.id].y}px" data-pick="${esc(n.id)}" aria-expanded="${selected === n.id}">
+                    style="top:${pos[n.id].y}px" data-pick="${esc(n.id)}" aria-expanded="${selected === n.id}"
+                    ${nodeOpen(n) ? '' : 'aria-label="Hidden link: predict it"'}>
               ${nodeOpen(n) ? esc(n.label) : '?'}
             </button>`).join('')}
         </div>

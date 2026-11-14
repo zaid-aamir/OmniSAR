@@ -25,7 +25,7 @@ export function openCustody(caseInfo, numbers) {
   dialog.innerHTML = `
     <article class="trap-card custody">
       <p class="eyebrow">Chain of custody · ${esc(caseInfo.name)}</p>
-      <h2 class="trap-title" tabindex="-1">Everything behind this verdict</h2>
+      <h2 class="trap-title" id="custody-title" tabindex="-1">Everything behind this verdict</h2>
       <h3>NASA files used</h3>
       <ul class="custody-files">
         ${(p.nasa_files || []).map((f) => `<li><code>${esc(f.file)}</code><br><span>${esc(f.date || f.dates || '')} · ${esc(f.direction || '')} · track ${esc(f.track ?? '')} frame ${esc(f.frame ?? '')} · ${esc(f.processing || '')} ${f.product_version ? '· product ' + esc(f.product_version) : ''}</span></li>`).join('')}
@@ -58,6 +58,7 @@ export function openCustody(caseInfo, numbers) {
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
+  dialog.setAttribute('aria-labelledby', 'custody-title');
   dialog.showModal();
   // the browser focuses the first button (at the bottom); start the reader at the top instead
   dialog.querySelector('.trap-title').focus();
