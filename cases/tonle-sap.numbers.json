@@ -1,6 +1,6 @@
 {
  "case": "tonle-sap",
- "generated": "2026-11-14T02:01Z",
+ "generated": "2026-11-14T07:09Z",
  "measured": [
   {
    "label": "Open water 19 Jun",
@@ -9,16 +9,40 @@
    "note": "NISAR HH ≤ −16 dB and HV ≤ −22 dB; agreement with DSWx-S1 (18 Jun): 98%"
   },
   {
+   "label": "Open water 30 Aug",
+   "value": 1062.4,
+   "unit": "km²",
+   "note": "NISAR HH ≤ −16 dB and HV ≤ −22 dB; agreement with DSWx-S1 (3 Sep): 90%"
+  },
+  {
+   "label": "Open water 17 Oct",
+   "value": 1284.4,
+   "unit": "km²",
+   "note": "NISAR HH ≤ −16 dB and HV ≤ −22 dB; agreement with DSWx-S1 (17 Oct): 79%"
+  },
+  {
    "label": "Flooded forest 19 Jun (L-band only)",
    "value": 15.1,
    "unit": "km²",
    "note": "Forest on 19 Jun whose HH rose to ≥ −5 dB (double bounce). Moderate by definition: no independent check sees under trees. The C-band water map calls 14.6 km² of it 'not water'."
   },
   {
+   "label": "Flooded forest 30 Aug (L-band only)",
+   "value": 205.8,
+   "unit": "km²",
+   "note": "Forest on 19 Jun whose HH rose to ≥ −5 dB (double bounce). Moderate by definition: no independent check sees under trees. The C-band water map calls 202.6 km² of it 'not water'."
+  },
+  {
+   "label": "Flooded forest 17 Oct (L-band only)",
+   "value": 75.5,
+   "unit": "km²",
+   "note": "Forest on 19 Jun whose HH rose to ≥ −5 dB (double bounce). Moderate by definition: no independent check sees under trees. The C-band water map calls 74.5 km² of it 'not water'."
+  },
+  {
    "label": "Passes analysed",
-   "value": 1,
+   "value": 3,
    "unit": "",
-   "note": "19 Jun. More passes (30 Aug, 17 Oct) give the pulse curve when they finish downloading."
+   "note": "19 Jun, 30 Aug, 17 Oct"
   },
   {
    "label": "Rain since 1 May",
@@ -29,12 +53,14 @@
  ],
  "check": {
   "label": "Independent check",
-  "text": "19 Jun vs DSWx-S1 18 Jun: 98% agree on open water (IoU 95%)"
+  "text": "19 Jun vs DSWx-S1 18 Jun: 98% agree on open water (IoU 95%); 30 Aug vs DSWx-S1 3 Sep: 90% agree on open water (IoU 82%); 17 Oct vs DSWx-S1 17 Oct: 79% agree on open water (IoU 69%)"
  },
  "badge": "Moderate",
- "badge_reason": "open water: 1 of 1 checked date(s) agree ≥ 80% with DSWx-S1 → Moderate; case capped at Moderate because flooded forest is L-band only",
+ "badge_reason": "open water: 2 of 3 checked date(s) agree ≥ 80% with DSWx-S1 → Strong; case capped at Moderate because flooded forest is L-band only",
  "sources": [
-  "NISAR_L2_PR_GCOV_023_083_A_008_2005_DHDH_M_20260619T223637_20260619T223711_P05023_N_F_J_001.h5"
+  "NISAR_L2_PR_GCOV_023_083_A_008_2005_DHDH_M_20260619T223637_20260619T223711_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GCOV_029_083_A_008_2005_DHDH_M_20260830T223633_20260830T223708_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GCOV_033_083_A_008_2005_DHDH_M_20261017T223633_20261017T223708_P05023_N_F_J_001.h5"
  ],
  "method": {
   "declared": "2026-11-14T05:12+04:00, before any Tonle Sap radar file was read",
@@ -94,13 +120,104 @@
       "valid_share": 1.0,
       "unknown_colour_px": 0
      }
+    ]
+   },
+   {
+    "date": "2026-08-30",
+    "open_water_km2": 1062.4,
+    "flooded_forest_km2": 205.8,
+    "valid_km2": 1931.5,
+    "hh_median_db": -17.38,
+    "hv_median_db": -24.77,
+    "dswx_date": "2026-09-03",
+    "agreement": 0.9,
+    "iou": 0.823,
+    "dswx_water_we_call_water": 0.963,
+    "our_water_dswx_calls_water": 0.85,
+    "dswx_open_water_km2": 937.7,
+    "dswx_inundated_veg_km2": 145.8,
+    "flooded_forest_missed_km2": 202.6,
+    "flooded_forest_dswx_inundated_veg_km2": 3.0,
+    "flooded_forest_dswx_open_water_km2": 0.2,
+    "dswx_unknown_colour_px": 0,
+    "dswx_tried": [
+     {
+      "date": "2026-08-30",
+      "error": "The read operation timed out"
+     },
+     {
+      "date": "2026-08-29",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-08-31",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-08-28",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-09-01",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-08-27",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-09-02",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-08-26",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-09-03",
+      "valid_share": 1.0,
+      "unknown_colour_px": 0
+     }
+    ]
+   },
+   {
+    "date": "2026-10-17",
+    "open_water_km2": 1284.4,
+    "flooded_forest_km2": 75.5,
+    "valid_km2": 1931.5,
+    "hh_median_db": -18.76,
+    "hv_median_db": -26.0,
+    "dswx_date": "2026-10-17",
+    "agreement": 0.794,
+    "iou": 0.694,
+    "dswx_water_we_call_water": 0.985,
+    "our_water_dswx_calls_water": 0.701,
+    "dswx_open_water_km2": 913.9,
+    "dswx_inundated_veg_km2": 74.5,
+    "flooded_forest_missed_km2": 74.5,
+    "flooded_forest_dswx_inundated_veg_km2": 1.0,
+    "flooded_forest_dswx_open_water_km2": 0.0,
+    "dswx_unknown_colour_px": 0,
+    "dswx_tried": [
+     {
+      "date": "2026-10-17",
+      "valid_share": 1.0,
+      "unknown_colour_px": 0
+     }
     ],
-    "wind_or_rough_km2": 7.5
+    "wind_or_rough_km2": 13.0
    }
   ],
   "forest_at_start_km2": 676.8,
   "pixel_m": 60.0,
-  "open_water_badge": "Moderate",
+  "open_water_badge": "Strong",
   "rain": {
    "label": "NASA POWER (MERRA-2), regional",
    "since_1_may_mm": 1214.5,
@@ -153,6 +270,26 @@
     "file": "NISAR_L2_PR_GCOV_023_083_A_008_2005_DHDH_M_20260619T223637_20260619T223711_P05023_N_F_J_001.h5",
     "date": "2026-06-19",
     "start": "2026-06-19T22:36:37.000000000",
+    "direction": "Ascending",
+    "track": 83,
+    "frame": 8,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   },
+   {
+    "file": "NISAR_L2_PR_GCOV_029_083_A_008_2005_DHDH_M_20260830T223633_20260830T223708_P05023_N_F_J_001.h5",
+    "date": "2026-08-30",
+    "start": "2026-08-30T22:36:33.000000000",
+    "direction": "Ascending",
+    "track": 83,
+    "frame": 8,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   },
+   {
+    "file": "NISAR_L2_PR_GCOV_033_083_A_008_2005_DHDH_M_20261017T223633_20261017T223708_P05023_N_F_J_001.h5",
+    "date": "2026-10-17",
+    "start": "2026-10-17T22:36:33.000000000",
     "direction": "Ascending",
     "track": 83,
     "frame": 8,

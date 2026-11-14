@@ -4,6 +4,9 @@
 //  - NASA's data gap (27 Jul - 10 Aug 2026, no NISAR data anywhere) is shaded and labelled.
 //  - Moving across a case's pass date tells main.js, which makes that case's beacon pulse.
 //  - Every move also reports the date (onDay), so unverified tips appear on their own dates.
+//  - While a case terrain is open, the slider picks the terrain layer (main.js connects them):
+//    brighter "layer" ticks mark the passes we actually processed, and setDate() lets the
+//    terrain's ◀ ▶ stepper move the slider back, so the two always agree.
 
 const DAY = 86400000;
 const START = Date.UTC(2026, 5, 1);    // 1 Jun 2026 (months count from 0)
@@ -34,6 +37,7 @@ export function createTimeline(root, cases, { onCross, onDay }) {
       <div class="tl-gap" style="left:${pos(dayOf(GAP[0]))}; width:calc((100% - 14px) * ${(dayOf(GAP[1]) - dayOf(GAP[0])) / TOTAL_DAYS})"
            title="No NISAR data was released for 27 Jul – 10 Aug 2026">NASA data gap</div>
       <div class="tl-ticks" id="tl-ticks"></div>
+      <div class="tl-ticks" id="tl-layer-ticks"></div>
       <input class="tl-slider" id="tl-slider" type="range" min="0" max="${TOTAL_DAYS}" step="1" value="0"
              aria-label="Date">
       <div class="tl-months" id="tl-months"></div>
@@ -43,6 +47,7 @@ export function createTimeline(root, cases, { onCross, onDay }) {
   const dateEl = root.querySelector('#tl-date');
   const caseEl = root.querySelector('#tl-case');
   const ticksEl = root.querySelector('#tl-ticks');
+  const layerTicksEl = root.querySelector('#tl-layer-ticks');
   const playBtn = root.querySelector('#tl-play');
 
   // Month labels on the 1st of each month
@@ -112,6 +117,22 @@ export function createTimeline(root, cases, { onCross, onDay }) {
   setDay(0);
 
   return {
+    // Move the slider to a date (used by the terrain stepper). Same as the player moving it.
+    setDate(iso) { if (dayOf(iso) !== current) setDay(dayOf(iso)); },
+    get date() { return new Date(START + current * DAY).toISOString().slice(0, 10); },
+    // Show or hide the whole bar (hidden when it would change nothing in the open view)
+    setVisible(show) { root.hidden = !show; if (!show) stop(); },
+    // Brighter ticks for the passes that have a processed terrain layer (or none with null)
+    setLayerTicks(dates) {
+      layerTicksEl.innerHTML = '';
+      for (const iso of dates || []) {
+        const tick = document.createElement('span');
+        tick.className = 'tl-tick tl-tick-layer';
+        tick.style.left = pos(dayOf(iso));
+        tick.title = `Processed pass: ${fmt(dayOf(iso))}`;
+        layerTicksEl.appendChild(tick);
+      }
+    },
     refresh() { setDay(current); onDay?.(new Date(START + current * DAY).toISOString().slice(0, 10)); },
     // Show one case's real passes as ticks (or none with null)
     setCase(c) {

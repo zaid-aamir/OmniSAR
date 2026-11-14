@@ -7,6 +7,10 @@
 //     (sequential = "how much", diverging = brighter/darker or up/down)
 //   - block HEIGHT = AWS Terrarium ground height, exaggerated (factor shown on screen)
 //   - a pass stepper moves through the real layers; hovering a block shows value, date, source
+//   - the bottom timeline and the stepper stay in sync: moving the slider shows the layer of the
+//     latest processed pass on or before that date (same kind of layer as the one on screen);
+//     stepping to a dated layer moves the slider there. Layers that aren't one pass (a change
+//     between two dates, slope) are reached only with the stepper.
 
 import * as THREE from 'three';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
@@ -16,6 +20,14 @@ import { colourFor, legendGradient } from './datacolours.js';
 const GAP = 0.88;            // block width as a share of its cell (the gap reads as a thin dark edge)
 const SIDE_SHADE = 0.7;
 const BASE_M = 4;            // every block is at least this tall (metres, before exaggeration)
+const GAP_DATES = ['2026-07-27', '2026-08-10'];   // NASA's NISAR data gap (no data anywhere)
+
+// A layer belongs to ONE pass if its date is a single day (not "A → B", not empty)
+const isDated = (l) => /^\d{4}-\d{2}-\d{2}$/.test(l?.date || '');
+// Layers of the same kind (same unit, scale and colour scale), e.g. "HH" or "water share"
+const family = (l) => `${l.kind}|${l.unit}|${(l.scale || []).join(',')}`;
+const fmtDate = (iso) => new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB',
+  { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
 function blockGeometry() {
   const geo = new THREE.BoxGeometry(1, 1, 1);
@@ -48,6 +60,7 @@ export function createCaseTerrain(container) {
       <div>
         <p class="eyebrow" id="tv-case"></p>
         <p class="terrain-layer" id="tv-layer"></p>
+        <p class="terrain-when" id="tv-when"></p>
       </div>
       <button class="ghost-btn" id="tv-globe">↩ Globe</button>
     </div>
@@ -79,6 +92,7 @@ export function createCaseTerrain(container) {
   controls.screenSpacePanning = false;
 
   let grid = null, mesh = null, layerIndex = 0, cells = [], exaggeration = 1, onGlobe = null, running = false;
+  let sliderDate = null, onLayerDate = null;
   const colour = new THREE.Color();
 
   function resize() {
@@ -144,6 +158,52 @@ export function createCaseTerrain(container) {
       ${layer.note ? `<p class="legend-note">${esc(layer.note)}</p>` : ''}`;
     $('tv-note').textContent =
       `${grid.block_text} · heights exaggerated ×${exaggeration} (${grid.height_source}) · values: ${layer.source}`;
+    updateWhen();
+  }
+
+  // The line under the layer name: which pass is on screen, the next processed pass, and the gap
+  function updateWhen() {
+    const layer = grid.layers[layerIndex];
+    const parts = [];
+    if (isDated(layer)) {
+      const same = grid.layers.filter((l) => isDated(l) && family(l) === family(layer)).map((l) => l.date).sort();
+      const next = same.find((d) => d > layer.date);
+      if (sliderDate && sliderDate < layer.date) parts.push(`No processed pass on or before ${fmtDate(sliderDate)} · showing the first, ${fmtDate(layer.date)}`);
+      else parts.push(`Showing the pass of ${fmtDate(layer.date)}`);
+      parts.push(next ? `next processed pass ${fmtDate(next)}` : 'no later processed pass');
+    } else {
+      parts.push(`Not a single pass (${layer.date || 'no date'}): reach it with ◀ ▶`);
+    }
+    if (sliderDate && sliderDate >= GAP_DATES[0] && sliderDate <= GAP_DATES[1]) {
+      parts.push(`${fmtDate(sliderDate)} is inside NASA's 27 Jul – 10 Aug 2026 data gap: no NISAR data`);
+    }
+    $('tv-when').textContent = parts.join(' · ');
+  }
+
+  // Step to layer i (the stepper); a dated layer moves the timeline slider to its date
+  function stepTo(i) {
+    if (!grid || i < 0 || i >= grid.layers.length || i === layerIndex) return;
+    layerIndex = i;
+    paint();
+    if (isDated(grid.layers[i])) onLayerDate?.(grid.layers[i].date);
+  }
+
+  // The timeline moved: show the latest processed pass on or before that date, keeping the same
+  // kind of layer as the one on screen (from a non-pass layer: the first kind of pass layer)
+  function showDate(iso, { select = true } = {}) {
+    if (!grid) return;
+    sliderDate = iso;
+    const cur = grid.layers[layerIndex];
+    if (select && !(isDated(cur) && cur.date === iso)) {
+      const fam = isDated(cur) ? family(cur) : family(grid.layers.find(isDated) || cur);
+      const options = grid.layers.map((l, i) => ({ l, i })).filter(({ l }) => isDated(l) && family(l) === fam)
+        .sort((a, b) => (a.l.date < b.l.date ? -1 : 1));
+      if (options.length) {
+        const pick = [...options].reverse().find(({ l }) => l.date <= iso) || options[0];
+        if (pick.i !== layerIndex) { layerIndex = pick.i; paint(); return; }
+      }
+    }
+    updateWhen();
   }
 
   // ----- hover: which block is under the mouse? -----
@@ -183,8 +243,8 @@ export function createCaseTerrain(container) {
     renderer.render(scene, camera);
   });
 
-  $('tv-prev').addEventListener('click', () => { if (layerIndex > 0) { layerIndex--; paint(); } });
-  $('tv-next').addEventListener('click', () => { if (layerIndex < grid.layers.length - 1) { layerIndex++; paint(); } });
+  $('tv-prev').addEventListener('click', () => stepTo(layerIndex - 1));
+  $('tv-next').addEventListener('click', () => stepTo(layerIndex + 1));
   $('tv-globe').addEventListener('click', () => onGlobe?.());
   view.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowLeft') $('tv-prev').click();
@@ -193,7 +253,7 @@ export function createCaseTerrain(container) {
 
   return {
     // Show a case's terrain. Returns false if the case has no grid yet (globe stays).
-    async open(caseInfo, gridPath, { onBackToGlobe } = {}) {
+    async open(caseInfo, gridPath, { onBackToGlobe, onLayerDate: onDate, date } = {}) {
       if (!gridPath) return false;
       view.hidden = false;                                   // show the view at once, with a loading line
       $('tv-case').textContent = `${caseInfo.name} · case terrain`;
@@ -207,11 +267,15 @@ export function createCaseTerrain(container) {
       }
       layerIndex = Math.max(0, grid.layers.findIndex((l) => l.id === grid.default_layer));
       onGlobe = onBackToGlobe;
+      onLayerDate = onDate;
+      sliderDate = date || null;
       $('tv-case').textContent = `${caseInfo.name} · case terrain`;
       view.hidden = false;
       running = true;
       resize();
       build();
+      // the slider jumps to the opening layer's pass (a non-pass layer leaves the slider alone)
+      if (isDated(grid.layers[layerIndex])) onLayerDate?.(grid.layers[layerIndex].date);
       return true;
     },
     close() {
@@ -220,5 +284,8 @@ export function createCaseTerrain(container) {
       $('tv-tip').hidden = true;
     },
     get isOpen() { return !view.hidden; },
+    showDate,
+    // the dates of the single-pass layers (for the timeline's "processed pass" ticks)
+    get layerDates() { return grid ? [...new Set(grid.layers.filter(isDated).map((l) => l.date))].sort() : []; },
   };
 }

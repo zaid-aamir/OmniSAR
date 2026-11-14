@@ -63,10 +63,15 @@ async function start() {
     onBack: backToGlobe,
     onOpen: openMystery,
   });
+  // Case terrain: the local blocky view of a case box (covers the globe while open)
+  const terrain = createCaseTerrain(area);
   const markers = createMarkers(globe, data.cases, { onSelect: selectCase, onTip: (t) => panel.showTip(t) });
   const timeline = createTimeline(document.getElementById('timeline'), data.cases, {
     onCross: (id) => markers.pulse(id),
-    onDay: (iso) => markers.setDate(iso),
+    onDay: (iso) => {
+      markers.setDate(iso);
+      if (terrain.isOpen) terrain.showDate(iso);     // the open case terrain follows the slider
+    },
   });
   // Unverified tips: a saved snapshot of NASA EONET natural events (tools/fetch_eonet.py).
   // If the file is missing the globe simply shows no tips.
@@ -77,11 +82,12 @@ async function start() {
     timeline.refresh();
   }).catch(() => {});
 
-  // Case terrain: the local blocky view of a case box (covers the globe while open)
-  const terrain = createCaseTerrain(area);
+  // Case terrain: the local blocky view of a case box (created above the timeline, which talks to it)
   function showGlobe() {
     terrain.close();
     globe.setPaused(false);
+    timeline.setLayerTicks(null);
+    timeline.setVisible(true);                       // on the globe the slider drives beacons and tips
   }
 
   function selectCase(id) {
@@ -125,8 +131,17 @@ async function start() {
       onExit: (how) => { showGlobe(); if (how?.finished && panel.allDone()) panel.showEnd(); else panel.showCase(c); },
     });
     // Opening a case moves the view down to its blocky terrain, if the case has a grid yet
-    const opened = await terrain.open(c, mystery.numbers?.files?.grid, { onBackToGlobe: showGlobe });
-    if (opened) globe.setPaused(true);
+    const opened = await terrain.open(c, mystery.numbers?.files?.grid, {
+      onBackToGlobe: showGlobe,
+      onLayerDate: (iso) => timeline.setDate(iso),   // stepper -> slider
+      date: timeline.date,
+    });
+    if (opened) {
+      globe.setPaused(true);
+      timeline.setLayerTicks(terrain.layerDates);
+      // the slider only earns its place if it can pick between at least two dated layers
+      timeline.setVisible(terrain.layerDates.length >= 2);
+    }
   }
 
   // ?case=<id> opens straight onto a case (for testing and screenshots)

@@ -528,3 +528,10 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
 .sort-card, .evidence-card, .graph-detail, .facts dd { min-width: 0; overflow-wrap: anywhere; }
 .evidence-source .tag, .sort-filed, .sort-feedback { white-space: normal; overflow-wrap: anywhere; }
 .custody code, .custody td { overflow-wrap: anywhere; }
+
+/* ---------- Terrain <-> timeline sync ---------- */
+.terrain-when { margin: 2px 0 0; font: 12px var(--font-data); color: var(--muted); }
+.tl-tick.tl-tick-layer { top: 0; height: 22px; width: 4px; margin-left: -2px; background: var(--data-nisar);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--data-nisar) 70%, transparent); }
+/* when the timeline would change nothing it is hidden, and its row closes up */
+.layout:has(> .timeline[hidden]) { grid-template-rows: 1fr 0; }

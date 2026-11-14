@@ -153,8 +153,8 @@
       "id": "pulse",
       "title": "Open water and flooded forest",
       "kind": "image",
-      "src": "assets/cases/tonle-sap/ev-pass-2026-06-19.png",
-      "caption": "NISAR on 19 Jun: 874.5 km² of open water and 15.1 km² of flooded forest in our box. Only one pass is processed so far, so the pulse curve has one point.",
+      "src": "assets/cases/tonle-sap/ev-pass-2026-10-17.png",
+      "caption": "NISAR on 17 Oct: 1284.4 km² of open water and 75.5 km² of flooded forest in our box.",
       "source": "NISAR GCOV, track 083 ascending",
       "bin": "real",
       "trap": null,
@@ -165,7 +165,7 @@
       "title": "L-band vs a C-band water map",
       "kind": "image",
       "src": "assets/cases/tonle-sap/ev-check.png",
-      "caption": "19 Jun: NISAR and the C-band OPERA DSWx-S1 map (18 Jun) agree on open water at 98% of pixels. Of our flooded forest, 14.6 km² is 'not water' on the C-band map.",
+      "caption": "17 Oct: NISAR and the C-band OPERA DSWx-S1 map (17 Oct) agree on open water at 79% of pixels. Of our flooded forest, 74.5 km² is 'not water' on the C-band map.",
       "source": "NISAR GCOV + NASA OPERA DSWx-S1",
       "bin": "real",
       "trap": null,
@@ -176,7 +176,7 @@
       "title": "Water that doesn't look dark",
       "kind": "image",
       "src": "assets/cases/tonle-sap/ev-wind.png",
-      "caption": "7.5 km² that the C-band map calls open water looked too bright to NISAR to count as water. Rough water (wind ripples, floating plants) scatters the beam back, so 'not dark' doesn't always mean 'not water'.",
+      "caption": "13.0 km² that the C-band map calls open water looked too bright to NISAR to count as water. Rough water (wind ripples, floating plants) scatters the beam back, so 'not dark' doesn't always mean 'not water'.",
       "source": "NISAR GCOV + NASA OPERA DSWx-S1",
       "bin": "trap",
       "trap": 11,
@@ -203,11 +203,11 @@
       "layers": {
         "off": {
           "src": "assets/cases/tonle-sap/tg-lband.png",
-          "label": "NISAR L-band 19 Jun"
+          "label": "NISAR L-band 17 Oct"
         },
         "on": {
           "src": "assets/cases/tonle-sap/tg-cband.png",
-          "label": "OPERA DSWx-S1 C-band 18 Jun"
+          "label": "OPERA DSWx-S1 C-band 17 Oct"
         }
       },
       "disabled": null
