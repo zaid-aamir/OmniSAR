@@ -167,7 +167,7 @@
       "title": "Median change: Jun–Jul vs Sep–Oct",
       "kind": "image",
       "src": null,
-      "caption": "Median of three passes per side: pending. The 30 Jun and 16 Oct files are still downloading.",
+      "caption": "Median of three passes per side: pending. We have 1 before and 1 after; with fewer than three, one bad date can't be outvoted.",
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "real",
       "trap": null,
@@ -198,7 +198,7 @@
       "title": "NISAR map tile at zoom 10",
       "kind": "image",
       "src": "assets/cases/jebel-ali/ev-zoom10.png",
-      "caption": "One NASA NISAR map-tile address at zoom 10, requested 5 times on 14 Nov 2026 04:08 UAE: 4 different image(s) came back. Map tiles are pictures; our numbers come from the science files.",
+      "caption": "One NASA NISAR map-tile address at zoom 10, requested 5 times on 14 Nov 2026 05:57 UAE: 5 different image(s) came back. Map tiles are pictures; our numbers come from the science files.",
       "source": "NASA GIBS NISAR tiles, zoom 10",
       "bin": "trap",
       "trap": 2
@@ -230,7 +230,7 @@
           "label": "Median of several passes"
         }
       },
-      "disabled": "The median needs three passes per side; the 30 Jun and 16 Oct files are still downloading."
+      "disabled": "The median needs three passes per side; we have 1 before and 1 after so far (more are downloading)."
     },
     {
       "id": "band",

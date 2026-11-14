@@ -45,7 +45,7 @@ import update_results
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)    # all-NaN tiles etc. are handled explicitly
 
-SCRIPT_VERSION = "1.2"   # 1.1: display rule, terrain heights, per-pass medians; 1.2: single-pass cross-checks, NaN-safe JSON (METHOD unchanged)
+SCRIPT_VERSION = "1.2.1"   # 1.2.1: script fingerprints taken with LF line endings (as stored in git); 1.1: display rule, terrain heights, per-pass medians; 1.2: single-pass cross-checks, NaN-safe JSON (METHOD unchanged)
 CASE = "jebel-ali"
 GRID = "/science/LSAR/GCOV/grids/frequencyA"
 DATA_DIR = os.path.join(nio.PROJECT, "data", "gcov")
@@ -112,11 +112,12 @@ def log(*a):
 
 
 def sha256(path):
-    h = hashlib.sha256()
+    """Fingerprint of a script, taken with LF line endings, which is exactly how git stores it.
+    (Windows checks files out with CRLF line endings; without this, the fingerprint made on a
+    Windows laptop would never match the same file on GitHub.) Used by every processing script."""
     with open(path, "rb") as f:
-        for block in iter(lambda: f.read(1 << 20), b""):
-            h.update(block)
-    return h.hexdigest()
+        data = f.read().replace(b"\r\n", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def font(size):

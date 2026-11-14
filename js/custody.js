@@ -25,7 +25,7 @@ export function openCustody(caseInfo, numbers) {
   dialog.innerHTML = `
     <article class="trap-card custody">
       <p class="eyebrow">Chain of custody · ${esc(caseInfo.name)}</p>
-      <h2 class="trap-title">Everything behind this verdict</h2>
+      <h2 class="trap-title" tabindex="-1">Everything behind this verdict</h2>
       <h3>NASA files used</h3>
       <ul class="custody-files">
         ${(p.nasa_files || []).map((f) => `<li><code>${esc(f.file)}</code><br><span>${esc(f.date || f.dates || '')} · ${esc(f.direction || '')} · track ${esc(f.track ?? '')} frame ${esc(f.frame ?? '')} · ${esc(f.processing || '')} ${f.product_version ? '· product ' + esc(f.product_version) : ''}</span></li>`).join('')}
@@ -42,7 +42,7 @@ export function openCustody(caseInfo, numbers) {
       <h3>Software</h3>
       <table class="custody-table">
         ${row('script', `${p.script || ''} v${p.script_version || '?'}`)}
-        ${row('script fingerprint (SHA-256)', p.script_sha256 || '')}
+        ${row('script fingerprint (SHA-256 of the script as stored in git, LF line endings)', p.script_sha256 || '')}
         ${p.helpers_sha256 ? row('helpers fingerprint (SHA-256)', p.helpers_sha256) : ''}
         ${row('numbers generated', numbers.generated)}
       </table>
@@ -59,4 +59,8 @@ export function openCustody(caseInfo, numbers) {
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   });
   dialog.showModal();
+  // the browser focuses the first button (at the bottom); start the reader at the top instead
+  dialog.querySelector('.trap-title').focus();
+  dialog.scrollTop = 0;
+  dialog.querySelector('.custody').scrollTop = 0;
 }

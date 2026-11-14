@@ -1,6 +1,6 @@
 {
  "case": "big-sur",
- "generated": "2026-11-14T01:03Z",
+ "generated": "2026-11-14T02:00Z",
  "measured": [
   {
    "label": "Burned (NISAR HV fell ≥ 2 dB)",
@@ -826,7 +826,7 @@
   ],
   "script": "tools/process_big_sur.py",
   "script_version": "1.1",
-  "script_sha256": "c8978b7bfd17c9272c6e41898baca0efa5e648777235136fdede49b0c4924d48",
-  "helpers_sha256": "d71853edabb0fb095ed99c2470163d6f05bd3687c088343e553c6e298e2c51c6"
+  "script_sha256": "55675b86d7197a761180cff9e759b113f3a2cbfc12b649eb23c66ed35641b061",
+  "helpers_sha256": "651c7412e7d07f81b886b5195dd010cf8e8feae929ac05f0500536ca06427888"
  }
 }

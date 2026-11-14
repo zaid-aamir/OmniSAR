@@ -1,6 +1,6 @@
 {
  "case": "jakarta",
- "generated": "2026-11-14T01:39Z",
+ "generated": "2026-11-14T01:58Z",
  "measured": [
   {
    "label": "Fastest-sinking district (2 km)",
@@ -660,7 +660,7 @@
   ],
   "script": "tools/process_jakarta.py",
   "script_version": "1.0.2",
-  "script_sha256": "0eef5a2c2ed7d693b51e1d639142a1c77e90ac2b05ee0b103ca7ce9b9ad9f392",
-  "helpers_sha256": "d71853edabb0fb095ed99c2470163d6f05bd3687c088343e553c6e298e2c51c6"
+  "script_sha256": "55f9590455d0ef57a903e5de4cf6722c8b1cf2a1b97e073cdaa0a4479f861318",
+  "helpers_sha256": "651c7412e7d07f81b886b5195dd010cf8e8feae929ac05f0500536ca06427888"
  }
 }

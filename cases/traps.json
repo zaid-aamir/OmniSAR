@@ -20,7 +20,7 @@
       "bucket": "data",
       "title": "NASA's NISAR map tiles break at close zoom",
       "fools": "Zoom in past level 9 (about 280 m pixels) and the tile server sends random garbage or errors that look like real detail.",
-      "proof": "We asked NASA's server for the same zoom-10 NISAR tile 5 times on 14 Nov 2026 and got 4 different images back (on 13 Nov: 4 different images in 5 requests, from two networks).",
+      "proof": "We asked NASA's server for the same zoom-10 NISAR tile 5 times on 14 Nov 2026 and got 5 different images back at 05:57 UAE (4 different at 04:08; on 13 Nov, 4 different images in 5 requests, from two networks).",
       "handling": "OmniSAR never takes a number from NISAR map tiles: every value comes from the science files. Sharper views use other satellites, always labelled.",
       "inApp": true
     },
@@ -83,16 +83,16 @@
       "bucket": "earth",
       "title": "Mountains create fake change",
       "fools": "Steep slopes facing towards or away from the satellite change brightness with the viewing angle, which can look like change.",
-      "proof": "Jebel Hafeet showed 'change' that is a viewing-angle effect.",
-      "handling": "Changes on rugged ground are marked low confidence, using elevation data.",
-      "inApp": false
+      "proof": "In our Big Sur box, 16.7% of the land is radar-distorted: steep slopes facing away from the satellite, radar shadow or layover, worked out from the look direction stored in the NISAR file and elevation data. 3.4 km² of apparent 'burn' sits on those slopes. (Jebel Hafeet near Al Ain also showed viewing-angle 'change'.)",
+      "handling": "OmniSAR flags those slopes using elevation data and the satellite's look direction, keeps them out of the headline number, and reports them separately as low confidence.",
+      "inApp": true
     },
     {
       "id": 10,
       "bucket": "artefacts",
       "title": "Speckle: radar graininess",
       "fools": "Single radar pixels jump up and down between dates even when nothing changed.",
-      "proof": "Single pixels jump up and down between dates in the NISAR images we compared.",
+      "proof": "In our Big Sur box, single 10 m pixels from one pass each 'change' by a spread of 2.4 dB where nothing burned. After filtering to 30 m and smoothing, the spread is 0.3 dB.",
       "handling": "We average each 3×3 block of 10 m pixels (30 m result) before comparing dates, and ignore changed patches smaller than about 1 hectare.",
       "inApp": true
     },
@@ -120,8 +120,8 @@
       "title": "Map tiles are pictures, not measurements",
       "fools": "The NISAR map tiles are pre-coloured images. Their colours are not calibrated radar values, so you can't measure from them.",
       "proof": "The tiles are 8-bit coloured PNG/JPEG images; the calibrated values are only in the science files.",
-      "handling": "Every number in a verdict comes from the calibrated science files, never from tile colours.",
-      "inApp": false
+      "handling": "Every radar number in a verdict comes from the calibrated science files, never from tile colours. Tiles are shown only for comparison and labelled as pictures. The one exception is NASA's OPERA DSWx-S1 water map: it is a set of classes (water, not water, ...) with a published colour table, so we decode the classes exactly; we never read radar brightness from colours.",
+      "inApp": true
     },
     {
       "id": 14,
@@ -147,18 +147,25 @@
       "title": "Sea-level rise is too slow to see",
       "fools": "Sea level rises a few millimetres a year. A few months of radar can't show it.",
       "proof": "NASA reports that global sea level rose about 4.5 mm in 2024, up from about 2.1 mm a year in 1993 (NASA Sea Level Change, Feb 2025). In each of our 12-day Jakarta pairs, the air alone moves the signal by up to 46 mm.",
-      "citation": [{"outlet": "NASA Sea Level Change", "date": "Feb 2025", "title": "Rate of sea level rise doubled over 30 years, new study shows", "url": "https://sealevel.nasa.gov/news/280/rate-of-sea-level-rise-doubled-over-30-years-new-study-shows/"}],
+      "citation": [
+        {
+          "outlet": "NASA Sea Level Change",
+          "date": "Feb 2025",
+          "title": "Rate of sea level rise doubled over 30 years, new study shows",
+          "url": "https://sealevel.nasa.gov/news/280/rate-of-sea-level-rise-doubled-over-30-years-new-study-shows/"
+        }
+      ],
       "handling": "OmniSAR measures land motion, not sea level, and says so.",
       "inApp": true
     },
     {
       "id": 17,
       "bucket": "earth",
-      "title": "Soil moisture data is coarse",
-      "fools": "NASA's SMAP soil moisture comes in 9 km squares, much bigger than one hillside.",
-      "proof": "The SMAP grid is 9 km; the slopes we study are a few hundred metres across.",
-      "handling": "Soil moisture is used only as regional wet or dry; slope comes from 30 m elevation data.",
-      "inApp": false
+      "title": "Soil moisture and rain data are coarse",
+      "fools": "NASA's SMAP soil moisture comes in 9 km squares, and NASA POWER's rain and soil wetness in squares about 50 km across: much bigger than one hillside.",
+      "proof": "The slopes we study at Big Sur are a few hundred metres across; one NASA POWER square covers the whole case box.",
+      "handling": "Big Sur's rain and soil wetness (NASA POWER) are labelled 'regional, not per slope' everywhere and used only as 'has rain fallen on the area'. Slope comes from ~30 m elevation data.",
+      "inApp": true
     }
   ],
   "limits": [

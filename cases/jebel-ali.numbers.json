@@ -1,6 +1,6 @@
 {
  "case": "jebel-ali",
- "generated": "2026-11-14T00:15Z",
+ "generated": "2026-11-14T01:57Z",
  "measured": [
   {
    "label": "New structures",
@@ -345,6 +345,7 @@
    "ok": false
   },
   "median_robust": false,
+  "cross_checks": [],
   "photo_check": {
    "status": "pending",
    "confirmed": null,
@@ -542,8 +543,8 @@
    ]
   },
   "script": "tools/process_jebel_ali.py",
-  "script_version": "1.1",
-  "script_sha256": "db1f0c85fd36d5c392bbe94aa892a86adc8fdd085f4c7fd5ccf23ceda3d0c7c6",
-  "helpers_sha256": "e71f9a96fa177aa4f9713fe60baf672f78d8f36e9a49d88865eeb72d77992bf9"
+  "script_version": "1.2.1",
+  "script_sha256": "8a431d2adb31ed1b664d4cc402e1f1a251a32945e7f139c83efe141cc4bd3cea",
+  "helpers_sha256": "651c7412e7d07f81b886b5195dd010cf8e8feae929ac05f0500536ca06427888"
  }
 }
