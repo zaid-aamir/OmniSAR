@@ -1,5 +1,5 @@
 {
-  "about": "Change Replay (js/replay.js): which layers each case terrain loops through and which rule outlines the changed blocks. Pass DATES are not written here: they come from the case's numbers file (the verdict's own passes = its NASA files minus quality_control.excluded_passes) and the grid's dated layers of 'unit'. Thresholds come from the numbers file's method block ('method:' keys). Captions are templates: {m:<measured label>} = that measured value + unit, {method:<key>} = a method number, {badge}, {badge_reason}, {first}/{last}/{date} = the replayed pass dates ('15 Sep'). A missing value makes the whole caption disappear, never a made-up number. CHANGE phase: blocks past the rule FLASH, red = the radar value fell (burned, lost, sank), cyan = it rose (new structures, new water); 'colour' = red / cyan for the whole case or 'sign' per block; 'legend' = the line that says so ({threshold} = this file's own display threshold).",
+  "about": "Change Replay (js/replay.js): which layers each case terrain loops through and which rule outlines the changed blocks. Pass DATES are not written here: they come from the case's numbers file (the verdict's own passes = its NASA files minus quality_control.excluded_passes) and the grid's dated layers of 'unit'. Thresholds come from the numbers file's method block ('method:' keys). Captions are templates: {m:<measured label>} = that measured value + unit, {method:<key>} = a method number, {badge}, {badge_reason}, {first}/{last}/{date} = the replayed pass dates ('15 Sep'). A missing value makes the whole caption disappear, never a made-up number. CHANGE phase: blocks past the rule FLASH, red = the radar value fell (burned, lost, sank), cyan = it rose (new structures, new water), orange = a trap; 'colour' = red / cyan / orange for the whole case or 'sign' per block; 'legend' = the line that says so ({threshold} = this file's own display threshold).",
   "cases": {
     "big-sur": {
       "unit": "dB",
@@ -25,8 +25,8 @@
         "label": "Trap 8: interference, not construction",
         "change": {
           "diff_abs_method": "X_db",
-          "colour": "red",
-          "legend": "Flashing red = Trap 8: one bad date (raw HH jumped ≥ {method:X_db} dB), not construction"
+          "colour": "orange",
+          "legend": "Flashing orange = Trap 8: one bad date (raw HH jumped ≥ {method:X_db} dB), not construction"
         },
         "caption": "Trap 8 · {last}: {qc}"
       }

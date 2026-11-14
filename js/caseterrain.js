@@ -219,8 +219,8 @@ export function createCaseTerrain(container) {
         diffuseColor.rgb = mix(vec3(0.05), vec3(0.16), st);
       }
       // CHANGE: blocks past the threshold flash between their own colour and RED (the radar value fell,
-      // #FF3B30) or CYAN (it rose, #66FCF1), 1.5 times a second, and glow (emissive, below)
-      vec3 flashCol = mix(vec3(1.0, 0.0423, 0.0296), vec3(0.133, 0.973, 0.879), step(1.5, vChg));
+      // #FF3B30), CYAN (it rose, #66FCF1) or ORANGE (a trap, #FF9F0A), 1.5 times a second, and glow (emissive)
+      vec3 flashCol = vChg > 2.5 ? vec3(1.0, 0.354, 0.003) : mix(vec3(1.0, 0.0423, 0.0296), vec3(0.133, 0.973, 0.879), step(1.5, vChg));
       float flashK = step(0.5, vChg) * uChgOn * uReplayOn * (0.5 + 0.5 * sin(uTime * 6.2831853 * uFlashHz));
       diffuseColor.rgb = mix(diffuseColor.rgb, flashCol, flashK);`)
       .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
@@ -474,6 +474,10 @@ export function createCaseTerrain(container) {
     $('tv-when').textContent = parts.join(' · ');
     $('tv-when').title = parts.join(' · ');      // the line is cut to two lines on narrow terrain
     if (replayBanner) ({ main, short, sub = '' } = replayBanner);   // the change replay's phase
+    // the title box follows the replay (which pass is on screen); with the replay paused by the stepper,
+    // it shows the stepper's layer again
+    $('tv-layer').textContent = replayBanner?.title || layer.label;
+    if (replayBanner?.when) { $('tv-when').textContent = replayBanner.when; $('tv-when').title = replayBanner.when; }
     const mainEl = $('tv-pass-main');
     if (mainEl.textContent !== main) {
       mainEl.textContent = main;
@@ -936,7 +940,7 @@ export function createCaseTerrain(container) {
       const i = cells[best], r = Math.floor(i / grid.cols), c = i % grid.cols;
       const v = new THREE.Vector3((c - grid.cols / 2 + 0.5) * km, blockH[best] * (1 + replayU.uRise.value), (r - grid.rows / 2 + 0.5) * km).project(camera);
       const rect = renderer.domElement.getBoundingClientRect();
-      return { x: rect.left + (v.x + 1) / 2 * rect.width, y: rect.top + (1 - v.y) / 2 * rect.height, colour: plan.mask[i] === 2 ? 'cyan' : 'red' };
+      return { x: rect.left + (v.x + 1) / 2 * rect.width, y: rect.top + (1 - v.y) / 2 * rect.height, colour: ['', 'red', 'cyan', 'orange'][plan.mask[i]] };
     },
     // tests: show the hover tooltip as if the pointer were at (clientX, clientY); false = no free spot
     testTip(clientX, clientY) {

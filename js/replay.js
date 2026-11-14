@@ -4,7 +4,8 @@
 //   BEFORE (2 s)  →  fade (1 s, "no data in between")  →  AFTER (2 s)  →  CHANGE (2.5 s)
 //   CHANGE: blocks past the case's own threshold FLASH (1.5 a second, limit 3) and rise a little; every
 //   other block dims to 25% grey; the camera glides to the largest flashing cluster (and back at the next
-//   BEFORE). RED = the radar value fell (burned, lost, sank); CYAN = it rose (new structures, new water).
+//   BEFORE). RED = the radar value fell (burned, lost, sank); CYAN = it rose (new structures, new water);
+//   ORANGE = a trap (Jebel Ali's 28 Oct interference), so red only ever means "fell".
 //   A caption gives the key measured number and a legend line says what the flashing colour means.
 // Cases with 3+ passes step through each one (Tonle Sap 19 Jun → 30 Aug → 17 Oct; Jakarta's 8 dates,
 // with the blocks sinking by the measured motion, exaggerated by a stated factor).
@@ -100,11 +101,12 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
 
   // ----- the flashing blocks: the same rule the verdict uses (thresholds from the numbers file) -----
   // mask per grid cell: 0 = not past the threshold, 1 = past it and the radar value FELL (red),
-  // 2 = past it and the value ROSE (cyan). rule.colour: 'red' / 'cyan' for the whole case, 'sign' = per block.
+  // 2 = past it and the value ROSE (cyan), 3 = a trap (orange). rule.colour: 'red' / 'cyan' / 'orange' for
+  // the whole case, 'sign' = per block.
   const rule = trap ? cfg.trap.change : cfg?.change;
   const n = grid.rows * grid.cols;
   const mask = new Uint8Array(n);
-  let count = 0, red = 0, cyan = 0;
+  let count = 0, red = 0, cyan = 0, orange = 0;
   const thr = (key) => (typeof method?.[key] === 'number' ? method[key] : null);
   const diff = (i) => last.values[i] - first.values[i];
   let test = null, dir = null;
@@ -128,9 +130,10 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
   if (test) {
     for (let i = 0; i < n; i++) {
       if (!test(i)) continue;
+      count++;
+      if (mode === 'orange') { mask[i] = 3; orange++; continue; }
       const rose = mode === 'cyan' || (mode === 'sign' && dir && dir(i) > 0);
       mask[i] = rose ? 2 : 1;
-      count++;
       if (rose) cyan++; else red++;
     }
   }
@@ -143,7 +146,7 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
   if (live && /\{badge/.test(captionTpl || '')) captionTpl = captionTpl.replace(/\s*·\s*badge \{badge\}: \{badge_reason\}/, '');   // Live Ops asks you to guess the badge
   const caption = fill(captionTpl, { numbers, method, dates, qc }) || '';
   const legend = test ? (fill(rule?.legend || '', { numbers, method, dates, threshold: rule?.diff_abs_gte ?? null }) || '') : '';
-  const swatch = red && cyan ? 'both' : red ? 'red' : cyan ? 'cyan' : '';
+  const swatch = orange ? 'orange' : red && cyan ? 'both' : red ? 'red' : cyan ? 'cyan' : '';
   const stepCaptions = steps.map((l) => fill(cfg?.stepCaption, { numbers, method, dates: { ...dates, date: l.date }, layer: l }) || '');
 
   // Jakarta: blocks sink by the measured motion, exaggerated so the largest value on the scale is maxWorldM
@@ -153,7 +156,7 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
     sink = { factor: Math.round(cfg.sink.maxWorldM / (maxMm / 1000)) };
   }
   return {
-    caseId, trap, steps, mask, count, red, cyan, focus, caption, legend, swatch, stepCaptions, sink,
+    caseId, trap, steps, mask, count, red, cyan, orange, focus, caption, legend, swatch, stepCaptions, sink,
     label: trap ? cfg.trap.label : null,
     trapAvailable, trapButton: cfg?.trap?.button || null,
   };
@@ -227,15 +230,20 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
     const join = (...xs) => xs.filter(Boolean).join(' · ');
     if (ph.kind === 'fade') {
       return { main: 'fading between two real passes (no data in between)', short: 'fading · no data between',
-        sub: join(`${fmtDate(s[ph.a].date)} → ${fmtDate(s[ph.b].date)}`, sinkNote), phase: 'fade' };
+        sub: join(`${fmtDate(s[ph.a].date)} → ${fmtDate(s[ph.b].date)}`, sinkNote), phase: 'fade',
+        title: `Fading ${fmtShort(s[ph.a].date)} → ${fmtDate(s[ph.b].date)}`,
+        when: 'Change replay · a cross-fade between two real passes, no data in between · ◀ ▶ pauses it' };
     }
     if (ph.kind === 'change') {
       return { main: `CHANGE · ${fmtShort(s[0].date)} → ${fmtDate(s[s.length - 1].date)}`, short: `CHANGE · ${fmtShort(s[0].date)} → ${fmtShort(s[s.length - 1].date)}`,
-        sub: join(plan.caption, sinkNote), key: plan.legend, swatch: plan.swatch, phase: 'change' };
+        sub: join(plan.caption, sinkNote), key: plan.legend, swatch: plan.swatch, phase: 'change',
+        title: `CHANGE ${fmtShort(s[0].date)} → ${fmtDate(s[s.length - 1].date)}`,
+        when: `Change replay · ${plan.legend || 'what changed between the two passes'} · ◀ ▶ pauses it` };
     }
     const d = s[ph.at].date;
     const word = ph.kind === 'before' ? 'BEFORE' : ph.kind === 'after' ? 'AFTER' : 'PASS';
-    return { main: `${word} · ${fmtDate(d)}`, short: `${word} · ${fmtShort(d)}`, sub: join(sc[ph.at], sinkNote), phase: ph.kind };
+    return { main: `${word} · ${fmtDate(d)}`, short: `${word} · ${fmtShort(d)}`, sub: join(sc[ph.at], sinkNote), phase: ph.kind,
+      title: `${word} · ${fmtDate(d)}`, when: `Change replay · ${s[ph.at].label} · ◀ ▶ pauses it` };
   }
 
   function pairOf(ph) {
@@ -368,7 +376,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
       if (!plan) return null;
       const ph = phases[curPhase] || null;
       return { phase: ph?.kind, t: Math.round(t), total, playing, frozen, speed, on, trap: plan.trap,
-        dates: plan.steps.map((s) => s.date), outlined: plan.count, red: plan.red, cyan: plan.cyan, focus: plan.focus, legend: plan.legend, caption: plan.caption, label: plan.label,
+        dates: plan.steps.map((s) => s.date), outlined: plan.count, red: plan.red, cyan: plan.cyan, orange: plan.orange, focus: plan.focus, legend: plan.legend, caption: plan.caption, label: plan.label,
         sinkFactor: plan.sink?.factor || null, phaseIndex: curPhase, phases: phases.map((p) => ({ kind: p.kind, t0: p.t0, ms: p.ms })) };
     },
   };

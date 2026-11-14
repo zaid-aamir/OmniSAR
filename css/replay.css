@@ -23,12 +23,13 @@
 .rp-trap[aria-pressed="true"] { background: color-mix(in srgb, var(--ui-wrong) 18%, transparent); }
 .rp-trap[hidden] { display: none; }
 
-/* "Trap 8: interference, not construction": big and obvious, top-left of the terrain's free region */
+/* "Trap 8: interference, not construction": big and obvious, top-left of the terrain's free region;
+   orange like the trap's flashing blocks (red only ever means "radar fell") */
 .tv-overlay .tv-main > .rp-label {
   top: 0; left: 0; max-width: min(420px, 100%); padding: 8px 12px;
   font: 700 15px/1.3 var(--font-data); color: #fff;
-  background: color-mix(in srgb, var(--alert) 30%, var(--surface-2));
-  border: 2px solid var(--alert); border-radius: 8px;
+  background: color-mix(in srgb, #FF9F0A 28%, var(--surface-2));
+  border: 2px solid #FF9F0A; border-radius: 8px;
 }
 .rp-label[hidden] { display: none; }
 /* one floating thing at a time in the free region: the label steps aside for the SI panel and the popover */
@@ -53,5 +54,6 @@
 /* the CHANGE legend line ("Flashing red = burned …"): a filled swatch in the flash colour (fixed data colours) */
 .tp-key[data-swatch="red"] .tp-swatch { border-color: #FF3B30; background: #FF3B30; }
 .tp-key[data-swatch="cyan"] .tp-swatch { border-color: #66FCF1; background: #66FCF1; }
+.tp-key[data-swatch="orange"] .tp-swatch { border-color: #FF9F0A; background: #FF9F0A; }
 .tp-key[data-swatch="both"] .tp-swatch { border-color: #FF3B30; background: linear-gradient(90deg, #FF3B30 50%, #66FCF1 50%); }
 .terrain-pass[data-phase="change"] .tp-key { color: var(--text); font-weight: 600; }
