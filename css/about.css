@@ -1,0 +1,22 @@
+/* Home legend + extra views (js/about.js), "we caught it" verdicts, tour captions (js/tour.js) */
+.home-legend { margin: 12px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.legend-sq { display: inline-block; width: 8px; height: 14px; vertical-align: -2px; border-radius: 1px; }
+.legend-case { background: var(--data-nisar); }
+.legend-tip { background: var(--data-unverified); }
+.home-actions .primary-btn { width: 100%; }
+.about-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 14px; }
+.about-list li { padding: 8px 10px; border: 1px solid var(--line); border-radius: var(--radius); }
+.about-list .cite { margin-left: 4px; }
+.about-facts div { grid-template-columns: 120px 1fr; }
+.about-points { padding-left: 18px; display: grid; gap: 10px; font-size: 14px; }
+.caught { border-left: 3px solid var(--data-pending); background: color-mix(in srgb, var(--surface) 72%, transparent);
+  padding: 8px 12px; margin: 10px 0; border-radius: 0 var(--radius) var(--radius) 0; font-size: 14px; }
+.caught .reply-head { color: var(--data-pending); margin: 0 0 4px; }
+.caught p { margin: 0 0 4px; }
+.tour-cap {
+  position: fixed; left: 50%; bottom: 110px; transform: translateX(-50%); z-index: 50;
+  width: min(720px, calc(100vw - 32px)); display: flex; gap: 12px; align-items: center;
+  padding: 12px 14px; border: 1px solid var(--hud-line, var(--line-strong)); border-radius: var(--radius);
+  background: var(--surface-2); box-shadow: 0 10px 30px rgba(0, 0, 0, .5); animation: boot-in 260ms ease backwards;
+}
+.tour-text { margin: 0; flex: 1; font-size: 15px; line-height: 1.45; color: var(--text); }

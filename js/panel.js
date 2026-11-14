@@ -20,7 +20,7 @@ export function statusChip(status) {
   return `<span class="status status-${status}">${esc(STATUS_TEXT[status] || status)}</span>`;
 }
 
-export function createPanel(root, cases, { onPick, onBack, onOpen }) {
+export function createPanel(root, cases, { onPick, onBack, onOpen, onAction }) {
   let tipCount = 0;
   const ids = cases.map((c) => c.id);
   let started = false;
@@ -47,10 +47,20 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
       </ol>
       ${done ? `<p class="panel-note">${done} of ${cases.length} cases solved.</p>
         <button class="${done === cases.length ? 'primary-btn' : 'ghost-btn'}" id="end-btn">${done === cases.length ? 'Your investigation: all five solved' : 'Your investigation so far'}</button>` : ''}
+      <p class="home-legend"><span class="legend-sq legend-case" aria-hidden="true"></span> cyan columns: our five cases ·
+        <span class="legend-sq legend-tip" aria-hidden="true"></span> grey columns: live-event markers, NASA EONET natural events nobody has checked with radar</p>
+      <nav class="home-actions" aria-label="More">
+        <button class="primary-btn" data-action="tour">Watch a 1-minute tour</button>
+        <button class="ghost-btn" data-action="traplab">Trap Lab: all 17 traps</button>
+        <button class="ghost-btn" data-action="nasa">Powered by NASA data</button>
+        <button class="ghost-btn" data-action="challenge">How OmniSAR answers the challenge</button>
+        <button class="ghost-btn" data-action="about">About</button>
+      </nav>
       ${tipCount ? `<p class="panel-note">Grey columns are ${tipCount} unverified tips: natural events from NASA EONET (fires, floods, storms, volcanoes), 1 Jun – 10 Nov 2026. They appear as the timeline reaches their dates. Nobody has checked them with radar.</p>` : ''}`;
     root.querySelectorAll('.case-row').forEach((btn) =>
       btn.addEventListener('click', () => onPick(btn.dataset.id)));
     root.querySelector('#end-btn')?.addEventListener('click', showEnd);
+    root.querySelectorAll('[data-action]').forEach((b) => b.addEventListener('click', () => onAction?.(b.dataset.action)));
     if (started) focusHeading(root);
     started = true;
   }

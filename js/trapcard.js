@@ -14,6 +14,10 @@ function findTrap(data, id) {
   return data.traps.find((t) => t.id === id) || data.limits.find((t) => t.id === id);
 }
 
+// The Trap Lab registers itself here, so every trap card can link to it
+let labOpener = null;
+export function setTrapLabOpener(fn) { labOpener = fn; }
+
 // The <dialog> element is made once and reused for every card
 let dialog = null;
 function getDialog() {
@@ -43,9 +47,13 @@ export async function openTrap(id) {
         : `${esc(c.outlet)}, ${esc(c.date)}: “${esc(c.title)}”`)).join('; ')}</p>` : ''}
       <h3>How OmniSAR handles it</h3><p>${esc(t.handling)}</p>
       ${t.inApp ? '' : '<p class="trap-later">This fix is not in this version of the app yet.</p>'}
-      <button class="primary-btn" id="trap-close">Got it</button>
+      <div class="trap-actions">
+        <button class="primary-btn" id="trap-close">Got it</button>
+        ${labOpener && !isLimit ? '<button class="ghost-btn" id="trap-lab">Open in the Trap Lab</button>' : ''}
+      </div>
     </article>`;
   d.querySelector('#trap-close').addEventListener('click', () => d.close());
+  d.querySelector('#trap-lab')?.addEventListener('click', () => { d.close(); labOpener(t.id); });
   d.setAttribute('aria-labelledby', 'trap-title');
   d.showModal();
   announce(`${isLimit ? 'What radar can’t prove' : `Trap card ${t.id}`} opened: ${t.title}`);

@@ -11,6 +11,11 @@ import { loadMystery } from './engine.js';
 import { runWalkthrough } from './walkthrough.js';
 import { createCaseTerrain } from './caseterrain.js';
 import { createHud } from './hud.js';
+import { showTrapLab } from './traplab.js';
+import { setTrapLabOpener } from './trapcard.js';
+import { startGlossary } from './glossary.js';
+import { showInfo } from './about.js';
+import { runTour } from './tour.js';
 
 const params = new URLSearchParams(location.search);
 const HOME_DISTANCE = 3.2;
@@ -64,7 +69,20 @@ async function start() {
     onPick: selectCase,
     onBack: backToGlobe,
     onOpen: openMystery,
+    onAction: (a) => {
+      if (a === 'traplab') openTrapLab();
+      else if (a === 'tour') runTour(app);
+      else showInfo(panel.root, a, { onBack: backToGlobe });          // nasa / challenge / about
+    },
   });
+
+  // Trap Lab: from the home screen, and from every trap card ("Open in the Trap Lab")
+  function openTrapLab(focus = null) {
+    hud.expand();
+    showTrapLab(panel.root, data.cases, { focus, onBack: backToGlobe, onPick: selectCase });
+  }
+  setTrapLabOpener(openTrapLab);
+  startGlossary();                                 // dotted radar words with one-line definitions
   // Case terrain: the local blocky view of a case box (covers the globe while open)
   const terrain = createCaseTerrain(area);
   const markers = createMarkers(globe, data.cases, { onSelect: selectCase, onTip: (t) => panel.showTip(t) });
@@ -141,6 +159,7 @@ async function start() {
       onBackToGlobe: showGlobe,
       onLayerDate: (iso) => timeline.setDate(iso),   // stepper -> slider
       date: timeline.date,
+      numbers: mystery.numbers,                      // the inspector marks passes left out by quality control
     });
     if (opened) {
       globe.setPaused(true);
@@ -156,7 +175,10 @@ async function start() {
     if (params.has('play')) openMystery(params.get('case'));   // ?case=jebel-ali&play opens the walkthrough
   }
 
-  window.omnisar = { globe, data, selectCase, terrain };   // handy for poking at things in the browser console
+  // the app's own controls, used by the tour (and handy in the browser console)
+  const app = { globe, data, selectCase, terrain, openTrapLab, openMystery, backToGlobe };
+  window.omnisar = app;
+  if (params.has('tour')) setTimeout(() => runTour(app), 1500);    // ?tour starts the hands-free demo   // handy for poking at things in the browser console
 }
 
 start();

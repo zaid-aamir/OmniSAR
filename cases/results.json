@@ -1,6 +1,6 @@
 {
   "about": "Cases whose numbers file exists. Written by tools/update_results.py - do not edit by hand.",
-  "generated": "2026-11-14T07:09Z",
+  "generated": "2026-11-14T08:38Z",
   "measured": {
     "al-ain": "cases/al-ain.numbers.json",
     "big-sur": "cases/big-sur.numbers.json",

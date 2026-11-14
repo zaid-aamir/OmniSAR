@@ -582,3 +582,15 @@ a.tag.cite { display: inline-block; padding-top: 6px; padding-bottom: 6px; }
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Accessibility for the new views (Trap Lab, inspector, glossary, tour) ---------- */
+.lab-toggle:focus-visible { outline-offset: -3px; }
+.inspector:focus-within { border-color: var(--accent); }
+.gloss:focus-visible { outline: 2px solid var(--data-nisar); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .bounce-svg .bp.is-on .ray { animation: none; stroke-dasharray: none; }   /* the selected path stays highlighted, still */
+}
+@media (forced-colors: active) {
+  .gloss { text-decoration-color: CanvasText; }
+  .lab-item, .inspector, .gb, .caught, .tour-cap { border: 1px solid CanvasText; }
+}

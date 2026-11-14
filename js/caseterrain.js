@@ -16,6 +16,7 @@ import * as THREE from 'three';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { esc, setShown, reducedMotion } from './util.js';
 import { colourFor, legendGradient } from './datacolours.js';
+import { createInspector } from './inspector.js';
 
 const GAP = 0.88;            // block width as a share of its cell (the gap reads as a thin dark edge)
 const SIDE_SHADE = 0.7;
@@ -54,7 +55,7 @@ export function createCaseTerrain(container) {
   view.className = 'terrain-view';
   view.hidden = true;
   view.tabIndex = 0;                       // focusable, so the arrow keys can step through layers
-  view.setAttribute('aria-label', 'Case terrain: arrow keys change the layer');
+  view.setAttribute('aria-label', 'Case terrain: arrow keys change the layer; Enter or I inspects the block in the middle of the view');
   view.innerHTML = `
     <div class="terrain-hud terrain-top">
       <div>
@@ -74,6 +75,7 @@ export function createCaseTerrain(container) {
     <p class="terrain-note" id="tv-note"></p>`;
   container.appendChild(view);
   const $ = (id) => view.querySelector('#' + id);
+  const inspector = createInspector(view);       // "What did the radar hit?" box (js/inspector.js)
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -93,6 +95,7 @@ export function createCaseTerrain(container) {
 
   let grid = null, mesh = null, layerIndex = 0, cells = [], exaggeration = 1, onGlobe = null, running = false;
   let sliderDate = null, onLayerDate = null, isOpenNow = false;
+  let tops = null, maxTop = 0;
   const colour = new THREE.Color();
 
   function resize() {
@@ -117,15 +120,18 @@ export function createCaseTerrain(container) {
       if (grid.layers.some((l) => l.values[i] != null)) cells.push(i);
     }
     mesh = new THREE.InstancedMesh(blockGeometry(), new THREE.MeshLambertMaterial({ vertexColors: true }), cells.length);
+    tops = new Float32Array(rows * cols);                     // block top heights, for picking a block by click
     const m = new THREE.Matrix4();
     cells.forEach((i, k) => {
       const r = Math.floor(i / cols), c = i % cols;
       const h = ((BASE_M + elev[i]) * exaggeration) / 1000;
+      tops[i] = h;
       m.makeScale(km * GAP, h, km * GAP);
       m.setPosition((c - cols / 2 + 0.5) * km, 0, (r - rows / 2 + 0.5) * km);
       mesh.setMatrixAt(k, m);
     });
     scene.add(mesh);
+    maxTop = tops.reduce((a, v) => Math.max(a, v), 0);
     const span = Math.max(rows, cols) * km;
     camera.position.set(0, span * 0.75, span * 0.8);
     controls.target.set(0, 0, 0);
@@ -222,11 +228,9 @@ export function createCaseTerrain(container) {
     const e = pending; pending = null;
     const rect = renderer.domElement.getBoundingClientRect();
     mouse.set(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
-    ray.setFromCamera(mouse, camera);
-    const hit = ray.intersectObject(mesh)[0];
+    const i = pickBlock(mouse.x, mouse.y);
     const tip = $('tv-tip');
-    if (!hit) { tip.hidden = true; return; }
-    const i = cells[hit.instanceId];
+    if (i < 0) { tip.hidden = true; return; }
     const layer = grid.layers[layerIndex];
     const v = layer.values[i];
     tip.innerHTML = `
@@ -250,13 +254,50 @@ export function createCaseTerrain(container) {
   $('tv-next').addEventListener('click', () => stepTo(layerIndex + 1));
   $('tv-globe').addEventListener('click', () => onGlobe?.());
   view.addEventListener('keydown', (e) => {
+    if (e.target !== view) return;                 // keys inside the HUD boxes are theirs
     if (e.key === 'ArrowLeft') $('tv-prev').click();
     if (e.key === 'ArrowRight') $('tv-next').click();
+    if (e.key === 'Enter' || e.key === 'i' || e.key === 'I') inspectAt(0, 0);
+  });
+
+  // ----- click (not drag) a block to inspect it -----
+  // The block is found by walking along the view ray over the blocks' own heights (a heightfield
+  // march), which is exact for a grid of blocks and doesn't depend on mesh picking.
+  const _p = new THREE.Vector3();
+  function pickBlock(nx, ny) {
+    if (!mesh || !tops) return -1;
+    mouse.set(nx, ny);
+    ray.setFromCamera(mouse, camera);
+    const { origin, direction } = ray.ray;
+    if (direction.y >= 0) return -1;                            // looking up: no ground there
+    const { rows, cols } = grid;
+    const km = grid.block_m / 1000;
+    const t0 = Math.max(0, (maxTop - origin.y) / direction.y);   // where the ray drops below the highest block
+    const t1 = (0 - origin.y) / direction.y;                     // where it reaches the ground plane
+    for (let t = t0; t <= t1; t += km / 6) {
+      _p.copy(direction).multiplyScalar(t).add(origin);
+      const c = Math.floor(_p.x / km + cols / 2), r = Math.floor(_p.z / km + rows / 2);
+      if (r < 0 || r >= rows || c < 0 || c >= cols) continue;
+      const i = r * cols + c;
+      if (tops[i] > 0 && _p.y <= tops[i]) return i;
+    }
+    return -1;
+  }
+  function inspectAt(nx, ny) {
+    const i = pickBlock(nx, ny);
+    if (i >= 0) inspector.inspect(i);
+  }
+  let downAt = null;
+  renderer.domElement.addEventListener('pointerdown', (e) => { downAt = { x: e.clientX, y: e.clientY }; });
+  renderer.domElement.addEventListener('pointerup', (e) => {
+    if (!downAt || Math.hypot(e.clientX - downAt.x, e.clientY - downAt.y) > 5) return;
+    const rect = renderer.domElement.getBoundingClientRect();
+    inspectAt(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
   });
 
   return {
     // Show a case's terrain. Returns false if the case has no grid yet (globe stays).
-    async open(caseInfo, gridPath, { onBackToGlobe, onLayerDate: onDate, date } = {}) {
+    async open(caseInfo, gridPath, { onBackToGlobe, onLayerDate: onDate, date, numbers } = {}) {
       if (!gridPath) return false;
       isOpenNow = true;
       setShown(view, true);                                  // cross-fade in at once, with a loading line
@@ -271,6 +312,7 @@ export function createCaseTerrain(container) {
         return false;
       }
       layerIndex = Math.max(0, grid.layers.findIndex((l) => l.id === grid.default_layer));
+      inspector.setCase(caseInfo, numbers, grid);
       onGlobe = onBackToGlobe;
       onLayerDate = onDate;
       sliderDate = date || null;
@@ -291,9 +333,11 @@ export function createCaseTerrain(container) {
       setShown(view, false);
       setTimeout(() => { if (!isOpenNow) running = false; }, reducedMotion() ? 0 : 260);
       $('tv-tip').hidden = true;
+      inspector.close();
     },
     get isOpen() { return isOpenNow; },
     showDate,
+    inspectAt,
     // the dates of the single-pass layers (for the timeline's "processed pass" ticks)
     get layerDates() { return grid ? [...new Set(grid.layers.filter(isDated).map((l) => l.date))].sort() : []; },
   };

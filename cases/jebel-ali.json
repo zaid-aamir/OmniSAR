@@ -198,7 +198,7 @@
       "title": "NISAR map tile at zoom 10",
       "kind": "image",
       "src": "assets/cases/jebel-ali/ev-zoom10.png",
-      "caption": "One NASA NISAR map-tile address at zoom 10, requested 5 times on 14 Nov 2026 05:57 UAE: 5 different image(s) came back. Map tiles are pictures; our numbers come from the science files.",
+      "caption": "One NASA NISAR map-tile address at zoom 10, requested 5 times on 14 Nov 2026 12:39 UAE: 5 different image(s) came back. Map tiles are pictures; our numbers come from the science files.",
       "source": "NASA GIBS NISAR tiles, zoom 10",
       "bin": "trap",
       "trap": 2
@@ -208,7 +208,7 @@
       "title": "Satellite photos: June vs October",
       "kind": "image",
       "src": "assets/cases/jebel-ali/ev-hls.png",
-      "caption": "NASA HLS photos of the same box, 2026-06-18 and 2026-10-29. Compare the port basin and the Palm: some ground clearly changed between them.",
+      "caption": "NASA HLS photos of the same box, 2026-06-18 and 2026-10-14. Compare the port basin and the Palm: some ground clearly changed between them.",
       "source": "NASA HLS (Landsat and Sentinel-2)",
       "bin": "real",
       "trap": null

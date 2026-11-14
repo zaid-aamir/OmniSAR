@@ -6,7 +6,7 @@
 //   - the collapse button folds the panel into a thin rail so the globe / terrain gets the room
 //   - a short "boot-up" sweep each time the panel shows a new view (js/motion.js)
 
-import { esc } from './util.js';
+import { esc, announce } from './util.js';
 import { finishedCount } from './progress.js';
 import { bootPanel } from './motion.js';
 
@@ -67,6 +67,13 @@ export function createHud(cases) {
     signature = sig;
     bootPanel(panel, inner);
     render();                               // the solved count may have changed
+    // Screen readers: say which view opened, unless focus already moved to its heading (read anyway)
+    setTimeout(() => {
+      if (!inner.contains(document.activeElement)) {
+        const head = inner.querySelector('h1, h2')?.textContent.trim();
+        if (head) announce(`Panel: ${head}`);
+      }
+    }, 120);
   }).observe(inner, { childList: true });
 
   render();

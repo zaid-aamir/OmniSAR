@@ -1,0 +1,24 @@
+/* "From gigabytes to your browser" (js/gigabytes.js) and glossary tooltips (js/glossary.js) */
+.gb { margin-top: 18px; padding: 12px; border: 1px solid var(--hud-line, var(--line-strong)); border-radius: var(--radius); }
+.gb-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; margin: 6px 0; font-size: 14px; }
+.gb-big { font: 700 22px var(--font-data); color: var(--text); }
+.gb-small { color: var(--data-nisar); }
+.gb-arrow { color: var(--accent); font-size: 20px; }
+.gb-pipe { list-style: none; margin: 12px 0 8px; padding: 0 0 0 16px; border-left: 2px solid var(--line-strong); display: grid; gap: 8px; }
+.gb-pipe li { position: relative; display: grid; gap: 2px; }
+.gb-pipe li::before { content: ""; position: absolute; left: -22px; top: 5px; width: 10px; height: 10px; border-radius: 2px;
+  background: var(--bg); border: 2px solid var(--accent); }
+.gb-step { font: 12px var(--font-data); color: var(--text); }
+.gb-why { font-size: 13px; color: var(--muted); line-height: 1.4; }
+.gb-pipe.is-drawing li { animation: boot-in 300ms var(--ease, ease) backwards; animation-delay: calc(var(--i) * 70ms); }
+.gb-raw summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; color: var(--accent); font: 13px var(--font-data); }
+.gb-raw ul { padding-left: 18px; font-size: 12px; display: grid; gap: 8px; }
+.gb-raw code { overflow-wrap: anywhere; }
+
+.gloss { position: relative; text-decoration: underline dotted color-mix(in srgb, var(--accent) 70%, transparent); text-underline-offset: 3px; cursor: help; }
+.gloss:focus-visible { outline: 2px solid var(--data-nisar); outline-offset: 2px; border-radius: 2px; }
+.gloss-tip {
+  position: fixed; z-index: 60; width: max-content; padding: 6px 9px; border-radius: 4px; pointer-events: none;
+  border: 1px solid var(--hud-line, var(--line-strong)); background: var(--surface-2); color: var(--text);
+  font: 12px/1.4 var(--font-ui); box-shadow: 0 6px 18px rgba(0, 0, 0, .45);
+}

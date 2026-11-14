@@ -45,7 +45,7 @@ import update_results
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)    # all-NaN tiles etc. are handled explicitly
 
-SCRIPT_VERSION = "1.2.1"   # 1.2.1: script fingerprints taken with LF line endings (as stored in git); 1.1: display rule, terrain heights, per-pass medians; 1.2: single-pass cross-checks, NaN-safe JSON (METHOD unchanged)
+SCRIPT_VERSION = "1.3"   # 1.3: passes flagged by our interference check are excluded from the change rule (QC_EXCLUSIONS, declared 14 Nov 05:50 + 12:35, METHOD unchanged); 1.2.1: script fingerprints taken with LF line endings (as stored in git); 1.1: display rule, terrain heights, per-pass medians; 1.2: single-pass cross-checks, NaN-safe JSON (METHOD unchanged)
 CASE = "jebel-ali"
 GRID = "/science/LSAR/GCOV/grids/frequencyA"
 DATA_DIR = os.path.join(nio.PROJECT, "data", "gcov")
@@ -93,6 +93,15 @@ METHOD = {
     "badge_rule": "Strong if >= 7 of 10 hotspots are photo-confirmed; Moderate if radar only (photo check not done) or 4-6 confirmed; Weak otherwise. 'Radar only' counts as Moderate only if the radar quality checks pass and at least one hotspot exists; otherwise Weak.",
     "coherence_check": "UAE interferograms on hand are track 128 frame 015, which start ~25.2 N, north of this box (top edge 25.06 N): no coherence check for Jebel Ali",
 }
+
+# Quality control, declared in why_log.md (Sat 14 Nov 05:50, repeated 12:35) BEFORE this version ran.
+# Not a METHOD change: every threshold above stays the same. A listed pass is still read (so the
+# interference check can show it, and it stays the Trap #8 exhibit) but is left out of the change
+# rule. The script refuses to run if a listed pass is NOT flagged by the interference check.
+QC_EXCLUSIONS = {
+    "2026-10-28": "flagged by our own interference check (box HH +6.3 dB while the whole frame moved +0.1 dB on 14 Nov 05:40); kept as the Trap #8 exhibit",
+}
+QC_DECLARED = "2026-11-14T05:50+04:00 (why_log.md), repeated 12:35 before the v1.3 run; thresholds unchanged"
 
 CLASS_CODES = {"none": 0, "new-structures": 1, "water-to-land": 2, "land-to-water": 3}
 CLASS_NAMES = {1: "New structures (HH rose)", 2: "Water to land", 3: "Land to water"}
@@ -623,7 +632,20 @@ def main():
     for row in interference:
         log("  ", json.dumps(row))
 
-    pass_medians = [{"date": p["date"], "side": "before" if p in before else "after",
+    # quality control (QC_EXCLUSIONS): flagged passes stay out of the change rule
+    for d, why in QC_EXCLUSIONS.items():
+        row = next((r for r in interference if r["pass"] == d), None)
+        if row is not None and not row["anomaly_over_box"]:
+            raise SystemExit(f"{d} is listed in QC_EXCLUSIONS but the interference check did not flag it - stop, do not exclude")
+    excluded = [p for p in passes if p["date"] in QC_EXCLUSIONS]
+    all_after = after
+    before = [p for p in before if p["date"] not in QC_EXCLUSIONS]
+    after = [p for p in after if p["date"] not in QC_EXCLUSIONS]
+    log(f"used for the change rule: before {[p['date'] for p in before]}  after {[p['date'] for p in after]}  excluded {[p['date'] for p in excluded]}")
+    if not before or not after:
+        raise SystemExit("After quality control there is no clean pass on one side - the case stays 'evidence pending'.")
+
+    pass_medians = [{"date": p["date"], "side": "excluded (quality control)" if p in excluded else "before" if p in before else "after",
                      "hh_box_median_db": round(float(np.nanmedian(nio.power_to_db(boxes[p["date"]]["hh"]))), 2),
                      "hv_box_median_db": round(float(np.nanmedian(nio.power_to_db(boxes[p["date"]]["hv"]))), 2)} for p in passes]
     A = analyse(boxes, before, after, grid)
@@ -635,8 +657,8 @@ def main():
     # Cross-checks (same METHOD, nothing tuned): each after-pass on its own against the first
     # before-pass, so a contaminated date can be told apart from a clean one.
     cross_checks = []
-    if len(after) > 1 or len(before) > 1:
-        for p_after in after:
+    if len(all_after) > 1 or len(before) > 1:
+        for p_after in all_after:                       # including excluded passes: this is how they are shown
             C = analyse(boxes, before[:1], [p_after], grid, quiet=True)
             row = next((r for r in interference if r["pass"] == p_after["date"]), None)
             cross_checks.append({"before": before[0]["date"], "after": p_after["date"],
@@ -711,9 +733,20 @@ def main():
     else:
         measured.append({"label": "Water ↔ land", "value": "not separable", "unit": "",
                          "note": "In these images open sea and desert sand are about equally dark in HH (trap 11), so radar alone can't say where water became land."})
+    # Passes the interference check flags that are still used: reported, never hidden
+    flagged_used = [{"pass": r["pass"], "channels_flagged": [ch for ch in ("HH", "HV") if r[ch]["anomaly_over_box"]],
+                     "hh_box_vs_frame_db": [r["HH"]["box_median_change_db"], r["HH"]["frame_median_change_db"]],
+                     "hv_box_vs_frame_db": [r["HV"]["box_median_change_db"], r["HV"]["frame_median_change_db"]]}
+                    for r in interference if r["anomaly_over_box"] and r["pass"] not in QC_EXCLUSIONS]
     measured.append({"label": "Passes compared", "value": f"{n_b} before · {n_a} after", "unit": "",
-                     "note": ("Median of several passes per side." if robust else
-                              "Fewer than 3 passes per side, so a bad date can't be outvoted yet; more passes are downloading.")})
+                     "note": (f"{', '.join(fmt_date(p['date']) for p in before)} vs {', '.join(fmt_date(p['date']) for p in after)}. "
+                              + ("Median of several passes per side." if robust else
+                                 "Fewer than 3 passes per side, so a bad date can't be outvoted yet; more passes are downloading.")
+                              + (f" Left out: {', '.join(fmt_date(p['date']) for p in excluded)}, flagged by our interference check (quality control, declared before this run)." if excluded else "")
+                              + "".join(f" Warning: {fmt_date(f['pass'])} is also flagged, in {' and '.join(f['channels_flagged'])} only "
+                                        f"(HV box {f['hv_box_vs_frame_db'][0]:+.1f} dB vs frame {f['hv_box_vs_frame_db'][1]:+.1f} dB); the change rule uses HH, where it moved "
+                                        f"{f['hh_box_vs_frame_db'][0]:+.1f} dB vs the frame's {f['hh_box_vs_frame_db'][1]:+.1f} dB, so it is used — but treat this result with care."
+                                        for f in flagged_used if "HH" not in f["channels_flagged"]))})
     if any_anomaly:
         flagged = [r for r in interference if r["anomaly_over_box"]]
         measured.append({"label": "Interference check", "value": f"{len(flagged)} of {len(interference)} passes flagged", "unit": "",
@@ -738,6 +771,9 @@ def main():
         "custody_extra": [] if gain_ok else [{"label": "Contaminated candidate area", "value": area["new-structures"], "unit": "ha",
                                               "note": f"pixels where HH rose >= 3 dB, in {n_new} patches >= 1 ha; not shown in the verdict because the radar quality check failed"}],
         "method": METHOD,
+        "quality_control": {"excluded_passes": {p["date"]: QC_EXCLUSIONS[p["date"]] for p in excluded}, "declared": QC_DECLARED,
+                            "rule": "only the passes listed in excluded_passes (named before this run) are left out of the change rule; they are still read and shown",
+                            "flagged_but_used": flagged_used},
         "results": {
             "thresholds": {"T_water_db": round(t_water, 2), "T_land_db": round(t_land, 2), "separable": separable, **refs},
             "area_ha_in_hotspots": area,
@@ -765,7 +801,7 @@ def main():
             "projection_epsg": grid["proj"]["epsg"], "pixel_m_after_filter": abs(float(grid["x"][1] - grid["x"][0])),
             "number_of_looks_native": grid["looks"],
             "steps": ["read only the box rows/columns", "mask invalid pixels", "3x3 multilook (linear power)", "dB",
-                      "interference check (whole-frame sample)", "median per side", "2 km tile background removed",
+                      "interference check (whole-frame sample)", "leave out passes flagged by the interference check (quality_control)", "median per side", "2 km tile background removed",
                       "classify (method.classes)", "8-connected clusters >= 12 px", "top 10 by area",
                       "photo kit from NASA GIBS HLS", "badge (method.badge_rule)"],
             "photo_layers": [photo_before, photo_after],

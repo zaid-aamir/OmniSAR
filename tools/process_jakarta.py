@@ -5,7 +5,7 @@ Run (from the repo folder):   py tools/process_jakarta.py
 
 What it does, in order:
   1. Finds the finished NISAR GUNW interferograms for ascending track 010 frame 174 and
-     descending track 018 frame 091, one per pair of dates, and checks each direction forms an
+     descending track 018 frame 092 (FRAME_CHOICE), one per pair of dates, and checks each direction forms an
      unbroken chain (each pair starts on the date the previous one ended). Never opens .h5.part.
   2. For every pair, reads only the Jakarta box: unwrapped phase, coherence, connected
      components, ionosphere screen; and the troposphere screens from the 3D "radarGrid" cube.
@@ -44,7 +44,7 @@ from process_jebel_ali import diverging, font, fmt_date, sha256
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
-SCRIPT_VERSION = "1.0.2"   # 1.0.2: published-rate comparison (Abidin et al. 2011) and sea-level citation, text only; 1.0.1: reference picker treats no-data coherence as 0 (v1.0 kept a NaN window by accident)
+SCRIPT_VERSION = "1.1"   # 1.1: descending frame 092 (covers the box) instead of 091 (FRAME_CHOICE, declared 14 Nov 12:45; METHOD unchanged); 1.0.2: published-rate comparison (Abidin et al. 2011) and sea-level citation, text only; 1.0.1: reference picker treats no-data coherence as 0 (v1.0 kept a NaN window by accident)
 CASE = "jakarta"
 IFG = "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH"
 CUBE = "/science/LSAR/GUNW/metadata/radarGrid"
@@ -53,7 +53,12 @@ ASSET_DIR = os.path.join(nio.REPO, "assets", "cases", CASE)
 KIT_DIR = os.path.join(nio.PROJECT, "research", "checks", CASE)
 NUMBERS = os.path.join(nio.REPO, "cases", f"{CASE}.numbers.json")
 C = 299792458.0
-DIRECTIONS = {"ascending": "_010_A_174_", "descending": "_018_D_091_"}
+DIRECTIONS = {"ascending": "_010_A_174_", "descending": "_018_D_092_"}
+# Declared in why_log.md (Sat 14 Nov 12:45) before this version ran. Not a METHOD change.
+FRAME_CHOICE = {
+    "descending": "track 018 frame 092 (replaces frame 091, named in METHOD.inputs): 091 covers only the edge of the Jakarta box, 092 covers the box; all 8 pairs 27 Jun -> 13 Oct are finished files",
+    "declared": "2026-11-14T12:45+04:00, before any frame-092 result was computed; every rule and threshold unchanged",
+}
 
 METHOD = {
     "declared": "2026-11-14T04:13+04:00, before any Jakarta result was computed",
@@ -273,8 +278,8 @@ def fill_mystery(results, per_dir, badge, chains):
         caption=f"Ground motion after corrections, all {len(chains['ascending']['pairs'])} ascending pairs chained ({ra['days']} days). "
                 f"{ra['sinking_area_km2']} km² of land moved down 30 mm or more (blue), relative to central Jakarta.")
     ev["two-directions"].update(src=A + "ev-asc-desc.png", bin="trap", trap=14,
-        caption=("The descending frame we have covers only part of the box and is mostly incoherent there, so the second direction can't be used yet: a file problem, not a ground signal."
-                 if not per_dir["descending"]["usable"] else "Ascending and descending, side by side."))
+        caption=("The descending chain is not usable over the box, so the second direction can't be used: a file problem, not a ground signal."
+                 if not per_dir["descending"]["usable"] else "Ascending (05:39 local) and descending (18:11 local) chains side by side: two directions, two times of day, two different skies."))
     ev["gap"].update(src=A + "ev-gap.png", bin="trap", trap=14,
         caption="NASA has no data from 27 Jul to 10 Aug 2026. A chain of only 12-day pairs would break here; the 24-day pairs bridge it.")
     ev["sea-level"].update(src=A + "ev-noise.png", bin="trap", trap=16,
@@ -284,7 +289,7 @@ def fill_mystery(results, per_dir, badge, chains):
     tg["mask"]["layers"] = {"off": {"src": A + "tg-mask-off.png", "label": "No coherence mask"}, "on": {"src": A + "tg-mask-on.png", "label": "Coherence 0.4 or more only"}}
     tg["chain"]["layers"] = {"off": {"src": A + "tg-pair.png", "label": "One 12-day pair"}, "on": {"src": A + "tg-chain.png", "label": "All pairs chained"}}
     tg["direction"]["disabled"] = None if per_dir["descending"]["usable"] else (
-        "Switched off: the descending frame we have (018/091) covers only part of the box and is mostly incoherent there. The frame that covers it (092) is still downloading.")
+        "Switched off: the descending chain (track 018 frame 092) is not usable over the box (too little land stays coherent through the whole chain).")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(m, f, indent=2, ensure_ascii=False)
         f.write("\n")
@@ -594,7 +599,6 @@ def main():
         bad = [n for n in DIRECTIONS if not per_dir[n]["usable"]]
         shares = ", ".join("{:.0%} of land measurable".format(results[n]["land_valid_share"]) for n in bad)
         check_text = ("Two-direction check not possible yet: the " + " and ".join(bad) + f" chain is not usable ({shares}). "
-                      "The descending frame we have (091) covers only part of the box and is mostly incoherent there; the frame that covers it (092) is still downloading. "
                       "Without a second direction we can't fully rule out the air.")
     numbers = {
         "case": CASE,
@@ -606,6 +610,7 @@ def main():
         "sources": [p["file"] for n in DIRECTIONS for p in chains[n]["pairs"]],
         "custody_extra": [],
         "method": METHOD,
+        "frame_choice": FRAME_CHOICE,
         "results": results,
         "files": {"overlay": f"assets/cases/{CASE}/motion_overlay.png", "grid": f"assets/cases/{CASE}/grid.json",
                   "evidence": {k: f"assets/cases/{CASE}/{k}.png" for k in made}},

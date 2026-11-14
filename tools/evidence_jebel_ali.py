@@ -149,7 +149,9 @@ def main():
 
     # ---------- 1. Two single dates (trap 8): raw HH difference, nothing removed ----------
     flagged = [r for r in res["interference"] if r["anomaly_over_box"]]
-    worst = flagged[0] if flagged else res["interference"][-1]
+    # the exhibit is the pass whose HH (the channel the rule uses) jumped most against the whole frame
+    hh_jump = lambda r: abs(r["HH"]["box_median_change_db"] - r["HH"]["frame_median_change_db"])
+    worst = max(flagged, key=hh_jump) if flagged else res["interference"][-1]
     raw = a[f"hh_{worst['pass']}"] - a[f"hh_{worst['compared_with']}"]
     left = Image.fromarray(diverging(raw, 8.0))
     frame = Image.open(os.path.join(KIT_DIR, worst["picture"])).convert("RGB")

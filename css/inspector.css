@@ -1,0 +1,25 @@
+/* "What did the radar hit?" block inspector (js/inspector.js) */
+.inspector { top: 12px; right: 12px; width: min(300px, calc(100% - 24px)); max-height: calc(100% - 200px); overflow-y: auto;
+  font-size: 13px; z-index: 7; animation: boot-in 220ms var(--ease, ease) backwards; }
+.inspector[hidden] { display: none; }
+.insp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.insp-head .wt-sub { margin: 0; }
+.insp-close { min-width: 32px; min-height: 32px; padding: 0 8px; }
+.insp-table { width: 100%; border-collapse: collapse; font: 12px var(--font-data); margin: 6px 0; }
+.insp-table th { text-align: left; font-weight: 500; color: var(--muted); padding: 2px 6px 2px 0; }
+.insp-table td { padding: 2px 6px 2px 0; color: var(--text); }
+.insp-table tr.is-flagged td { color: var(--muted); }
+.spark { width: 100%; height: auto; display: block; }
+.spark text { font: 9px var(--font-data); fill: var(--muted); }
+.spark-key { margin: 0 0 6px; font: 11px var(--font-data); color: var(--muted); }
+.insp-type { margin: 6px 0; line-height: 1.45; }
+.insp-rule { margin: 4px 0 0; font-size: 11px; color: var(--muted); line-height: 1.4; }
+.bounce-svg { width: 100%; height: auto; display: block; margin-top: 4px; }
+.bounce-svg .ground, .bounce-svg .wall, .bounce-svg .tree { stroke: var(--muted); stroke-width: 2; fill: none; }
+.bounce-svg .tree { fill: color-mix(in srgb, var(--muted) 25%, transparent); }
+.bounce-svg .ray { fill: none; stroke: var(--line-strong); stroke-width: 1.6; stroke-dasharray: 4 3; }
+.bounce-svg text { font: 9px var(--font-data); fill: var(--muted); text-anchor: middle; }
+.bounce-svg .bp.is-on .ray { stroke: var(--data-nisar); stroke-width: 2.2; animation: ray-flow 900ms linear infinite; }
+.bounce-svg .bp.is-on text { fill: var(--data-nisar); }
+.bounce-svg .bp:not(.is-on) { opacity: 0.55; }
+@keyframes ray-flow { to { stroke-dashoffset: -14; } }

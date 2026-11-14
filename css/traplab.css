@@ -1,0 +1,30 @@
+/* Trap Lab (js/traplab.js) */
+.home-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+.lab-group { font: 600 12px var(--font-data); letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); margin: 22px 0 8px; }
+.lab-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lab-item { border: 1px solid var(--line-strong); border-radius: var(--radius); background: color-mix(in srgb, var(--surface) 72%, transparent); }
+.lab-item.is-open { border-color: var(--accent); }
+.lab-toggle {
+  width: 100%; min-height: 44px; display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; align-items: center;
+  padding: 8px 12px; background: none; border: 0; color: var(--text); font: inherit; text-align: left; cursor: pointer;
+}
+.lab-toggle:hover { color: var(--accent); }
+.lab-num { font: 600 13px var(--font-data); color: var(--accent); }
+.lab-title { font-weight: 600; font-size: 14px; }
+.lab-flags { display: flex; gap: 4px; }
+.lab-tag { font: 10px var(--font-data); letter-spacing: 0.8px; text-transform: uppercase; padding: 2px 6px; border-radius: 3px;
+  color: var(--data-nisar); border: 1px solid color-mix(in srgb, var(--data-nisar) 50%, transparent); }
+.lab-tag-text { color: var(--muted); border-color: var(--line-strong); }
+.lab-body { padding: 0 12px 12px; font-size: 14px; animation: boot-in 260ms var(--ease, ease) backwards; }
+.lab-body p { margin: 0 0 8px; }
+.lab-h { display: block; margin: 12px 0 4px; font: 600 11px var(--font-data); letter-spacing: 1px; text-transform: uppercase; color: var(--accent); }
+.lab-fig { margin: 6px 0 8px; }
+.lab-fig img { width: 100%; display: block; border-radius: 4px; }
+.lab-fig figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.45; }
+.lab-try { border: 1px dashed var(--line-strong); border-radius: var(--radius); padding: 8px 10px; margin: 10px 0; }
+.lab-try-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.lab-try-head .lab-h { margin: 0; }
+.lab-none { color: var(--muted); font-style: italic; }
+.lab-cases { display: flex; flex-wrap: wrap; gap: 12px; }
+.trap-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+.trap-actions .primary-btn { margin-top: 0; }

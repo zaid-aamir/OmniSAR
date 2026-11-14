@@ -1,27 +1,27 @@
 {
  "case": "jakarta",
- "generated": "2026-11-14T01:58Z",
+ "generated": "2026-11-14T08:38Z",
  "measured": [
   {
    "label": "Fastest-sinking district (2 km)",
-   "value": "-19",
+   "value": "-35",
    "unit": "mm",
    "note": "near 6.194° S, 106.979° E (ascending only); vertical equivalent over 108 days (26 Jun → 12 Oct), relative to central Jakarta"
   },
   {
    "label": "Land sinking ≥ 30 mm",
-   "value": 6.6,
+   "value": 28.8,
    "unit": "km²",
-   "note": "ascending chain; descending 0.0 km². Of the ascending area, 6.3 km² lies on land under 10 m."
+   "note": "ascending chain; descending 12.6 km². Of the ascending area, 25.2 km² lies on land under 10 m."
   },
   {
    "label": "Ascending (05:39 local)",
-   "value": "-21 mm for the fastest-sinking 5% of land, median +4 mm (79% of land measurable)",
+   "value": "-36 mm for the fastest-sinking 5% of land, median -11 mm (79% of land measurable)",
    "unit": ""
   },
   {
    "label": "Descending (18:11 local)",
-   "value": "not usable (chain broken or too little land measurable)",
+   "value": "-30 mm for the fastest-sinking 5% of land, median -1 mm (75% of land measurable)",
    "unit": ""
   },
   {
@@ -38,17 +38,17 @@
   },
   {
    "label": "Compared with published rates",
-   "value": "≈ -6.5 cm a year if it kept going",
+   "value": "≈ -11.7 cm a year if it kept going",
    "unit": "",
-   "note": "Our fastest district moved -19 mm in 108 days; scaled to a year that is about 6.5 cm. Abidin et al. (2011, Natural Hazards 59:1753–1771) report Jakarta subsidence of about 1–15 cm a year, up to about 20–28 cm a year at some places, with groundwater extraction a main cause. Our number sits inside that range, but 108 days of provisional data is not a yearly rate: it doesn't cover a full wet and dry season."
+   "note": "Our fastest district moved -35 mm in 108 days; scaled to a year that is about 11.7 cm. Abidin et al. (2011, Natural Hazards 59:1753–1771) report Jakarta subsidence of about 1–15 cm a year, up to about 20–28 cm a year at some places, with groundwater extraction a main cause. Our number sits inside that range, but 108 days of provisional data is not a yearly rate: it doesn't cover a full wet and dry season."
   }
  ],
  "check": {
   "label": "Independent check",
-  "text": "Two-direction check not possible yet: the descending chain is not usable (0% of land measurable). The descending frame we have (091) covers only part of the box and is mostly incoherent there; the frame that covers it (092) is still downloading. Without a second direction we can't fully rule out the air."
+  "text": "Two directions, two times of day: 37 of 99 shared 2 km districts agree (Pearson r = -0.55). They do not agree well enough to rule out the air."
  },
- "badge": "Moderate",
- "badge_reason": "one direction usable",
+ "badge": "Weak",
+ "badge_reason": "directions disagree or none usable",
  "sources": [
   "NISAR_L2_PR_GUNW_024_010_A_174_025_4000_SH_20260626T223921_20260626T223956_20260708T223920_20260708T223955_P05023_N_F_J_001.h5",
   "NISAR_L2_PR_GUNW_025_010_A_174_026_4000_SH_20260708T223920_20260708T223955_20260720T223920_20260720T223954_P05023_N_F_J_001.h5",
@@ -58,14 +58,14 @@
   "NISAR_L2_PR_GUNW_030_010_A_174_031_4000_SH_20260906T223918_20260906T223953_20260918T223918_20260918T223953_P05023_F_F_J_001.h5",
   "NISAR_L2_PR_GUNW_031_010_A_174_032_4000_SH_20260918T223918_20260918T223953_20260930T223918_20260930T223953_P05023_N_F_J_001.h5",
   "NISAR_L2_PR_GUNW_032_010_A_174_033_4000_SH_20260930T223918_20260930T223953_20261012T223918_20261012T223953_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_024_018_D_091_025_4000_SH_20260627T111112_20260627T111146_20260709T111111_20260709T111146_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_025_018_D_091_026_4000_SH_20260709T111111_20260709T111146_20260721T111111_20260721T111145_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_026_018_D_091_028_4000_SH_20260721T111111_20260721T111145_20260814T111109_20260814T111144_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_028_018_D_091_029_4000_SH_20260814T111109_20260814T111144_20260826T111109_20260826T111144_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_029_018_D_091_030_4000_SH_20260826T111109_20260826T111144_20260907T111109_20260907T111143_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_030_018_D_091_031_4000_SH_20260907T111109_20260907T111143_20260919T111109_20260919T111143_P05023_F_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_031_018_D_091_032_4000_SH_20260919T111109_20260919T111143_20261001T111109_20261001T111144_P05023_N_F_J_001.h5",
-  "NISAR_L2_PR_GUNW_032_018_D_091_033_4000_SH_20261001T111109_20261001T111144_20261013T111109_20261013T111144_P05023_N_F_J_001.h5"
+  "NISAR_L2_PR_GUNW_024_018_D_092_025_4000_SH_20260627T111145_20260627T111223_20260709T111145_20260709T111222_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_025_018_D_092_026_4000_SH_20260709T111145_20260709T111222_20260721T111144_20260721T111222_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_026_018_D_092_028_4000_SH_20260721T111144_20260721T111222_20260814T111143_20260814T111221_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_028_018_D_092_029_4000_SH_20260814T111143_20260814T111221_20260826T111143_20260826T111220_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_029_018_D_092_030_4000_SH_20260826T111143_20260826T111220_20260907T111142_20260907T111220_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_030_018_D_092_031_4000_SH_20260907T111142_20260907T111220_20260919T111142_20260919T111220_P05023_F_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_031_018_D_092_032_4000_SH_20260919T111142_20260919T111220_20261001T111143_20261001T111221_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GUNW_032_018_D_092_033_4000_SH_20261001T111143_20261001T111221_20261013T111143_20261013T111221_P05023_N_F_J_001.h5"
  ],
  "custody_extra": [],
  "method": {
@@ -121,6 +121,10 @@
   "low_land_m": 10.0,
   "badge_rule": "Strong = both directions usable and agree; Moderate = only one direction usable; Weak = both usable but they disagree, or none usable"
  },
+ "frame_choice": {
+  "descending": "track 018 frame 092 (replaces frame 091, named in METHOD.inputs): 091 covers only the edge of the Jakarta box, 092 covers the box; all 8 pairs 27 Jun -> 13 Oct are finished files",
+  "declared": "2026-11-14T12:45+04:00, before any frame-092 result was computed; every rule and threshold unchanged"
+ },
  "results": {
   "ascending": {
    "pairs": [
@@ -157,7 +161,7 @@
     {
      "pair": "2026-08-13 -> 2026-08-25",
      "days": 12,
-     "ref_valid_share": 0.996,
+     "ref_valid_share": 1.0,
      "coherence_above_0.4_share": 0.636,
      "spread_iono_mm": 3.8,
      "spread_tropo_mm": 18.1,
@@ -211,11 +215,11 @@
    "land_valid_share": 0.791,
    "usable": true,
    "incidence_deg_median": 36.9,
-   "vertical_mm_median_land": 4.3,
-   "vertical_mm_p5_land": -20.8,
-   "vertical_mm_p95_land": 20.0,
-   "sinking_area_km2": 6.6,
-   "sinking_area_under_10m_km2": 6.3,
+   "vertical_mm_median_land": -11.3,
+   "vertical_mm_p5_land": -36.2,
+   "vertical_mm_p95_land": 4.4,
+   "sinking_area_km2": 28.8,
+   "sinking_area_under_10m_km2": 25.2,
    "valid_land_km2": 288.3,
    "low_land_km2": 330.1,
    "land_km2": 364.7,
@@ -226,35 +230,35 @@
     },
     {
      "date": "2026-07-08",
-     "mm": 9.4
+     "mm": -1.2
     },
     {
      "date": "2026-07-20",
-     "mm": 6.7
+     "mm": -11.1
     },
     {
      "date": "2026-08-13",
-     "mm": 7.8
+     "mm": -12.4
     },
     {
      "date": "2026-08-25",
-     "mm": 4.6
+     "mm": -4.2
     },
     {
      "date": "2026-09-06",
-     "mm": 3.9
+     "mm": -12.3
     },
     {
      "date": "2026-09-18",
-     "mm": 4.5
+     "mm": -3.2
     },
     {
      "date": "2026-09-30",
-     "mm": 8.3
+     "mm": -14.8
     },
     {
      "date": "2026-10-12",
-     "mm": 4.3
+     "mm": -11.3
     }
    ]
   },
@@ -263,96 +267,96 @@
     {
      "pair": "2026-06-27 -> 2026-07-09",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.147,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.574,
+     "spread_iono_mm": 112.1,
+     "spread_tropo_mm": 26.2,
+     "spread_solid_earth_tide_mm": 3.8,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-07-09 -> 2026-07-21",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.241,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.601,
+     "spread_iono_mm": 259.3,
+     "spread_tropo_mm": 41.7,
+     "spread_solid_earth_tide_mm": 0.3,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-07-21 -> 2026-08-14",
      "days": 24,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.22,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.572,
+     "spread_iono_mm": 100.0,
+     "spread_tropo_mm": 11.6,
+     "spread_solid_earth_tide_mm": 4.6,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-08-14 -> 2026-08-26",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.314,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.599,
+     "spread_iono_mm": 80.3,
+     "spread_tropo_mm": 20.9,
+     "spread_solid_earth_tide_mm": 0.4,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-08-26 -> 2026-09-07",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.096,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.596,
+     "spread_iono_mm": 176.6,
+     "spread_tropo_mm": 17.4,
+     "spread_solid_earth_tide_mm": 2.4,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-09-07 -> 2026-09-19",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.081,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.593,
+     "spread_iono_mm": 185.2,
+     "spread_tropo_mm": 17.9,
+     "spread_solid_earth_tide_mm": 1.2,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-09-19 -> 2026-10-01",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.082,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.592,
+     "spread_iono_mm": 61.4,
+     "spread_tropo_mm": 9.0,
+     "spread_solid_earth_tide_mm": 0.8,
      "lambda_m": 0.24196
     },
     {
      "pair": "2026-10-01 -> 2026-10-13",
      "days": 12,
-     "ref_valid_share": 0.0,
-     "coherence_above_0.4_share": 0.314,
-     "spread_iono_mm": null,
-     "spread_tropo_mm": null,
-     "spread_solid_earth_tide_mm": null,
+     "ref_valid_share": 1.0,
+     "coherence_above_0.4_share": 0.598,
+     "spread_iono_mm": 87.9,
+     "spread_tropo_mm": 45.6,
+     "spread_solid_earth_tide_mm": 2.6,
      "lambda_m": 0.24196
     }
    ],
-   "chain_complete": false,
+   "chain_complete": true,
    "period": "2026-06-27 -> 2026-10-13",
    "days": 108,
-   "land_valid_share": 0.0,
-   "usable": false,
+   "land_valid_share": 0.746,
+   "usable": true,
    "incidence_deg_median": 41.91,
-   "vertical_mm_median_land": null,
-   "vertical_mm_p5_land": null,
-   "vertical_mm_p95_land": null,
-   "sinking_area_km2": 0.0,
-   "sinking_area_under_10m_km2": 0.0,
-   "valid_land_km2": 0.0,
+   "vertical_mm_median_land": -1.3,
+   "vertical_mm_p5_land": -29.6,
+   "vertical_mm_p95_land": 50.9,
+   "sinking_area_km2": 12.6,
+   "sinking_area_under_10m_km2": 11.6,
+   "valid_land_km2": 272.3,
    "low_land_km2": 330.1,
    "land_km2": 364.7,
    "series_box_median": [
@@ -362,42 +366,42 @@
     },
     {
      "date": "2026-07-09",
-     "mm": null
+     "mm": 1.8
     },
     {
      "date": "2026-07-21",
-     "mm": null
+     "mm": -2.1
     },
     {
      "date": "2026-08-14",
-     "mm": null
+     "mm": 0.5
     },
     {
      "date": "2026-08-26",
-     "mm": null
+     "mm": 4.6
     },
     {
      "date": "2026-09-07",
-     "mm": null
+     "mm": 3.9
     },
     {
      "date": "2026-09-19",
-     "mm": null
+     "mm": 3.2
     },
     {
      "date": "2026-10-01",
-     "mm": null
+     "mm": 9.3
     },
     {
      "date": "2026-10-13",
-     "mm": null
+     "mm": -1.3
     }
    ]
   },
   "fastest_district": {
    "lat": -6.1935,
    "lon": 106.9792,
-   "mm": -19.2,
+   "mm": -34.6,
    "basis": "ascending only",
    "series": {
     "ascending": [
@@ -407,51 +411,783 @@
      },
      {
       "date": "2026-07-08",
-      "mm": -1.9
+      "mm": -12.4
      },
      {
       "date": "2026-07-20",
-      "mm": 2.3
+      "mm": -15.2
      },
      {
       "date": "2026-08-13",
-      "mm": -9.7
+      "mm": -29.7
      },
      {
       "date": "2026-08-25",
-      "mm": -13.2
+      "mm": -22.0
      },
      {
       "date": "2026-09-06",
-      "mm": -16.9
+      "mm": -32.9
      },
      {
       "date": "2026-09-18",
-      "mm": -5.8
+      "mm": -13.4
      },
      {
       "date": "2026-09-30",
-      "mm": 1.3
+      "mm": -21.6
      },
      {
       "date": "2026-10-12",
-      "mm": -19.2
+      "mm": -34.6
+     }
+    ],
+    "descending": [
+     {
+      "date": "2026-06-27",
+      "mm": 0.0
+     },
+     {
+      "date": "2026-07-09",
+      "mm": -5.3
+     },
+     {
+      "date": "2026-07-21",
+      "mm": 4.5
+     },
+     {
+      "date": "2026-08-14",
+      "mm": 52.9
+     },
+     {
+      "date": "2026-08-26",
+      "mm": 33.1
+     },
+     {
+      "date": "2026-09-07",
+      "mm": 32.0
+     },
+     {
+      "date": "2026-09-19",
+      "mm": 41.3
+     },
+     {
+      "date": "2026-10-01",
+      "mm": 55.9
+     },
+     {
+      "date": "2026-10-13",
+      "mm": 23.5
      }
     ]
    }
   },
   "two_direction_check": {
    "same_projection": true,
-   "shared_districts": 0,
-   "agree_share": 0.0,
-   "pearson_r": null,
+   "shared_districts": 99,
+   "agree_share": 0.374,
+   "pearson_r": -0.554,
    "agree": false,
-   "districts": []
+   "districts": [
+    {
+     "lat": -6.1944,
+     "lon": 106.7082,
+     "asc_mm": 7.6,
+     "desc_mm": 8.1,
+     "agree": true
+    },
+    {
+     "lat": -6.1763,
+     "lon": 106.7081,
+     "asc_mm": 6.5,
+     "desc_mm": 1.2,
+     "agree": true
+    },
+    {
+     "lat": -6.1582,
+     "lon": 106.708,
+     "asc_mm": -6.1,
+     "desc_mm": -13.2,
+     "agree": true
+    },
+    {
+     "lat": -6.1402,
+     "lon": 106.708,
+     "asc_mm": -4.4,
+     "desc_mm": -5.2,
+     "agree": true
+    },
+    {
+     "lat": -6.1221,
+     "lon": 106.7079,
+     "asc_mm": -7.0,
+     "desc_mm": -3.5,
+     "agree": true
+    },
+    {
+     "lat": -6.104,
+     "lon": 106.7079,
+     "asc_mm": -3.3,
+     "desc_mm": -4.3,
+     "agree": true
+    },
+    {
+     "lat": -6.0859,
+     "lon": 106.7078,
+     "asc_mm": -0.9,
+     "desc_mm": 6.1,
+     "agree": true
+    },
+    {
+     "lat": -6.0678,
+     "lon": 106.7078,
+     "asc_mm": -9.8,
+     "desc_mm": 16.0,
+     "agree": false
+    },
+    {
+     "lat": -6.0497,
+     "lon": 106.7077,
+     "asc_mm": -14.1,
+     "desc_mm": 18.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1944,
+     "lon": 106.7262,
+     "asc_mm": 4.6,
+     "desc_mm": 0.9,
+     "agree": true
+    },
+    {
+     "lat": -6.1763,
+     "lon": 106.7262,
+     "asc_mm": 0.7,
+     "desc_mm": -14.7,
+     "agree": false
+    },
+    {
+     "lat": -6.1582,
+     "lon": 106.7261,
+     "asc_mm": -3.4,
+     "desc_mm": -19.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1401,
+     "lon": 106.726,
+     "asc_mm": -6.1,
+     "desc_mm": -10.8,
+     "agree": true
+    },
+    {
+     "lat": -6.122,
+     "lon": 106.726,
+     "asc_mm": -6.1,
+     "desc_mm": -7.5,
+     "agree": true
+    },
+    {
+     "lat": -6.0859,
+     "lon": 106.7259,
+     "asc_mm": -9.0,
+     "desc_mm": -5.6,
+     "agree": true
+    },
+    {
+     "lat": -6.1943,
+     "lon": 106.7443,
+     "asc_mm": 0.6,
+     "desc_mm": -5.8,
+     "agree": true
+    },
+    {
+     "lat": -6.1762,
+     "lon": 106.7442,
+     "asc_mm": -6.9,
+     "desc_mm": -17.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1581,
+     "lon": 106.7442,
+     "asc_mm": -7.1,
+     "desc_mm": -24.6,
+     "agree": false
+    },
+    {
+     "lat": -6.14,
+     "lon": 106.7441,
+     "asc_mm": -4.7,
+     "desc_mm": -23.3,
+     "agree": false
+    },
+    {
+     "lat": -6.122,
+     "lon": 106.7441,
+     "asc_mm": -4.7,
+     "desc_mm": -16.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1039,
+     "lon": 106.744,
+     "asc_mm": -1.4,
+     "desc_mm": -7.0,
+     "agree": true
+    },
+    {
+     "lat": -6.1942,
+     "lon": 106.7624,
+     "asc_mm": -5.9,
+     "desc_mm": -23.9,
+     "agree": false
+    },
+    {
+     "lat": -6.1762,
+     "lon": 106.7623,
+     "asc_mm": -5.5,
+     "desc_mm": -25.2,
+     "agree": false
+    },
+    {
+     "lat": -6.1581,
+     "lon": 106.7622,
+     "asc_mm": -8.7,
+     "desc_mm": -26.3,
+     "agree": false
+    },
+    {
+     "lat": -6.14,
+     "lon": 106.7622,
+     "asc_mm": -9.7,
+     "desc_mm": -20.7,
+     "agree": false
+    },
+    {
+     "lat": -6.1219,
+     "lon": 106.7621,
+     "asc_mm": -9.1,
+     "desc_mm": -11.6,
+     "agree": true
+    },
+    {
+     "lat": -6.1038,
+     "lon": 106.7621,
+     "asc_mm": -11.2,
+     "desc_mm": -11.5,
+     "agree": true
+    },
+    {
+     "lat": -6.1942,
+     "lon": 106.7804,
+     "asc_mm": -7.7,
+     "desc_mm": -25.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1761,
+     "lon": 106.7804,
+     "asc_mm": -5.9,
+     "desc_mm": -26.6,
+     "agree": false
+    },
+    {
+     "lat": -6.158,
+     "lon": 106.7803,
+     "asc_mm": -12.7,
+     "desc_mm": -28.1,
+     "agree": false
+    },
+    {
+     "lat": -6.1399,
+     "lon": 106.7803,
+     "asc_mm": -11.8,
+     "desc_mm": -11.7,
+     "agree": true
+    },
+    {
+     "lat": -6.1218,
+     "lon": 106.7802,
+     "asc_mm": -15.0,
+     "desc_mm": -4.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1038,
+     "lon": 106.7801,
+     "asc_mm": -13.0,
+     "desc_mm": -13.6,
+     "agree": true
+    },
+    {
+     "lat": -6.1941,
+     "lon": 106.7985,
+     "asc_mm": -7.6,
+     "desc_mm": -19.8,
+     "agree": false
+    },
+    {
+     "lat": -6.176,
+     "lon": 106.7984,
+     "asc_mm": -12.2,
+     "desc_mm": -22.1,
+     "agree": true
+    },
+    {
+     "lat": -6.158,
+     "lon": 106.7984,
+     "asc_mm": -17.6,
+     "desc_mm": -24.0,
+     "agree": true
+    },
+    {
+     "lat": -6.1399,
+     "lon": 106.7983,
+     "asc_mm": -14.4,
+     "desc_mm": -8.5,
+     "agree": true
+    },
+    {
+     "lat": -6.1218,
+     "lon": 106.7983,
+     "asc_mm": -18.4,
+     "desc_mm": -2.7,
+     "agree": false
+    },
+    {
+     "lat": -6.1037,
+     "lon": 106.7982,
+     "asc_mm": -16.2,
+     "desc_mm": -2.9,
+     "agree": false
+    },
+    {
+     "lat": -6.1941,
+     "lon": 106.8166,
+     "asc_mm": -2.7,
+     "desc_mm": -18.1,
+     "agree": false
+    },
+    {
+     "lat": -6.176,
+     "lon": 106.8165,
+     "asc_mm": -12.8,
+     "desc_mm": -23.8,
+     "agree": true
+    },
+    {
+     "lat": -6.1579,
+     "lon": 106.8164,
+     "asc_mm": -13.7,
+     "desc_mm": -22.6,
+     "agree": true
+    },
+    {
+     "lat": -6.1398,
+     "lon": 106.8164,
+     "asc_mm": -10.8,
+     "desc_mm": -15.1,
+     "agree": true
+    },
+    {
+     "lat": -6.1217,
+     "lon": 106.8163,
+     "asc_mm": -11.6,
+     "desc_mm": 2.0,
+     "agree": false
+    },
+    {
+     "lat": -6.194,
+     "lon": 106.8346,
+     "asc_mm": -9.4,
+     "desc_mm": -11.5,
+     "agree": true
+    },
+    {
+     "lat": -6.1759,
+     "lon": 106.8346,
+     "asc_mm": -4.6,
+     "desc_mm": -12.0,
+     "agree": true
+    },
+    {
+     "lat": -6.1578,
+     "lon": 106.8345,
+     "asc_mm": -3.4,
+     "desc_mm": -13.3,
+     "agree": true
+    },
+    {
+     "lat": -6.1397,
+     "lon": 106.8345,
+     "asc_mm": -7.3,
+     "desc_mm": -7.6,
+     "agree": true
+    },
+    {
+     "lat": -6.1217,
+     "lon": 106.8344,
+     "asc_mm": -7.7,
+     "desc_mm": -1.2,
+     "agree": true
+    },
+    {
+     "lat": -6.1939,
+     "lon": 106.8527,
+     "asc_mm": -5.7,
+     "desc_mm": -4.1,
+     "agree": true
+    },
+    {
+     "lat": -6.1758,
+     "lon": 106.8526,
+     "asc_mm": -0.1,
+     "desc_mm": -2.0,
+     "agree": true
+    },
+    {
+     "lat": -6.1578,
+     "lon": 106.8526,
+     "asc_mm": -3.1,
+     "desc_mm": -4.7,
+     "agree": true
+    },
+    {
+     "lat": -6.1397,
+     "lon": 106.8525,
+     "asc_mm": -5.9,
+     "desc_mm": -5.3,
+     "agree": true
+    },
+    {
+     "lat": -6.1216,
+     "lon": 106.8525,
+     "asc_mm": -8.0,
+     "desc_mm": -7.0,
+     "agree": true
+    },
+    {
+     "lat": -6.1939,
+     "lon": 106.8708,
+     "asc_mm": -4.9,
+     "desc_mm": 2.7,
+     "agree": true
+    },
+    {
+     "lat": -6.1758,
+     "lon": 106.8707,
+     "asc_mm": -3.0,
+     "desc_mm": 6.1,
+     "agree": true
+    },
+    {
+     "lat": -6.1577,
+     "lon": 106.8707,
+     "asc_mm": -3.2,
+     "desc_mm": 3.9,
+     "agree": true
+    },
+    {
+     "lat": -6.1396,
+     "lon": 106.8706,
+     "asc_mm": -8.5,
+     "desc_mm": 2.3,
+     "agree": true
+    },
+    {
+     "lat": -6.1215,
+     "lon": 106.8705,
+     "asc_mm": -14.8,
+     "desc_mm": 1.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1938,
+     "lon": 106.8888,
+     "asc_mm": -10.0,
+     "desc_mm": 10.4,
+     "agree": false
+    },
+    {
+     "lat": -6.1757,
+     "lon": 106.8888,
+     "asc_mm": -9.2,
+     "desc_mm": 14.9,
+     "agree": false
+    },
+    {
+     "lat": -6.1576,
+     "lon": 106.8887,
+     "asc_mm": -8.2,
+     "desc_mm": 14.6,
+     "agree": false
+    },
+    {
+     "lat": -6.1396,
+     "lon": 106.8887,
+     "asc_mm": -13.8,
+     "desc_mm": 14.9,
+     "agree": false
+    },
+    {
+     "lat": -6.1215,
+     "lon": 106.8886,
+     "asc_mm": -22.0,
+     "desc_mm": 11.1,
+     "agree": false
+    },
+    {
+     "lat": -6.1937,
+     "lon": 106.9069,
+     "asc_mm": -15.0,
+     "desc_mm": 18.7,
+     "agree": false
+    },
+    {
+     "lat": -6.1757,
+     "lon": 106.9069,
+     "asc_mm": -17.1,
+     "desc_mm": 29.5,
+     "agree": false
+    },
+    {
+     "lat": -6.1576,
+     "lon": 106.9068,
+     "asc_mm": -14.1,
+     "desc_mm": 30.1,
+     "agree": false
+    },
+    {
+     "lat": -6.1395,
+     "lon": 106.9067,
+     "asc_mm": -17.9,
+     "desc_mm": 28.2,
+     "agree": false
+    },
+    {
+     "lat": -6.1214,
+     "lon": 106.9067,
+     "asc_mm": -23.8,
+     "desc_mm": 30.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1033,
+     "lon": 106.9066,
+     "asc_mm": -22.4,
+     "desc_mm": 25.9,
+     "agree": false
+    },
+    {
+     "lat": -6.1937,
+     "lon": 106.925,
+     "asc_mm": -22.7,
+     "desc_mm": 21.4,
+     "agree": false
+    },
+    {
+     "lat": -6.1756,
+     "lon": 106.9249,
+     "asc_mm": -22.5,
+     "desc_mm": 42.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1575,
+     "lon": 106.9249,
+     "asc_mm": -20.4,
+     "desc_mm": 46.3,
+     "agree": false
+    },
+    {
+     "lat": -6.1394,
+     "lon": 106.9248,
+     "asc_mm": -22.6,
+     "desc_mm": 47.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1213,
+     "lon": 106.9247,
+     "asc_mm": -25.9,
+     "desc_mm": 44.4,
+     "agree": false
+    },
+    {
+     "lat": -6.1033,
+     "lon": 106.9247,
+     "asc_mm": -30.3,
+     "desc_mm": 40.6,
+     "agree": false
+    },
+    {
+     "lat": -6.1936,
+     "lon": 106.9431,
+     "asc_mm": -27.0,
+     "desc_mm": 20.6,
+     "agree": false
+    },
+    {
+     "lat": -6.1755,
+     "lon": 106.943,
+     "asc_mm": -23.4,
+     "desc_mm": 39.5,
+     "agree": false
+    },
+    {
+     "lat": -6.1574,
+     "lon": 106.9429,
+     "asc_mm": -20.3,
+     "desc_mm": 51.1,
+     "agree": false
+    },
+    {
+     "lat": -6.1394,
+     "lon": 106.9429,
+     "asc_mm": -25.4,
+     "desc_mm": 55.8,
+     "agree": false
+    },
+    {
+     "lat": -6.1213,
+     "lon": 106.9428,
+     "asc_mm": -33.0,
+     "desc_mm": 53.9,
+     "agree": false
+    },
+    {
+     "lat": -6.1032,
+     "lon": 106.9427,
+     "asc_mm": -30.1,
+     "desc_mm": 54.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1935,
+     "lon": 106.9611,
+     "asc_mm": -32.4,
+     "desc_mm": 26.4,
+     "agree": false
+    },
+    {
+     "lat": -6.1755,
+     "lon": 106.9611,
+     "asc_mm": -29.3,
+     "desc_mm": 27.6,
+     "agree": false
+    },
+    {
+     "lat": -6.1574,
+     "lon": 106.961,
+     "asc_mm": -24.5,
+     "desc_mm": 42.2,
+     "agree": false
+    },
+    {
+     "lat": -6.1393,
+     "lon": 106.9609,
+     "asc_mm": -16.1,
+     "desc_mm": 63.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1212,
+     "lon": 106.9609,
+     "asc_mm": -26.2,
+     "desc_mm": 58.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1935,
+     "lon": 106.9792,
+     "asc_mm": -34.6,
+     "desc_mm": 23.5,
+     "agree": false
+    },
+    {
+     "lat": -6.1754,
+     "lon": 106.9791,
+     "asc_mm": -29.4,
+     "desc_mm": 29.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1573,
+     "lon": 106.9791,
+     "asc_mm": -23.3,
+     "desc_mm": 35.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1031,
+     "lon": 106.9789,
+     "asc_mm": -2.3,
+     "desc_mm": 49.1,
+     "agree": false
+    },
+    {
+     "lat": -6.085,
+     "lon": 106.9788,
+     "asc_mm": -6.7,
+     "desc_mm": 41.3,
+     "agree": false
+    },
+    {
+     "lat": -6.1934,
+     "lon": 106.9973,
+     "asc_mm": -34.1,
+     "desc_mm": 35.0,
+     "agree": false
+    },
+    {
+     "lat": -6.1753,
+     "lon": 106.9972,
+     "asc_mm": -27.5,
+     "desc_mm": 35.2,
+     "agree": false
+    },
+    {
+     "lat": -6.1572,
+     "lon": 106.9971,
+     "asc_mm": -21.5,
+     "desc_mm": 32.6,
+     "agree": false
+    },
+    {
+     "lat": -6.1392,
+     "lon": 106.9971,
+     "asc_mm": -10.1,
+     "desc_mm": 51.4,
+     "agree": false
+    },
+    {
+     "lat": -6.1211,
+     "lon": 106.997,
+     "asc_mm": -4.4,
+     "desc_mm": 62.3,
+     "agree": false
+    },
+    {
+     "lat": -6.103,
+     "lon": 106.9969,
+     "asc_mm": -18.2,
+     "desc_mm": 58.6,
+     "agree": false
+    },
+    {
+     "lat": -6.0849,
+     "lon": 106.9969,
+     "asc_mm": -1.1,
+     "desc_mm": 63.5,
+     "agree": false
+    }
+   ]
   },
   "reference": {
-   "lat": -6.1666,
-   "lon": 106.8134,
-   "mean_coherence": 0.437
+   "lat": -6.1806,
+   "lon": 106.8534,
+   "mean_coherence": 0.832
   }
  },
  "files": {
@@ -547,74 +1283,74 @@
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_024_018_D_091_025_4000_SH_20260627T111112_20260627T111146_20260709T111111_20260709T111146_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_024_018_D_092_025_4000_SH_20260627T111145_20260627T111223_20260709T111145_20260709T111222_P05023_N_F_J_001.h5",
     "dates": "2026-06-27 → 2026-07-09",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_025_018_D_091_026_4000_SH_20260709T111111_20260709T111146_20260721T111111_20260721T111145_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_025_018_D_092_026_4000_SH_20260709T111145_20260709T111222_20260721T111144_20260721T111222_P05023_N_F_J_001.h5",
     "dates": "2026-07-09 → 2026-07-21",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_026_018_D_091_028_4000_SH_20260721T111111_20260721T111145_20260814T111109_20260814T111144_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_026_018_D_092_028_4000_SH_20260721T111144_20260721T111222_20260814T111143_20260814T111221_P05023_N_F_J_001.h5",
     "dates": "2026-07-21 → 2026-08-14",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_028_018_D_091_029_4000_SH_20260814T111109_20260814T111144_20260826T111109_20260826T111144_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_028_018_D_092_029_4000_SH_20260814T111143_20260814T111221_20260826T111143_20260826T111220_P05023_N_F_J_001.h5",
     "dates": "2026-08-14 → 2026-08-26",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_029_018_D_091_030_4000_SH_20260826T111109_20260826T111144_20260907T111109_20260907T111143_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_029_018_D_092_030_4000_SH_20260826T111143_20260826T111220_20260907T111142_20260907T111220_P05023_N_F_J_001.h5",
     "dates": "2026-08-26 → 2026-09-07",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_030_018_D_091_031_4000_SH_20260907T111109_20260907T111143_20260919T111109_20260919T111143_P05023_F_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_030_018_D_092_031_4000_SH_20260907T111142_20260907T111220_20260919T111142_20260919T111220_P05023_F_F_J_001.h5",
     "dates": "2026-09-07 → 2026-09-19",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_031_018_D_091_032_4000_SH_20260919T111109_20260919T111143_20261001T111109_20261001T111144_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_031_018_D_092_032_4000_SH_20260919T111142_20260919T111220_20261001T111143_20261001T111221_P05023_N_F_J_001.h5",
     "dates": "2026-09-19 → 2026-10-01",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    },
    {
-    "file": "NISAR_L2_PR_GUNW_032_018_D_091_033_4000_SH_20261001T111109_20261001T111144_20261013T111109_20261013T111144_P05023_N_F_J_001.h5",
+    "file": "NISAR_L2_PR_GUNW_032_018_D_092_033_4000_SH_20261001T111143_20261001T111221_20261013T111143_20261013T111221_P05023_N_F_J_001.h5",
     "dates": "2026-10-01 → 2026-10-13",
     "direction": "Descending",
     "track": 18,
-    "frame": 91,
+    "frame": 92,
     "processing": "P05023",
     "product_version": "1.0.11"
    }
@@ -659,8 +1395,8 @@
    "NISAR L2 GUNW product specification JPL D-102272 Rev E: corrections stored, not applied"
   ],
   "script": "tools/process_jakarta.py",
-  "script_version": "1.0.2",
-  "script_sha256": "55f9590455d0ef57a903e5de4cf6722c8b1cf2a1b97e073cdaa0a4479f861318",
+  "script_version": "1.1",
+  "script_sha256": "d49d9feb12f349032e81244c6771195e35cd229f60ccba5540f603ab1af34eaa",
   "helpers_sha256": "651c7412e7d07f81b886b5195dd010cf8e8feae929ac05f0500536ca06427888"
  }
 }

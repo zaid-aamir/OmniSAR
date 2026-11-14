@@ -11,6 +11,7 @@ import { mountGraph } from './graph.js';
 import { openCustody } from './custody.js';
 import { recordCase } from './progress.js';
 import { countUpAll, stamp } from './motion.js';
+import { mountGigabytes } from './gigabytes.js';
 
 // Why "Next" is still disabled on a step (shown next to the button)
 const WAIT_REASON = {
@@ -112,6 +113,7 @@ export function runWalkthrough(root, mystery, { onExit }) {
     root.querySelector('#wt-custody')?.addEventListener('click', () => openCustody(m.info, m.numbers));
     if (step.type === 'evidence') mountMinigame(root.querySelector('#wt-mini'), m, { onChange: () => { updateNav(); wireTrapChips(root); } });
     if (step.type === 'graph') mountGraph(root.querySelector('#wt-graph'), m, { onChange: updateNav });
+    if (step.type === 'verdict') mountGigabytes(root.querySelector('#wt-gb'), m.info, m.numbers);
     wireTrapChips(root);
     if (focus !== 'reply') root.closest('.panel')?.scrollTo({ top: 0 });
     // keyboard focus never stays on a control that the redraw removed
@@ -209,6 +211,20 @@ export function runWalkthrough(root, mystery, { onExit }) {
         </ul>` : ''}`;
   }
 
+  // Weak or unchecked evidence is a catch, not a failure: say what was caught and why that is honest.
+  // Only the case's own badge reason and check text are used, so it never claims more than the evidence.
+  function caught(n) {
+    if (/^weak/i.test(n.badge || '')) {
+      return `<div class="caught"><p class="reply-head">We caught it</p><p>${esc(n.check?.text || n.badge_reason || '')} Rather than claim more than the radar can carry,
+        the badge says Weak: the honest answer for now is “not proven yet”. That is the evidence check doing its job.</p></div>`;
+    }
+    if (/^unchecked/i.test(n.badge || '')) {
+      return `<div class="caught"><p class="reply-head">We caught it</p><p>There is no independent check yet. ${esc(n.check?.text || n.badge_reason || '')}
+        So every class here stays labelled “radar only” until a second source agrees or disagrees. Saying so is the honest result.</p></div>`;
+    }
+    return '';
+  }
+
   // Verdict: real numbers only. No numbers file listed in results.json -> "evidence pending".
   function renderVerdict() {
     const v = mystery.data.verdict;
@@ -221,7 +237,9 @@ export function runWalkthrough(root, mystery, { onExit }) {
         ${n.check ? `<div><dt>${esc(n.check.label)}</dt><dd>${esc(n.check.text)}</dd></div>` : ''}
       </dl>
       ${n.badge ? `<p class="badge-line"><span class="tag tag-nisar">Evidence: ${esc(n.badge)}</span> <span class="evidence-caption">${esc(n.badge_reason || '')}</span></p>` : ''}
-      <button class="ghost-btn" id="wt-custody">Chain of custody: every file, step and threshold</button>`
+      ${caught(n)}
+      <button class="ghost-btn" id="wt-custody">Chain of custody: every file, step and threshold</button>
+      <div id="wt-gb"></div>`
       : `<div class="pending-box pending-verdict">${esc(v.pending)}</div>`;
     return `
       <h2 class="wt-title" tabindex="-1">Verdict</h2>

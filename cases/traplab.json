@@ -1,0 +1,57 @@
+{
+ "about": "Trap Lab 'try it' exhibits built by tools/build_traplab.py from our processed data (no new rules).",
+ "generated": "2026-11-14T08:41Z",
+ "tryIts": {
+  "8": {
+   "case": "jebel-ali",
+   "off": {
+    "src": "assets/traplab/t8-2026-10-16.png",
+    "label": "16 Oct vs 18 Jun (box -0.9 dB, frame -0.2 dB)"
+   },
+   "on": {
+    "src": "assets/traplab/t8-2026-10-28.png",
+    "label": "28 Oct vs 18 Jun (box +6.3 dB, frame +0.1 dB)"
+   },
+   "offWord": "Clean pass",
+   "onWord": "Flagged pass",
+   "note": "The same comparison, two different after-dates. On 28 Oct the whole Jebel Ali box seems to brighten while the rest of the frame doesn't: interference, not construction. A median of three passes per side would outvote one bad date; we only have one clean pass per side so far."
+  },
+  "11": {
+   "case": "jebel-ali",
+   "off": {
+    "src": "assets/traplab/t11-sea.png",
+    "label": "Open sea: -17.1 dB"
+   },
+   "on": {
+    "src": "assets/traplab/t11-desert.png",
+    "label": "Desert sand: -16.9 dB"
+   },
+   "offWord": "Sea",
+   "onWord": "Desert",
+   "note": "Both reflect the beam away like a mirror, so both come back dark: -17.1 dB vs -16.9 dB. Radar alone can't tell calm water from smooth sand here."
+  },
+  "2": {
+   "case": "jebel-ali",
+   "off": {
+    "src": "assets/traplab/t2-request1.png",
+    "label": "Request 1: image ead54434dc19"
+   },
+   "on": {
+    "src": "assets/traplab/t2-request2.png",
+    "label": "Request 2: image a74feab043d1"
+   },
+   "offWord": "Request 1",
+   "onWord": "Request 2",
+   "note": "The same NASA NISAR map-tile address at zoom 10, asked twice on 14 Nov 2026 12:41 UAE: two different images came back for one address (fingerprints ead54434dc19 and a74feab043d1). Map tiles are pictures; our numbers come from the science files.",
+   "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/NISAR_L2_Geocoded_Polarimetric_Covariance/default/2026-10-16/GoogleMapsCompatible_Level13/10/438/668.png",
+   "statuses": [
+    200,
+    200
+   ],
+   "fingerprints": [
+    "ead54434dc19",
+    "a74feab043d1"
+   ]
+  }
+ }
+}

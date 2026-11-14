@@ -157,10 +157,10 @@
       "title": "Motion after corrections, 8 pairs chained",
       "kind": "image",
       "src": "assets/cases/jakarta/motion_overlay.png",
-      "caption": "Ground motion after corrections, all 8 ascending pairs chained (108 days). 6.6 km² of land moved down 30 mm or more (blue), relative to central Jakarta.",
+      "caption": "Ground motion after corrections, all 8 ascending pairs chained (108 days). 28.8 km² of land moved down 30 mm or more (blue), relative to central Jakarta.",
       "source": "NISAR GUNW, ascending track 010",
-      "bin": "real",
-      "trap": null
+      "bin": "trap",
+      "trap": 15
     },
     {
       "id": "coherence",
@@ -177,7 +177,7 @@
       "title": "Ascending vs descending",
       "kind": "image",
       "src": "assets/cases/jakarta/ev-asc-desc.png",
-      "caption": "The descending frame we have covers only part of the box and is mostly incoherent there, so the second direction can't be used yet: a file problem, not a ground signal.",
+      "caption": "Ascending (05:39 local) and descending (18:11 local) chains side by side: two directions, two times of day, two different skies.",
       "source": "NISAR GUNW, tracks 010 and 018",
       "bin": "trap",
       "trap": 14
@@ -263,7 +263,7 @@
         "off": null,
         "on": null
       },
-      "disabled": "Switched off: the descending frame we have (018/091) covers only part of the box and is mostly incoherent there. The frame that covers it (092) is still downloading.",
+      "disabled": null,
       "explains": "Two directions, two times of day, different air. If both see the same districts sinking, the motion is in the ground."
     }
   ],
