@@ -1,0 +1,1957 @@
+{
+ "case": "al-ain",
+ "generated": "2026-11-14T01:37Z",
+ "measured": [
+  {
+   "label": "Pivot A",
+   "value": "Fallow",
+   "unit": "",
+   "note": "Crop echo vs desert: +1.5 dB on 18 Jun → +2.4 dB on 28 Oct (crop present if ≥ +3 dB). 26-year MODIS record: green this summer (last green year 2026)."
+  },
+  {
+   "label": "Pivot B",
+   "value": "Fallow",
+   "unit": "",
+   "note": "Crop echo vs desert: +2.2 dB on 18 Jun → +1.2 dB on 28 Oct (crop present if ≥ +3 dB). 26-year MODIS record: green this summer (last green year 2026)."
+  },
+  {
+   "label": "Pivot C",
+   "value": "Fallow",
+   "unit": "",
+   "note": "Crop echo vs desert: -0.8 dB on 18 Jun → -0.8 dB on 28 Oct (crop present if ≥ +3 dB). 26-year MODIS record: quiet for years (last green year 2021)."
+  },
+  {
+   "label": "Pivot D",
+   "value": "Fallow",
+   "unit": "",
+   "note": "Crop echo vs desert: -0.4 dB on 18 Jun → -0.4 dB on 28 Oct (crop present if ≥ +3 dB). 26-year MODIS record: quiet for years (last green year 2023)."
+  },
+  {
+   "label": "Warning: MODIS disagrees",
+   "value": "1 of 4 pivots",
+   "unit": "",
+   "note": "Pivot A: radar says fallow, but MODIS NDVI was 0.67 on 16 Oct. MODIS is our history source, not the formal check (its 250 m pixels are a third of a circle), but it suggests our 3 dB radar rule misses some green crops. We don't change a rule after seeing results; the HLS check will decide."
+  },
+  {
+   "label": "Passes used",
+   "value": "2 of 2",
+   "unit": "",
+   "note": "18 Jun, 28 Oct. The interference check found no patch over Al Ain on any pass."
+  }
+ ],
+ "check": {
+  "label": "Independent check",
+  "text": "Pending: the NASA HLS photo-based NDVI check needs the AppEEARS files, which haven't been downloaded yet. Until then the classes are radar only."
+ },
+ "badge": "Unchecked (radar only)",
+ "badge_reason": "HLS NDVI check pending (rule: ≥ 75% of pivots agree = Strong, 50–74% = Moderate, below = Weak)",
+ "sources": [
+  "NISAR_L2_PR_GCOV_023_056_A_014_4005_DHDH_A_20260618T014305_20260618T014336_P05023_N_F_J_001.h5",
+  "NISAR_L2_PR_GCOV_034_056_A_014_4005_DHDH_A_20261028T014300_20261028T014333_P05036_N_F_J_001.h5"
+ ],
+ "method": {
+  "declared": "2026-11-14T05:18+04:00, before any pivot was classified",
+  "inputs": "NISAR L2 GCOV, track 056, ascending, frame 014, mode 4005 (10 m): finished passes from 18 Jun to 28 Oct 2026",
+  "window": [
+   "2026-06-18",
+   "2026-10-28"
+  ],
+  "layers": [
+   "HHHH",
+   "HVHV",
+   "mask"
+  ],
+  "valid_pixel": "mask 1-254, HH > 0, HV > 0",
+  "interference_check": "whole frame sampled on a 40x40 grid of 32x32-pixel windows; a pass is flagged if |Al Ain box median change - frame median change| >= 1.5 dB in HH or HV vs 18 Jun; a flagged pass is excluded and the reason shown",
+  "interference_limit_db": 1.5,
+  "pivots": "HLS-NDVI pivot finding is pending (AppEEARS files not downloaded), so the four logged pivots and the desert control from the 28 Oct AppEEARS request are used",
+  "points": [
+   {
+    "id": "pivot_dark",
+    "lat": 24.49083455,
+    "lon": 55.58140118,
+    "kind": "pivot"
+   },
+   {
+    "id": "pivot_dark2",
+    "lat": 24.49705499,
+    "lon": 55.57581644,
+    "kind": "pivot"
+   },
+   {
+    "id": "pivot_brown",
+    "lat": 24.47625597,
+    "lon": 55.52696285,
+    "kind": "pivot"
+   },
+   {
+    "id": "pivot_old",
+    "lat": 24.48999604,
+    "lon": 55.52484753,
+    "kind": "pivot"
+   },
+   {
+    "id": "desert",
+    "lat": 24.46468191,
+    "lon": 55.52715393,
+    "kind": "control"
+   }
+  ],
+  "disk_radius_m": 300,
+  "pivot_value": "mean linear HV (and HH) of 10 m pixels within 300 m of the centre (circles are ~800 m across), in dB",
+  "relative_hv": "rHV = HV(pivot) - HV(desert control), same pass",
+  "crop_present_db": 3.0,
+  "classes": {
+   "Active": "crop present (rHV >= 3 dB) on the latest usable pass",
+   "Newly cleared": "present on the first pass, absent on the latest, and rHV fell by >= 3 dB",
+   "Fallow": "otherwise absent on the latest pass"
+  },
+  "history": "MODIS MOD13Q1 16-day NDVI from the NASA ORNL DAAC MODIS web service (public, no login; same product as the AppEEARS order), centre pixel of each point, 18 Feb 2000 -> latest; active year = yearly max NDVI >= 0.30; 'quiet for years' = no active year in 2024-2026 after >= 3 earlier active years; 'quiet this summer only' = 2026 Jun-Oct max < 0.30 with an active year in 2023-2025. History only, not the check (250 m pixels).",
+  "ndvi_active": 0.3,
+  "check": "PENDING until the AppEEARS HLS files arrive: HLS NDVI, Fmask cloud-masked; Active if median NDVI within +/-16 days of the latest pass >= 0.30; Newly cleared if >= 0.30 within +/-16 days of the first pass and < 0.30 at the latest; Fallow otherwise",
+  "badge_rule": "Strong if >= 75% of pivots agree with the HLS class; Moderate 50-74%; Weak otherwise. Until the check exists: 'Unchecked (radar only)'"
+ },
+ "results": {
+  "pivots": [
+   {
+    "id": "pivot_dark",
+    "name": "Pivot A",
+    "lat": 24.49083455,
+    "lon": 55.58140118,
+    "class": "Fallow",
+    "series": [
+     {
+      "date": "2026-06-18",
+      "hv_db": -21.54,
+      "rhv_db": 1.52
+     },
+     {
+      "date": "2026-10-28",
+      "hv_db": -19.28,
+      "rhv_db": 2.36
+     }
+    ],
+    "history": "green this summer",
+    "last_active_year": 2026,
+    "summer_2026_ndvi_max": 0.6691,
+    "modis_near_passes": {
+     "2026-06-18": {
+      "date": "2026-06-10",
+      "ndvi": 0.5792
+     },
+     "2026-10-28": {
+      "date": "2026-10-16",
+      "ndvi": 0.6655
+     }
+    },
+    "modis_near_latest": {
+     "date": "2026-10-16",
+     "ndvi": 0.6655
+    },
+    "modis_disagrees": true
+   },
+   {
+    "id": "pivot_dark2",
+    "name": "Pivot B",
+    "lat": 24.49705499,
+    "lon": 55.57581644,
+    "class": "Fallow",
+    "series": [
+     {
+      "date": "2026-06-18",
+      "hv_db": -20.81,
+      "rhv_db": 2.25
+     },
+     {
+      "date": "2026-10-28",
+      "hv_db": -20.4,
+      "rhv_db": 1.24
+     }
+    ],
+    "history": "green this summer",
+    "last_active_year": 2026,
+    "summer_2026_ndvi_max": 0.7094,
+    "modis_near_passes": {
+     "2026-06-18": {
+      "date": "2026-06-10",
+      "ndvi": 0.5662
+     },
+     "2026-10-28": {
+      "date": "2026-10-16",
+      "ndvi": 0.1825
+     }
+    },
+    "modis_near_latest": {
+     "date": "2026-10-16",
+     "ndvi": 0.1825
+    },
+    "modis_disagrees": false
+   },
+   {
+    "id": "pivot_brown",
+    "name": "Pivot C",
+    "lat": 24.47625597,
+    "lon": 55.52696285,
+    "class": "Fallow",
+    "series": [
+     {
+      "date": "2026-06-18",
+      "hv_db": -23.87,
+      "rhv_db": -0.81
+     },
+     {
+      "date": "2026-10-28",
+      "hv_db": -22.47,
+      "rhv_db": -0.83
+     }
+    ],
+    "history": "quiet for years",
+    "last_active_year": 2021,
+    "summer_2026_ndvi_max": 0.1316,
+    "modis_near_passes": {
+     "2026-06-18": {
+      "date": "2026-06-10",
+      "ndvi": 0.1316
+     },
+     "2026-10-28": {
+      "date": "2026-10-16",
+      "ndvi": 0.1188
+     }
+    },
+    "modis_near_latest": {
+     "date": "2026-10-16",
+     "ndvi": 0.1188
+    },
+    "modis_disagrees": false
+   },
+   {
+    "id": "pivot_old",
+    "name": "Pivot D",
+    "lat": 24.48999604,
+    "lon": 55.52484753,
+    "class": "Fallow",
+    "series": [
+     {
+      "date": "2026-06-18",
+      "hv_db": -23.5,
+      "rhv_db": -0.44
+     },
+     {
+      "date": "2026-10-28",
+      "hv_db": -22.08,
+      "rhv_db": -0.44
+     }
+    ],
+    "history": "quiet for years",
+    "last_active_year": 2023,
+    "summer_2026_ndvi_max": 0.1385,
+    "modis_near_passes": {
+     "2026-06-18": {
+      "date": "2026-06-10",
+      "ndvi": 0.131
+     },
+     "2026-10-28": {
+      "date": "2026-10-16",
+      "ndvi": 0.1294
+     }
+    },
+    "modis_near_latest": {
+     "date": "2026-10-16",
+     "ndvi": 0.1294
+    },
+    "modis_disagrees": false
+   }
+  ],
+  "desert": {
+   "2026-06-18": {
+    "hv_db": -23.06,
+    "hh_db": -16.12,
+    "pixels": 2821
+   },
+   "2026-10-28": {
+    "hv_db": -21.64,
+    "hh_db": -15.6,
+    "pixels": 2821
+   }
+  },
+  "point_values": {
+   "pivot_dark": {
+    "2026-06-18": {
+     "hv_db": -21.54,
+     "hh_db": -13.47,
+     "pixels": 2821
+    },
+    "2026-10-28": {
+     "hv_db": -19.28,
+     "hh_db": -11.59,
+     "pixels": 2821
+    }
+   },
+   "pivot_dark2": {
+    "2026-06-18": {
+     "hv_db": -20.81,
+     "hh_db": -13.11,
+     "pixels": 2821
+    },
+    "2026-10-28": {
+     "hv_db": -20.4,
+     "hh_db": -11.66,
+     "pixels": 2821
+    }
+   },
+   "pivot_brown": {
+    "2026-06-18": {
+     "hv_db": -23.87,
+     "hh_db": -17.47,
+     "pixels": 2821
+    },
+    "2026-10-28": {
+     "hv_db": -22.47,
+     "hh_db": -16.57,
+     "pixels": 2821
+    }
+   },
+   "pivot_old": {
+    "2026-06-18": {
+     "hv_db": -23.5,
+     "hh_db": -16.6,
+     "pixels": 2821
+    },
+    "2026-10-28": {
+     "hv_db": -22.08,
+     "hh_db": -15.82,
+     "pixels": 2821
+    }
+   },
+   "desert": {
+    "2026-06-18": {
+     "hv_db": -23.06,
+     "hh_db": -16.12,
+     "pixels": 2821
+    },
+    "2026-10-28": {
+     "hv_db": -21.64,
+     "hh_db": -15.6,
+     "pixels": 2821
+    }
+   }
+  },
+  "interference": [
+   {
+    "pass": "2026-10-28",
+    "compared_with": "2026-06-18",
+    "HH": {
+     "box_median_change_db": 0.88,
+     "frame_median_change_db": 0.09,
+     "anomaly_over_box": false
+    },
+    "HV": {
+     "box_median_change_db": 1.33,
+     "frame_median_change_db": 0.36,
+     "anomaly_over_box": false
+    },
+    "anomaly_over_box": false
+   }
+  ],
+  "excluded_passes": [],
+  "history": {
+   "pivot_dark": {
+    "yearly_max": [
+     {
+      "date": "2000-07-01",
+      "year": 2000,
+      "ndvi_max": 0.125
+     },
+     {
+      "date": "2001-07-01",
+      "year": 2001,
+      "ndvi_max": 0.129
+     },
+     {
+      "date": "2002-07-01",
+      "year": 2002,
+      "ndvi_max": 0.131
+     },
+     {
+      "date": "2003-07-01",
+      "year": 2003,
+      "ndvi_max": 0.126
+     },
+     {
+      "date": "2004-07-01",
+      "year": 2004,
+      "ndvi_max": 0.127
+     },
+     {
+      "date": "2005-07-01",
+      "year": 2005,
+      "ndvi_max": 0.146
+     },
+     {
+      "date": "2006-07-01",
+      "year": 2006,
+      "ndvi_max": 0.137
+     },
+     {
+      "date": "2007-07-01",
+      "year": 2007,
+      "ndvi_max": 0.133
+     },
+     {
+      "date": "2008-07-01",
+      "year": 2008,
+      "ndvi_max": 0.128
+     },
+     {
+      "date": "2009-07-01",
+      "year": 2009,
+      "ndvi_max": 0.127
+     },
+     {
+      "date": "2010-07-01",
+      "year": 2010,
+      "ndvi_max": 0.128
+     },
+     {
+      "date": "2011-07-01",
+      "year": 2011,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2012-07-01",
+      "year": 2012,
+      "ndvi_max": 0.127
+     },
+     {
+      "date": "2013-07-01",
+      "year": 2013,
+      "ndvi_max": 0.134
+     },
+     {
+      "date": "2014-07-01",
+      "year": 2014,
+      "ndvi_max": 0.37
+     },
+     {
+      "date": "2015-07-01",
+      "year": 2015,
+      "ndvi_max": 0.768
+     },
+     {
+      "date": "2016-07-01",
+      "year": 2016,
+      "ndvi_max": 0.762
+     },
+     {
+      "date": "2017-07-01",
+      "year": 2017,
+      "ndvi_max": 0.823
+     },
+     {
+      "date": "2018-07-01",
+      "year": 2018,
+      "ndvi_max": 0.799
+     },
+     {
+      "date": "2019-07-01",
+      "year": 2019,
+      "ndvi_max": 0.748
+     },
+     {
+      "date": "2020-07-01",
+      "year": 2020,
+      "ndvi_max": 0.795
+     },
+     {
+      "date": "2021-07-01",
+      "year": 2021,
+      "ndvi_max": 0.814
+     },
+     {
+      "date": "2022-07-01",
+      "year": 2022,
+      "ndvi_max": 0.844
+     },
+     {
+      "date": "2023-07-01",
+      "year": 2023,
+      "ndvi_max": 0.71
+     },
+     {
+      "date": "2024-07-01",
+      "year": 2024,
+      "ndvi_max": 0.772
+     },
+     {
+      "date": "2025-07-01",
+      "year": 2025,
+      "ndvi_max": 0.766
+     },
+     {
+      "date": "2026-07-01",
+      "year": 2026,
+      "ndvi_max": 0.823
+     }
+    ],
+    "active_years": [
+     2014,
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ],
+    "summer_2026_max": 0.6691,
+    "label": "green this summer",
+    "last_active_year": 2026
+   },
+   "pivot_dark2": {
+    "yearly_max": [
+     {
+      "date": "2000-07-01",
+      "year": 2000,
+      "ndvi_max": 0.128
+     },
+     {
+      "date": "2001-07-01",
+      "year": 2001,
+      "ndvi_max": 0.133
+     },
+     {
+      "date": "2002-07-01",
+      "year": 2002,
+      "ndvi_max": 0.131
+     },
+     {
+      "date": "2003-07-01",
+      "year": 2003,
+      "ndvi_max": 0.129
+     },
+     {
+      "date": "2004-07-01",
+      "year": 2004,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2005-07-01",
+      "year": 2005,
+      "ndvi_max": 0.14
+     },
+     {
+      "date": "2006-07-01",
+      "year": 2006,
+      "ndvi_max": 0.137
+     },
+     {
+      "date": "2007-07-01",
+      "year": 2007,
+      "ndvi_max": 0.135
+     },
+     {
+      "date": "2008-07-01",
+      "year": 2008,
+      "ndvi_max": 0.131
+     },
+     {
+      "date": "2009-07-01",
+      "year": 2009,
+      "ndvi_max": 0.138
+     },
+     {
+      "date": "2010-07-01",
+      "year": 2010,
+      "ndvi_max": 0.131
+     },
+     {
+      "date": "2011-07-01",
+      "year": 2011,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2012-07-01",
+      "year": 2012,
+      "ndvi_max": 0.133
+     },
+     {
+      "date": "2013-07-01",
+      "year": 2013,
+      "ndvi_max": 0.134
+     },
+     {
+      "date": "2014-07-01",
+      "year": 2014,
+      "ndvi_max": 0.136
+     },
+     {
+      "date": "2015-07-01",
+      "year": 2015,
+      "ndvi_max": 0.405
+     },
+     {
+      "date": "2016-07-01",
+      "year": 2016,
+      "ndvi_max": 0.491
+     },
+     {
+      "date": "2017-07-01",
+      "year": 2017,
+      "ndvi_max": 0.833
+     },
+     {
+      "date": "2018-07-01",
+      "year": 2018,
+      "ndvi_max": 0.72
+     },
+     {
+      "date": "2019-07-01",
+      "year": 2019,
+      "ndvi_max": 0.691
+     },
+     {
+      "date": "2020-07-01",
+      "year": 2020,
+      "ndvi_max": 0.792
+     },
+     {
+      "date": "2021-07-01",
+      "year": 2021,
+      "ndvi_max": 0.663
+     },
+     {
+      "date": "2022-07-01",
+      "year": 2022,
+      "ndvi_max": 0.811
+     },
+     {
+      "date": "2023-07-01",
+      "year": 2023,
+      "ndvi_max": 0.743
+     },
+     {
+      "date": "2024-07-01",
+      "year": 2024,
+      "ndvi_max": 0.795
+     },
+     {
+      "date": "2025-07-01",
+      "year": 2025,
+      "ndvi_max": 0.779
+     },
+     {
+      "date": "2026-07-01",
+      "year": 2026,
+      "ndvi_max": 0.777
+     }
+    ],
+    "active_years": [
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023,
+     2024,
+     2025,
+     2026
+    ],
+    "summer_2026_max": 0.7094,
+    "label": "green this summer",
+    "last_active_year": 2026
+   },
+   "pivot_brown": {
+    "yearly_max": [
+     {
+      "date": "2000-07-01",
+      "year": 2000,
+      "ndvi_max": 0.123
+     },
+     {
+      "date": "2001-07-01",
+      "year": 2001,
+      "ndvi_max": 0.122
+     },
+     {
+      "date": "2002-07-01",
+      "year": 2002,
+      "ndvi_max": 0.122
+     },
+     {
+      "date": "2003-07-01",
+      "year": 2003,
+      "ndvi_max": 0.123
+     },
+     {
+      "date": "2004-07-01",
+      "year": 2004,
+      "ndvi_max": 0.126
+     },
+     {
+      "date": "2005-07-01",
+      "year": 2005,
+      "ndvi_max": 0.138
+     },
+     {
+      "date": "2006-07-01",
+      "year": 2006,
+      "ndvi_max": 0.138
+     },
+     {
+      "date": "2007-07-01",
+      "year": 2007,
+      "ndvi_max": 0.128
+     },
+     {
+      "date": "2008-07-01",
+      "year": 2008,
+      "ndvi_max": 0.125
+     },
+     {
+      "date": "2009-07-01",
+      "year": 2009,
+      "ndvi_max": 0.123
+     },
+     {
+      "date": "2010-07-01",
+      "year": 2010,
+      "ndvi_max": 0.125
+     },
+     {
+      "date": "2011-07-01",
+      "year": 2011,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2012-07-01",
+      "year": 2012,
+      "ndvi_max": 0.122
+     },
+     {
+      "date": "2013-07-01",
+      "year": 2013,
+      "ndvi_max": 0.138
+     },
+     {
+      "date": "2014-07-01",
+      "year": 2014,
+      "ndvi_max": 0.132
+     },
+     {
+      "date": "2015-07-01",
+      "year": 2015,
+      "ndvi_max": 0.74
+     },
+     {
+      "date": "2016-07-01",
+      "year": 2016,
+      "ndvi_max": 0.757
+     },
+     {
+      "date": "2017-07-01",
+      "year": 2017,
+      "ndvi_max": 0.817
+     },
+     {
+      "date": "2018-07-01",
+      "year": 2018,
+      "ndvi_max": 0.772
+     },
+     {
+      "date": "2019-07-01",
+      "year": 2019,
+      "ndvi_max": 0.81
+     },
+     {
+      "date": "2020-07-01",
+      "year": 2020,
+      "ndvi_max": 0.765
+     },
+     {
+      "date": "2021-07-01",
+      "year": 2021,
+      "ndvi_max": 0.767
+     },
+     {
+      "date": "2022-07-01",
+      "year": 2022,
+      "ndvi_max": 0.265
+     },
+     {
+      "date": "2023-07-01",
+      "year": 2023,
+      "ndvi_max": 0.244
+     },
+     {
+      "date": "2024-07-01",
+      "year": 2024,
+      "ndvi_max": 0.202
+     },
+     {
+      "date": "2025-07-01",
+      "year": 2025,
+      "ndvi_max": 0.181
+     },
+     {
+      "date": "2026-07-01",
+      "year": 2026,
+      "ndvi_max": 0.174
+     }
+    ],
+    "active_years": [
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021
+    ],
+    "summer_2026_max": 0.1316,
+    "label": "quiet for years",
+    "last_active_year": 2021
+   },
+   "pivot_old": {
+    "yearly_max": [
+     {
+      "date": "2000-07-01",
+      "year": 2000,
+      "ndvi_max": 0.124
+     },
+     {
+      "date": "2001-07-01",
+      "year": 2001,
+      "ndvi_max": 0.124
+     },
+     {
+      "date": "2002-07-01",
+      "year": 2002,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2003-07-01",
+      "year": 2003,
+      "ndvi_max": 0.127
+     },
+     {
+      "date": "2004-07-01",
+      "year": 2004,
+      "ndvi_max": 0.126
+     },
+     {
+      "date": "2005-07-01",
+      "year": 2005,
+      "ndvi_max": 0.137
+     },
+     {
+      "date": "2006-07-01",
+      "year": 2006,
+      "ndvi_max": 0.135
+     },
+     {
+      "date": "2007-07-01",
+      "year": 2007,
+      "ndvi_max": 0.137
+     },
+     {
+      "date": "2008-07-01",
+      "year": 2008,
+      "ndvi_max": 0.128
+     },
+     {
+      "date": "2009-07-01",
+      "year": 2009,
+      "ndvi_max": 0.133
+     },
+     {
+      "date": "2010-07-01",
+      "year": 2010,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2011-07-01",
+      "year": 2011,
+      "ndvi_max": 0.133
+     },
+     {
+      "date": "2012-07-01",
+      "year": 2012,
+      "ndvi_max": 0.129
+     },
+     {
+      "date": "2013-07-01",
+      "year": 2013,
+      "ndvi_max": 0.137
+     },
+     {
+      "date": "2014-07-01",
+      "year": 2014,
+      "ndvi_max": 0.164
+     },
+     {
+      "date": "2015-07-01",
+      "year": 2015,
+      "ndvi_max": 0.735
+     },
+     {
+      "date": "2016-07-01",
+      "year": 2016,
+      "ndvi_max": 0.734
+     },
+     {
+      "date": "2017-07-01",
+      "year": 2017,
+      "ndvi_max": 0.662
+     },
+     {
+      "date": "2018-07-01",
+      "year": 2018,
+      "ndvi_max": 0.728
+     },
+     {
+      "date": "2019-07-01",
+      "year": 2019,
+      "ndvi_max": 0.776
+     },
+     {
+      "date": "2020-07-01",
+      "year": 2020,
+      "ndvi_max": 0.766
+     },
+     {
+      "date": "2021-07-01",
+      "year": 2021,
+      "ndvi_max": 0.636
+     },
+     {
+      "date": "2022-07-01",
+      "year": 2022,
+      "ndvi_max": 0.524
+     },
+     {
+      "date": "2023-07-01",
+      "year": 2023,
+      "ndvi_max": 0.41
+     },
+     {
+      "date": "2024-07-01",
+      "year": 2024,
+      "ndvi_max": 0.181
+     },
+     {
+      "date": "2025-07-01",
+      "year": 2025,
+      "ndvi_max": 0.146
+     },
+     {
+      "date": "2026-07-01",
+      "year": 2026,
+      "ndvi_max": 0.159
+     }
+    ],
+    "active_years": [
+     2015,
+     2016,
+     2017,
+     2018,
+     2019,
+     2020,
+     2021,
+     2022,
+     2023
+    ],
+    "summer_2026_max": 0.1385,
+    "label": "quiet for years",
+    "last_active_year": 2023
+   },
+   "desert": {
+    "yearly_max": [
+     {
+      "date": "2000-07-01",
+      "year": 2000,
+      "ndvi_max": 0.114
+     },
+     {
+      "date": "2001-07-01",
+      "year": 2001,
+      "ndvi_max": 0.114
+     },
+     {
+      "date": "2002-07-01",
+      "year": 2002,
+      "ndvi_max": 0.113
+     },
+     {
+      "date": "2003-07-01",
+      "year": 2003,
+      "ndvi_max": 0.118
+     },
+     {
+      "date": "2004-07-01",
+      "year": 2004,
+      "ndvi_max": 0.115
+     },
+     {
+      "date": "2005-07-01",
+      "year": 2005,
+      "ndvi_max": 0.126
+     },
+     {
+      "date": "2006-07-01",
+      "year": 2006,
+      "ndvi_max": 0.128
+     },
+     {
+      "date": "2007-07-01",
+      "year": 2007,
+      "ndvi_max": 0.118
+     },
+     {
+      "date": "2008-07-01",
+      "year": 2008,
+      "ndvi_max": 0.121
+     },
+     {
+      "date": "2009-07-01",
+      "year": 2009,
+      "ndvi_max": 0.115
+     },
+     {
+      "date": "2010-07-01",
+      "year": 2010,
+      "ndvi_max": 0.12
+     },
+     {
+      "date": "2011-07-01",
+      "year": 2011,
+      "ndvi_max": 0.12
+     },
+     {
+      "date": "2012-07-01",
+      "year": 2012,
+      "ndvi_max": 0.118
+     },
+     {
+      "date": "2013-07-01",
+      "year": 2013,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2014-07-01",
+      "year": 2014,
+      "ndvi_max": 0.116
+     },
+     {
+      "date": "2015-07-01",
+      "year": 2015,
+      "ndvi_max": 0.119
+     },
+     {
+      "date": "2016-07-01",
+      "year": 2016,
+      "ndvi_max": 0.121
+     },
+     {
+      "date": "2017-07-01",
+      "year": 2017,
+      "ndvi_max": 0.125
+     },
+     {
+      "date": "2018-07-01",
+      "year": 2018,
+      "ndvi_max": 0.122
+     },
+     {
+      "date": "2019-07-01",
+      "year": 2019,
+      "ndvi_max": 0.122
+     },
+     {
+      "date": "2020-07-01",
+      "year": 2020,
+      "ndvi_max": 0.123
+     },
+     {
+      "date": "2021-07-01",
+      "year": 2021,
+      "ndvi_max": 0.123
+     },
+     {
+      "date": "2022-07-01",
+      "year": 2022,
+      "ndvi_max": 0.121
+     },
+     {
+      "date": "2023-07-01",
+      "year": 2023,
+      "ndvi_max": 0.122
+     },
+     {
+      "date": "2024-07-01",
+      "year": 2024,
+      "ndvi_max": 0.13
+     },
+     {
+      "date": "2025-07-01",
+      "year": 2025,
+      "ndvi_max": 0.137
+     },
+     {
+      "date": "2026-07-01",
+      "year": 2026,
+      "ndvi_max": 0.143
+     }
+    ],
+    "active_years": [],
+    "summer_2026_max": 0.1429,
+    "label": "never green in the record",
+    "last_active_year": null
+   }
+  },
+  "history_meta": {
+   "pivot_dark": {
+    "composites": 614,
+    "first": "2000-02-18",
+    "last": "2026-10-16",
+    "downloaded": "2026-11-14T01:31Z"
+   },
+   "pivot_dark2": {
+    "composites": 614,
+    "first": "2000-02-18",
+    "last": "2026-10-16",
+    "downloaded": "2026-11-14T01:33Z"
+   },
+   "pivot_brown": {
+    "composites": 614,
+    "first": "2000-02-18",
+    "last": "2026-10-16",
+    "downloaded": "2026-11-14T01:34Z"
+   },
+   "pivot_old": {
+    "composites": 614,
+    "first": "2000-02-18",
+    "last": "2026-10-16",
+    "downloaded": "2026-11-14T01:35Z"
+   },
+   "desert": {
+    "composites": 614,
+    "first": "2000-02-18",
+    "last": "2026-10-16",
+    "downloaded": "2026-11-14T01:36Z"
+   }
+  },
+  "check_status": "pending",
+  "appeears_hls_files": 0,
+  "lake_rule_desert_km2": 283.81,
+  "history_series": {
+   "pivot_dark": [
+    {
+     "date": "2000-07-01",
+     "year": 2000,
+     "ndvi_max": 0.125
+    },
+    {
+     "date": "2001-07-01",
+     "year": 2001,
+     "ndvi_max": 0.129
+    },
+    {
+     "date": "2002-07-01",
+     "year": 2002,
+     "ndvi_max": 0.131
+    },
+    {
+     "date": "2003-07-01",
+     "year": 2003,
+     "ndvi_max": 0.126
+    },
+    {
+     "date": "2004-07-01",
+     "year": 2004,
+     "ndvi_max": 0.127
+    },
+    {
+     "date": "2005-07-01",
+     "year": 2005,
+     "ndvi_max": 0.146
+    },
+    {
+     "date": "2006-07-01",
+     "year": 2006,
+     "ndvi_max": 0.137
+    },
+    {
+     "date": "2007-07-01",
+     "year": 2007,
+     "ndvi_max": 0.133
+    },
+    {
+     "date": "2008-07-01",
+     "year": 2008,
+     "ndvi_max": 0.128
+    },
+    {
+     "date": "2009-07-01",
+     "year": 2009,
+     "ndvi_max": 0.127
+    },
+    {
+     "date": "2010-07-01",
+     "year": 2010,
+     "ndvi_max": 0.128
+    },
+    {
+     "date": "2011-07-01",
+     "year": 2011,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2012-07-01",
+     "year": 2012,
+     "ndvi_max": 0.127
+    },
+    {
+     "date": "2013-07-01",
+     "year": 2013,
+     "ndvi_max": 0.134
+    },
+    {
+     "date": "2014-07-01",
+     "year": 2014,
+     "ndvi_max": 0.37
+    },
+    {
+     "date": "2015-07-01",
+     "year": 2015,
+     "ndvi_max": 0.768
+    },
+    {
+     "date": "2016-07-01",
+     "year": 2016,
+     "ndvi_max": 0.762
+    },
+    {
+     "date": "2017-07-01",
+     "year": 2017,
+     "ndvi_max": 0.823
+    },
+    {
+     "date": "2018-07-01",
+     "year": 2018,
+     "ndvi_max": 0.799
+    },
+    {
+     "date": "2019-07-01",
+     "year": 2019,
+     "ndvi_max": 0.748
+    },
+    {
+     "date": "2020-07-01",
+     "year": 2020,
+     "ndvi_max": 0.795
+    },
+    {
+     "date": "2021-07-01",
+     "year": 2021,
+     "ndvi_max": 0.814
+    },
+    {
+     "date": "2022-07-01",
+     "year": 2022,
+     "ndvi_max": 0.844
+    },
+    {
+     "date": "2023-07-01",
+     "year": 2023,
+     "ndvi_max": 0.71
+    },
+    {
+     "date": "2024-07-01",
+     "year": 2024,
+     "ndvi_max": 0.772
+    },
+    {
+     "date": "2025-07-01",
+     "year": 2025,
+     "ndvi_max": 0.766
+    },
+    {
+     "date": "2026-07-01",
+     "year": 2026,
+     "ndvi_max": 0.823
+    }
+   ],
+   "pivot_dark2": [
+    {
+     "date": "2000-07-01",
+     "year": 2000,
+     "ndvi_max": 0.128
+    },
+    {
+     "date": "2001-07-01",
+     "year": 2001,
+     "ndvi_max": 0.133
+    },
+    {
+     "date": "2002-07-01",
+     "year": 2002,
+     "ndvi_max": 0.131
+    },
+    {
+     "date": "2003-07-01",
+     "year": 2003,
+     "ndvi_max": 0.129
+    },
+    {
+     "date": "2004-07-01",
+     "year": 2004,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2005-07-01",
+     "year": 2005,
+     "ndvi_max": 0.14
+    },
+    {
+     "date": "2006-07-01",
+     "year": 2006,
+     "ndvi_max": 0.137
+    },
+    {
+     "date": "2007-07-01",
+     "year": 2007,
+     "ndvi_max": 0.135
+    },
+    {
+     "date": "2008-07-01",
+     "year": 2008,
+     "ndvi_max": 0.131
+    },
+    {
+     "date": "2009-07-01",
+     "year": 2009,
+     "ndvi_max": 0.138
+    },
+    {
+     "date": "2010-07-01",
+     "year": 2010,
+     "ndvi_max": 0.131
+    },
+    {
+     "date": "2011-07-01",
+     "year": 2011,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2012-07-01",
+     "year": 2012,
+     "ndvi_max": 0.133
+    },
+    {
+     "date": "2013-07-01",
+     "year": 2013,
+     "ndvi_max": 0.134
+    },
+    {
+     "date": "2014-07-01",
+     "year": 2014,
+     "ndvi_max": 0.136
+    },
+    {
+     "date": "2015-07-01",
+     "year": 2015,
+     "ndvi_max": 0.405
+    },
+    {
+     "date": "2016-07-01",
+     "year": 2016,
+     "ndvi_max": 0.491
+    },
+    {
+     "date": "2017-07-01",
+     "year": 2017,
+     "ndvi_max": 0.833
+    },
+    {
+     "date": "2018-07-01",
+     "year": 2018,
+     "ndvi_max": 0.72
+    },
+    {
+     "date": "2019-07-01",
+     "year": 2019,
+     "ndvi_max": 0.691
+    },
+    {
+     "date": "2020-07-01",
+     "year": 2020,
+     "ndvi_max": 0.792
+    },
+    {
+     "date": "2021-07-01",
+     "year": 2021,
+     "ndvi_max": 0.663
+    },
+    {
+     "date": "2022-07-01",
+     "year": 2022,
+     "ndvi_max": 0.811
+    },
+    {
+     "date": "2023-07-01",
+     "year": 2023,
+     "ndvi_max": 0.743
+    },
+    {
+     "date": "2024-07-01",
+     "year": 2024,
+     "ndvi_max": 0.795
+    },
+    {
+     "date": "2025-07-01",
+     "year": 2025,
+     "ndvi_max": 0.779
+    },
+    {
+     "date": "2026-07-01",
+     "year": 2026,
+     "ndvi_max": 0.777
+    }
+   ],
+   "pivot_brown": [
+    {
+     "date": "2000-07-01",
+     "year": 2000,
+     "ndvi_max": 0.123
+    },
+    {
+     "date": "2001-07-01",
+     "year": 2001,
+     "ndvi_max": 0.122
+    },
+    {
+     "date": "2002-07-01",
+     "year": 2002,
+     "ndvi_max": 0.122
+    },
+    {
+     "date": "2003-07-01",
+     "year": 2003,
+     "ndvi_max": 0.123
+    },
+    {
+     "date": "2004-07-01",
+     "year": 2004,
+     "ndvi_max": 0.126
+    },
+    {
+     "date": "2005-07-01",
+     "year": 2005,
+     "ndvi_max": 0.138
+    },
+    {
+     "date": "2006-07-01",
+     "year": 2006,
+     "ndvi_max": 0.138
+    },
+    {
+     "date": "2007-07-01",
+     "year": 2007,
+     "ndvi_max": 0.128
+    },
+    {
+     "date": "2008-07-01",
+     "year": 2008,
+     "ndvi_max": 0.125
+    },
+    {
+     "date": "2009-07-01",
+     "year": 2009,
+     "ndvi_max": 0.123
+    },
+    {
+     "date": "2010-07-01",
+     "year": 2010,
+     "ndvi_max": 0.125
+    },
+    {
+     "date": "2011-07-01",
+     "year": 2011,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2012-07-01",
+     "year": 2012,
+     "ndvi_max": 0.122
+    },
+    {
+     "date": "2013-07-01",
+     "year": 2013,
+     "ndvi_max": 0.138
+    },
+    {
+     "date": "2014-07-01",
+     "year": 2014,
+     "ndvi_max": 0.132
+    },
+    {
+     "date": "2015-07-01",
+     "year": 2015,
+     "ndvi_max": 0.74
+    },
+    {
+     "date": "2016-07-01",
+     "year": 2016,
+     "ndvi_max": 0.757
+    },
+    {
+     "date": "2017-07-01",
+     "year": 2017,
+     "ndvi_max": 0.817
+    },
+    {
+     "date": "2018-07-01",
+     "year": 2018,
+     "ndvi_max": 0.772
+    },
+    {
+     "date": "2019-07-01",
+     "year": 2019,
+     "ndvi_max": 0.81
+    },
+    {
+     "date": "2020-07-01",
+     "year": 2020,
+     "ndvi_max": 0.765
+    },
+    {
+     "date": "2021-07-01",
+     "year": 2021,
+     "ndvi_max": 0.767
+    },
+    {
+     "date": "2022-07-01",
+     "year": 2022,
+     "ndvi_max": 0.265
+    },
+    {
+     "date": "2023-07-01",
+     "year": 2023,
+     "ndvi_max": 0.244
+    },
+    {
+     "date": "2024-07-01",
+     "year": 2024,
+     "ndvi_max": 0.202
+    },
+    {
+     "date": "2025-07-01",
+     "year": 2025,
+     "ndvi_max": 0.181
+    },
+    {
+     "date": "2026-07-01",
+     "year": 2026,
+     "ndvi_max": 0.174
+    }
+   ],
+   "pivot_old": [
+    {
+     "date": "2000-07-01",
+     "year": 2000,
+     "ndvi_max": 0.124
+    },
+    {
+     "date": "2001-07-01",
+     "year": 2001,
+     "ndvi_max": 0.124
+    },
+    {
+     "date": "2002-07-01",
+     "year": 2002,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2003-07-01",
+     "year": 2003,
+     "ndvi_max": 0.127
+    },
+    {
+     "date": "2004-07-01",
+     "year": 2004,
+     "ndvi_max": 0.126
+    },
+    {
+     "date": "2005-07-01",
+     "year": 2005,
+     "ndvi_max": 0.137
+    },
+    {
+     "date": "2006-07-01",
+     "year": 2006,
+     "ndvi_max": 0.135
+    },
+    {
+     "date": "2007-07-01",
+     "year": 2007,
+     "ndvi_max": 0.137
+    },
+    {
+     "date": "2008-07-01",
+     "year": 2008,
+     "ndvi_max": 0.128
+    },
+    {
+     "date": "2009-07-01",
+     "year": 2009,
+     "ndvi_max": 0.133
+    },
+    {
+     "date": "2010-07-01",
+     "year": 2010,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2011-07-01",
+     "year": 2011,
+     "ndvi_max": 0.133
+    },
+    {
+     "date": "2012-07-01",
+     "year": 2012,
+     "ndvi_max": 0.129
+    },
+    {
+     "date": "2013-07-01",
+     "year": 2013,
+     "ndvi_max": 0.137
+    },
+    {
+     "date": "2014-07-01",
+     "year": 2014,
+     "ndvi_max": 0.164
+    },
+    {
+     "date": "2015-07-01",
+     "year": 2015,
+     "ndvi_max": 0.735
+    },
+    {
+     "date": "2016-07-01",
+     "year": 2016,
+     "ndvi_max": 0.734
+    },
+    {
+     "date": "2017-07-01",
+     "year": 2017,
+     "ndvi_max": 0.662
+    },
+    {
+     "date": "2018-07-01",
+     "year": 2018,
+     "ndvi_max": 0.728
+    },
+    {
+     "date": "2019-07-01",
+     "year": 2019,
+     "ndvi_max": 0.776
+    },
+    {
+     "date": "2020-07-01",
+     "year": 2020,
+     "ndvi_max": 0.766
+    },
+    {
+     "date": "2021-07-01",
+     "year": 2021,
+     "ndvi_max": 0.636
+    },
+    {
+     "date": "2022-07-01",
+     "year": 2022,
+     "ndvi_max": 0.524
+    },
+    {
+     "date": "2023-07-01",
+     "year": 2023,
+     "ndvi_max": 0.41
+    },
+    {
+     "date": "2024-07-01",
+     "year": 2024,
+     "ndvi_max": 0.181
+    },
+    {
+     "date": "2025-07-01",
+     "year": 2025,
+     "ndvi_max": 0.146
+    },
+    {
+     "date": "2026-07-01",
+     "year": 2026,
+     "ndvi_max": 0.159
+    }
+   ],
+   "desert": [
+    {
+     "date": "2000-07-01",
+     "year": 2000,
+     "ndvi_max": 0.114
+    },
+    {
+     "date": "2001-07-01",
+     "year": 2001,
+     "ndvi_max": 0.114
+    },
+    {
+     "date": "2002-07-01",
+     "year": 2002,
+     "ndvi_max": 0.113
+    },
+    {
+     "date": "2003-07-01",
+     "year": 2003,
+     "ndvi_max": 0.118
+    },
+    {
+     "date": "2004-07-01",
+     "year": 2004,
+     "ndvi_max": 0.115
+    },
+    {
+     "date": "2005-07-01",
+     "year": 2005,
+     "ndvi_max": 0.126
+    },
+    {
+     "date": "2006-07-01",
+     "year": 2006,
+     "ndvi_max": 0.128
+    },
+    {
+     "date": "2007-07-01",
+     "year": 2007,
+     "ndvi_max": 0.118
+    },
+    {
+     "date": "2008-07-01",
+     "year": 2008,
+     "ndvi_max": 0.121
+    },
+    {
+     "date": "2009-07-01",
+     "year": 2009,
+     "ndvi_max": 0.115
+    },
+    {
+     "date": "2010-07-01",
+     "year": 2010,
+     "ndvi_max": 0.12
+    },
+    {
+     "date": "2011-07-01",
+     "year": 2011,
+     "ndvi_max": 0.12
+    },
+    {
+     "date": "2012-07-01",
+     "year": 2012,
+     "ndvi_max": 0.118
+    },
+    {
+     "date": "2013-07-01",
+     "year": 2013,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2014-07-01",
+     "year": 2014,
+     "ndvi_max": 0.116
+    },
+    {
+     "date": "2015-07-01",
+     "year": 2015,
+     "ndvi_max": 0.119
+    },
+    {
+     "date": "2016-07-01",
+     "year": 2016,
+     "ndvi_max": 0.121
+    },
+    {
+     "date": "2017-07-01",
+     "year": 2017,
+     "ndvi_max": 0.125
+    },
+    {
+     "date": "2018-07-01",
+     "year": 2018,
+     "ndvi_max": 0.122
+    },
+    {
+     "date": "2019-07-01",
+     "year": 2019,
+     "ndvi_max": 0.122
+    },
+    {
+     "date": "2020-07-01",
+     "year": 2020,
+     "ndvi_max": 0.123
+    },
+    {
+     "date": "2021-07-01",
+     "year": 2021,
+     "ndvi_max": 0.123
+    },
+    {
+     "date": "2022-07-01",
+     "year": 2022,
+     "ndvi_max": 0.121
+    },
+    {
+     "date": "2023-07-01",
+     "year": 2023,
+     "ndvi_max": 0.122
+    },
+    {
+     "date": "2024-07-01",
+     "year": 2024,
+     "ndvi_max": 0.13
+    },
+    {
+     "date": "2025-07-01",
+     "year": 2025,
+     "ndvi_max": 0.137
+    },
+    {
+     "date": "2026-07-01",
+     "year": 2026,
+     "ndvi_max": 0.143
+    }
+   ]
+  },
+  "modis_near_passes": {
+   "pivot_dark": {
+    "2026-06-18": {
+     "date": "2026-06-10",
+     "ndvi": 0.5792
+    },
+    "2026-10-28": {
+     "date": "2026-10-16",
+     "ndvi": 0.6655
+    }
+   },
+   "pivot_dark2": {
+    "2026-06-18": {
+     "date": "2026-06-10",
+     "ndvi": 0.5662
+    },
+    "2026-10-28": {
+     "date": "2026-10-16",
+     "ndvi": 0.1825
+    }
+   },
+   "pivot_brown": {
+    "2026-06-18": {
+     "date": "2026-06-10",
+     "ndvi": 0.1316
+    },
+    "2026-10-28": {
+     "date": "2026-10-16",
+     "ndvi": 0.1188
+    }
+   },
+   "pivot_old": {
+    "2026-06-18": {
+     "date": "2026-06-10",
+     "ndvi": 0.131
+    },
+    "2026-10-28": {
+     "date": "2026-10-16",
+     "ndvi": 0.1294
+    }
+   },
+   "desert": {
+    "2026-06-18": {
+     "date": "2026-06-10",
+     "ndvi": 0.1349
+    },
+    "2026-10-28": {
+     "date": "2026-10-16",
+     "ndvi": 0.1429
+    }
+   }
+  }
+ },
+ "files": {
+  "grid": "assets/cases/al-ain/grid.json"
+ },
+ "provenance": {
+  "nasa_files": [
+   {
+    "file": "NISAR_L2_PR_GCOV_023_056_A_014_4005_DHDH_A_20260618T014305_20260618T014336_P05023_N_F_J_001.h5",
+    "date": "2026-06-18",
+    "start": "2026-06-18T01:43:05.000000000",
+    "direction": "Ascending",
+    "track": 56,
+    "frame": 14,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   },
+   {
+    "file": "NISAR_L2_PR_GCOV_034_056_A_014_4005_DHDH_A_20261028T014300_20261028T014333_P05036_N_F_J_001.h5",
+    "date": "2026-10-28",
+    "start": "2026-10-28T01:43:00.000000000",
+    "direction": "Ascending",
+    "track": 56,
+    "frame": 14,
+    "product_version": "1.0.20",
+    "processing": "P05036"
+   }
+  ],
+  "collection": "NISAR L2 GCOV (ASF DAAC)",
+  "layers": [
+   "/science/LSAR/GCOV/grids/frequencyA/HHHH",
+   "/science/LSAR/GCOV/grids/frequencyA/HVHV",
+   "/science/LSAR/GCOV/grids/frequencyA/mask"
+  ],
+  "box_lonlat": [
+   55.45,
+   24.4,
+   55.65,
+   24.58
+  ],
+  "box_rows_cols": [
+   18803,
+   20818,
+   22043,
+   24090
+  ],
+  "projection_epsg": 32640,
+  "other_sources": {
+   "history": "MODIS MOD13Q1 NDVI via NASA ORNL DAAC MODIS web service (modis.ornl.gov/rst/api/v1)",
+   "heights": "AWS Terrarium elevation tiles, zoom 12 (s3.amazonaws.com/elevation-tiles-prod)"
+  },
+  "steps": [
+   "read only the box at 10 m",
+   "mask invalid pixels",
+   "interference check (whole-frame sample)",
+   "300 m disk means (linear) at each point",
+   "rHV vs desert control, classes (method.classes)",
+   "MODIS 26-year history per point",
+   "HLS check (pending)"
+  ],
+  "script": "tools/process_al_ain.py",
+  "script_version": "1.1",
+  "script_sha256": "25564783d1d3c0c6dc3f66626fc361d335e7837ea7a4f57bfea6acef0a2a8d32",
+  "helpers_sha256": "d71853edabb0fb095ed99c2470163d6f05bd3687c088343e553c6e298e2c51c6"
+ }
+}

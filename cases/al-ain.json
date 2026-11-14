@@ -1,0 +1,434 @@
+{
+  "id": "al-ain",
+  "format": 1,
+  "about": "Mystery file for Al Ain. All text is pre-written; every choice has its own reply. Evidence images, caption numbers and toggles are filled in by tools/process_al_ain.py from our analysis. src null = 'Evidence pending'.",
+  "numbersFile": "cases/al-ain.numbers.json",
+  "tip": {
+    "title": "Green circles in the sand",
+    "text": [
+      "North-west of Al Ain, round fields watered by centre-pivot sprinklers make green circles in the desert, each about 800 m across.",
+      "Some circles look green, some look bare. NISAR passes over them about every 12 days, day or night.",
+      "Your question: which farms went quiet, and is that normal? One picture can't tell you. Time can."
+    ]
+  },
+  "steps": [
+    {
+      "type": "tip"
+    },
+    {
+      "type": "choice",
+      "choice": "timeseries"
+    },
+    {
+      "type": "choice",
+      "choice": "summer"
+    },
+    {
+      "type": "choice",
+      "choice": "pixel"
+    },
+    {
+      "type": "choice",
+      "choice": "dark"
+    },
+    {
+      "type": "evidence",
+      "title": "The evidence so far",
+      "text": "Each card comes from our own processing of NISAR files or NASA's MODIS record. Sort them: real change, or a trap?"
+    },
+    {
+      "type": "toggles",
+      "title": "Interrogate the evidence",
+      "text": "Each switch changes how the radar evidence is shown."
+    },
+    {
+      "type": "graph",
+      "title": "Cause and effect",
+      "text": "Fill in the hidden links. Each link is something we measured, or something we can't measure."
+    },
+    {
+      "type": "choice",
+      "choice": "what-can-we-say"
+    },
+    {
+      "type": "verdict"
+    },
+    {
+      "type": "lesson"
+    }
+  ],
+  "choices": {
+    "timeseries": {
+      "prompt": "On one NISAR pass, a farm circle is dark in HV. Has the farm stopped working?",
+      "options": [
+        {
+          "text": "Yes: dark in HV means nothing is growing, so it's been abandoned.",
+          "correct": false,
+          "reply": "One date is one moment. Crops are planted, grow and get harvested, so a field can be bare for weeks between crops. You need a series of dates before you say anything."
+        },
+        {
+          "text": "Not from one date. Compare passes over time, and against the farm's history in other years.",
+          "correct": true,
+          "reply": "Right. HV rises as a crop grows (more leaves and stems for the beam to bounce around in) and drops at harvest. The pattern over time tells active, resting and cleared fields apart."
+        }
+      ]
+    },
+    "summer": {
+      "prompt": "In the middle of a UAE summer, several farm circles are bare. What should you check before calling them abandoned?",
+      "options": [
+        {
+          "text": "Nothing: bare in summer means abandoned.",
+          "correct": false,
+          "reply": "Fallow isn't abandoned. A field can rest for a season and be planted again later. Calling it abandoned from one summer would be wrong if it turns green again."
+        },
+        {
+          "text": "Whether the same fields were bare in earlier summers too, or green in recent years: a long record shows if this is a normal pause.",
+          "correct": true,
+          "reply": "Exactly. NASA's MODIS satellite has measured greenness here every 16 days since 2000. 'Quiet this summer' and 'quiet for years' look the same in one picture, but not in 26 years of data."
+        }
+      ]
+    },
+    "pixel": {
+      "prompt": "You open NASA's online NISAR map and zoom in on a farm circle. What do you see?",
+      "options": [
+        {
+          "text": "Every detail of the field, as sharp as the science files.",
+          "correct": false,
+          "trap": 2,
+          "reply": "NISAR's map tiles only work up to zoom 9, about 280 m per pixel. An 800 m circle is about three pixels: a blur. The 10 m detail is only in the science files we download and process."
+        },
+        {
+          "text": "A blur of a few pixels: the working map tiles are about 280 m per pixel, so we measure from the 10 m science files instead.",
+          "correct": true,
+          "reply": "Right. Map tiles are for looking; numbers come from the science files."
+        }
+      ]
+    },
+    "dark": {
+      "prompt": "A patch of the desert next to the farms is very dark in both HH and HV. Is it a pond?",
+      "options": [
+        {
+          "text": "Yes: very dark means water.",
+          "correct": false,
+          "trap": 11,
+          "reply": "Smooth dry sand reflects the beam away just like calm water, so both look dark. In a desert, dark alone can't tell sand from water."
+        },
+        {
+          "text": "Not necessarily: smooth sand looks as dark as calm water. It needs another source to tell.",
+          "correct": true,
+          "reply": "Right. That's why our farm classes compare each field with a desert control point on the same date, instead of using 'dark = something'."
+        }
+      ]
+    },
+    "what-can-we-say": {
+      "prompt": "One circle shows no crop now, and its long record shows it hasn't been green for years. What can you say?",
+      "options": [
+        {
+          "text": "These farms were abandoned illegally.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "Radar can't see ownership, permits or rules. Calling it illegal is an accusation the evidence can't support."
+        },
+        {
+          "text": "The farm will never be used again.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "That's a forecast. A field can be replanted at any time; the data only shows the past."
+        },
+        {
+          "text": "This field has shown no crop on our passes and no green season in recent years, unlike its active neighbours. Why it stopped is outside what satellites can see.",
+          "correct": true,
+          "reply": "That's exactly what the evidence supports: what happened and when, not why or who."
+        }
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "id": "pivots",
+      "title": "Four farm circles, two dates",
+      "kind": "image",
+      "src": "assets/cases/al-ain/ev-pivots.png",
+      "caption": "NISAR HV at four farm circles, 18 Jun vs 28 Oct: Pivot A fallow; Pivot B fallow; Pivot C fallow; Pivot D fallow. Classes are radar only until the photo-based NDVI check is done.",
+      "source": "NISAR GCOV, track 056 ascending",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    },
+    {
+      "id": "history",
+      "title": "26 years of greenness",
+      "kind": "image",
+      "src": "assets/cases/al-ain/ev-history.png",
+      "caption": "26 years of NASA MODIS greenness: Pivot A: green this summer; Pivot B: green this summer; Pivot C: quiet for years; Pivot D: quiet for years. One quiet summer is not the same as a farm left for years.",
+      "source": "NASA MODIS NDVI (ORNL DAAC)",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    },
+    {
+      "id": "tile",
+      "title": "The field on a map tile",
+      "kind": "image",
+      "src": "assets/cases/al-ain/ev-tile.png",
+      "caption": "An 800 m farm circle at NISAR's 10 m science resolution, and the same place at 280 m, the sharpest NISAR map tiles that work. On the tile, the circle is a blur of about three pixels.",
+      "source": "NISAR GCOV, track 056 ascending",
+      "bin": "trap",
+      "trap": 2,
+      "pending": false
+    },
+    {
+      "id": "dark",
+      "title": "Dark ground next to the farms",
+      "kind": "image",
+      "src": "assets/cases/al-ain/ev-dark.png",
+      "caption": "A simple 'dark = water' rule would call 283.8 km² of this desert 'water'. It's smooth sand. In a desert, dark alone can't tell sand from water.",
+      "source": "NISAR GCOV, track 056 ascending",
+      "bin": "trap",
+      "trap": 11,
+      "pending": false
+    }
+  ],
+  "toggles": [
+    {
+      "id": "channel",
+      "label": "HH (direct echo) ↔ HV (crop echo)",
+      "trap": 4,
+      "explains": "Growing crops add leaves and stems, which twist the beam: HV picks out active fields more clearly than HH.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/al-ain/tg-hh.png",
+          "label": "HH"
+        },
+        "on": {
+          "src": "assets/cases/al-ain/tg-hv.png",
+          "label": "HV"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "pixel",
+      "label": "10 m science file ↔ 280 m map tile",
+      "trap": 2,
+      "explains": "The same farm circle at the resolution we measure with, and at the sharpest NISAR map-tile zoom that works.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/al-ain/tg-10m.png",
+          "label": "10 m science file"
+        },
+        "on": {
+          "src": "assets/cases/al-ain/tg-280m.png",
+          "label": "280 m map tile"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "direction",
+      "label": "One direction ↔ Mixed directions",
+      "trap": 7,
+      "explains": "Mixing ascending and descending passes changes the viewing angle, which changes brightness by itself.",
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Al Ain: we only analyse ascending track 056."
+    },
+    {
+      "id": "coherence",
+      "label": "Coherence mask off ↔ on",
+      "trap": 15,
+      "explains": "Coherence shows where the radar signal stayed stable between two passes.",
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Al Ain: none of our NISAR interferograms cover this box."
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "crop",
+        "label": "A crop grows on the circle",
+        "detail": "Farmers plant, water and harvest each circle on their own schedule. We can't see the schedule, only its effects.",
+        "source": "Not measured",
+        "basis": "none",
+        "notMeasured": "radar and NDVI see plants, not farm schedules or decisions.",
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": null
+        }
+      },
+      {
+        "id": "hv",
+        "label": "HV rises above the desert",
+        "detail": "Measured by NISAR: each circle's HV compared with a desert control point on the same pass. A crop is 'present' when the circle is at least 3 dB brighter than the desert.",
+        "source": "NISAR L-band GCOV, HV",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "What should NISAR's HV do over a circle as its crop grows?",
+        "options": [
+          {
+            "text": "HV rises",
+            "correct": true,
+            "reply": "Yes: more leaves and stems, more bouncing around, more of the 'twisted' HV echo."
+          },
+          {
+            "text": "HV falls",
+            "correct": false,
+            "reply": "HV falls at harvest, when the plants are removed. Growing plants raise it."
+          },
+          {
+            "text": "HV can't see crops",
+            "correct": false,
+            "reply": "It can: crops are exactly the kind of jumbled leaves and stems that HV responds to."
+          }
+        ],
+        "opens": {
+          "layer": null,
+          "chart": {
+            "title": "Crop echo vs desert (rHV) per pass",
+            "series": [
+              {
+                "label": "Pivot A",
+                "path": "results.pivots.0.series",
+                "y": "rhv_db"
+              },
+              {
+                "label": "Pivot D",
+                "path": "results.pivots.3.series",
+                "y": "rhv_db"
+              }
+            ],
+            "x": "date",
+            "unit": "dB",
+            "zero": true
+          },
+          "badge": "numbers"
+        }
+      },
+      {
+        "id": "green",
+        "label": "Greenness over 26 years",
+        "detail": "Measured by NASA's MODIS satellite every 16 days since 2000 (250 m pixels): the greenest value of each year at each circle.",
+        "source": "NASA MODIS NDVI (ORNL DAAC)",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "How do you tell 'quiet this summer' from 'quiet for years'?",
+        "options": [
+          {
+            "text": "Look at the same field in earlier years",
+            "correct": true,
+            "reply": "Right. If it was green last year, a bare summer is probably a pause. If it hasn't been green for years, something lasting changed."
+          },
+          {
+            "text": "Look harder at this summer's image",
+            "correct": false,
+            "reply": "One summer can't show you the pattern. Only the long record can."
+          },
+          {
+            "text": "You can't tell",
+            "correct": false,
+            "reply": "You can, with a long record. MODIS has measured greenness here since 2000."
+          }
+        ],
+        "opens": {
+          "layer": null,
+          "chart": {
+            "title": "Greenest NDVI each year, MODIS 250 m",
+            "series": [
+              {
+                "label": "Pivot A",
+                "path": "results.history_series.pivot_dark",
+                "y": "ndvi_max"
+              },
+              {
+                "label": "Pivot D",
+                "path": "results.history_series.pivot_old",
+                "y": "ndvi_max"
+              }
+            ],
+            "x": "date",
+            "unit": "NDVI"
+          },
+          "badge": "NASA MODIS"
+        }
+      },
+      {
+        "id": "verdict",
+        "label": "Active, fallow or newly cleared",
+        "detail": "Our class for each circle from NISAR, with the MODIS history beside it. Checked against NASA HLS photo-based greenness once those files are downloaded.",
+        "source": "NISAR L-band GCOV",
+        "basis": "measured",
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": "numbers",
+          "check": true
+        }
+      },
+      {
+        "id": "why",
+        "label": "Why a farm went quiet",
+        "detail": "Water, money, rules, a change of owner, a rest season: none of these is visible from space.",
+        "source": "Not measured",
+        "basis": "none",
+        "notMeasured": "satellites can't see the reasons behind a farm's decisions.",
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": null
+        }
+      }
+    ],
+    "edges": [
+      [
+        "crop",
+        "hv"
+      ],
+      [
+        "hv",
+        "green"
+      ],
+      [
+        "green",
+        "verdict"
+      ],
+      [
+        "verdict",
+        "why"
+      ]
+    ]
+  },
+  "verdict": {
+    "pending": "Evidence pending — this case's measurements are being processed.",
+    "cantProve": [
+      "Why any farm went quiet, or who decided it.",
+      "Whether anything was allowed or not.",
+      "Whether a quiet field will be planted again."
+    ]
+  },
+  "lesson": {
+    "title": "What this case teaches about radar",
+    "points": [
+      {
+        "head": "Time series beat snapshots",
+        "text": "A single radar image is one moment. A field can be bare between two crops, or bare because nobody farms it any more: only a series of dates shows which."
+      },
+      {
+        "head": "HV follows the growing cycle",
+        "text": "As a crop grows, its leaves and stems twist more of the radar beam into the HV echo, so HV rises; at harvest it falls back to the level of bare ground. Comparing each field with a desert control on the same date removes changes that hit the whole image."
+      },
+      {
+        "head": "Check radar against greenness",
+        "text": "Optical satellites measure greenness (NDVI). Radar works through dust and darkness; NDVI shows plants directly. When both agree on a field, the class is much stronger. Over 26 years, NASA's MODIS record shows whether a quiet summer is normal for that field."
+      }
+    ]
+  }
+}
