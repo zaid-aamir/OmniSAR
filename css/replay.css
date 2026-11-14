@@ -49,3 +49,9 @@
   .tv-overlay .rp { gap: 4px; padding: 4px 6px; }
   .rp-trap { padding: 0 6px; }
 }
+
+/* the CHANGE legend line ("Flashing red = burned …"): a filled swatch in the flash colour (fixed data colours) */
+.tp-key[data-swatch="red"] .tp-swatch { border-color: #FF3B30; background: #FF3B30; }
+.tp-key[data-swatch="cyan"] .tp-swatch { border-color: #66FCF1; background: #66FCF1; }
+.tp-key[data-swatch="both"] .tp-swatch { border-color: #FF3B30; background: linear-gradient(90deg, #FF3B30 50%, #66FCF1 50%); }
+.terrain-pass[data-phase="change"] .tp-key { color: var(--text); font-weight: 600; }

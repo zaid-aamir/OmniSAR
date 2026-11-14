@@ -2,13 +2,15 @@
 // verdict uses, so you can SEE what changed without reading a legend:
 //
 //   BEFORE (2 s)  →  fade (1 s, "no data in between")  →  AFTER (2 s)  →  CHANGE (2.5 s)
-//   CHANGE: blocks past the case's own threshold get a pulsing cyan outline and rise a little; the
-//   rest dim to 40%. A caption gives the key measured number.
+//   CHANGE: blocks past the case's own threshold FLASH (1.5 a second, limit 3) and rise a little; every
+//   other block dims to 25% grey; the camera glides to the largest flashing cluster (and back at the next
+//   BEFORE). RED = the radar value fell (burned, lost, sank); CYAN = it rose (new structures, new water).
+//   A caption gives the key measured number and a legend line says what the flashing colour means.
 // Cases with 3+ passes step through each one (Tonle Sap 19 Jun → 30 Aug → 17 Oct; Jakarta's 8 dates,
 // with the blocks sinking by the measured motion, exaggerated by a stated factor).
 //
 // What is real here: every colour is a real pass layer; the fade is only a cross-fade between two real
-// passes (the banner says so); the outline rule and every caption number come from the case's numbers
+// passes (the banner says so); the flash rule and every caption number come from the case's numbers
 // file (cases/replay.json only says WHICH rule and WHICH measured label). Pass dates come from the
 // numbers file too (its NASA files minus passes left out by quality control). In Live Ops the replay
 // never uses a pass dated after the event (limit), like the cards' availableOn.
@@ -45,9 +47,10 @@ function verdictDates(numbers) {
 }
 
 // Fill a caption template from the numbers file. Any missing value -> null (no caption at all).
-function fill(tpl, { numbers, method, dates = {}, layer = null, qc = '' }) {
+function fill(tpl, { numbers, method, dates = {}, layer = null, qc = '', threshold = null }) {
   if (!tpl) return null;
   let missing = false;
+  tpl = tpl.replace(/\{threshold\}/g, () => (threshold != null ? String(threshold) : ((missing = true), '')));
   let s = tpl.replace(/\{(date|first|last)\}/g, (_, k) => (dates[k] ? fmtShort(dates[k]) : ((missing = true), '')));
   s = s.replace(/\{layer\}/g, () => (layer?.label ? layer.label : ((missing = true), '')));
   s = s.replace(/\{m:([^}]+)\}/g, (_, label) => {
@@ -66,7 +69,7 @@ function fill(tpl, { numbers, method, dates = {}, layer = null, qc = '' }) {
   return missing ? null : s;
 }
 
-// Which passes to loop and which blocks to outline. Returns null if fewer than 2 passes qualify.
+// Which passes to loop and which blocks flash. Returns null if fewer than 2 passes qualify.
 //   limit: Live Ops event date (no pass after it); trap: Jebel Ali's "Show the trap" version
 export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = false, flashRule = null, live = false }) {
   const cfg = config?.cases?.[caseId] || null;
@@ -95,13 +98,16 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
   if (steps.length < 2) return null;
   const first = steps[0], last = steps[steps.length - 1];
 
-  // ----- the outline: the same rule the verdict uses (thresholds from the numbers file) -----
+  // ----- the flashing blocks: the same rule the verdict uses (thresholds from the numbers file) -----
+  // mask per grid cell: 0 = not past the threshold, 1 = past it and the radar value FELL (red),
+  // 2 = past it and the value ROSE (cyan). rule.colour: 'red' / 'cyan' for the whole case, 'sign' = per block.
   const rule = trap ? cfg.trap.change : cfg?.change;
   const n = grid.rows * grid.cols;
   const mask = new Uint8Array(n);
-  let count = 0;
+  let count = 0, red = 0, cyan = 0;
   const thr = (key) => (typeof method?.[key] === 'number' ? method[key] : null);
-  let test = null;
+  const diff = (i) => last.values[i] - first.values[i];
+  let test = null, dir = null;
   if (rule?.layer) {
     const L = grid.layers.find((l) => l.id === rule.layer);
     const r = rangeOf(L);
@@ -110,15 +116,25 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
     if (L && r && r[0] === first.date && r[1] === last.date && t != null) test = (i) => L.values[i] != null && L.values[i] / 10 >= t;
   } else if (rule?.diff_abs_gte != null || rule?.diff_abs_method) {
     const t = rule.diff_abs_gte ?? Math.abs(thr(rule.diff_abs_method) ?? NaN);
-    if (Number.isFinite(t)) test = (i) => first.values[i] != null && last.values[i] != null && Math.abs(last.values[i] - first.values[i]) / 10 >= t;
+    if (Number.isFinite(t)) { test = (i) => first.values[i] != null && last.values[i] != null && Math.abs(diff(i)) / 10 >= t; dir = diff; }
   } else if (rule?.last_lte_method) {
     const t = thr(rule.last_lte_method);
     if (t != null) test = (i) => last.values[i] != null && last.values[i] / 10 <= t;
   } else if (!cfg && flashRule) {
     const fr = flashRule(caseId, last, method);
-    if (fr) test = (i) => first.values[i] != null && last.values[i] != null && fr.test(first.values[i] / 10, last.values[i] / 10);
+    if (fr) { test = (i) => first.values[i] != null && last.values[i] != null && fr.test(first.values[i] / 10, last.values[i] / 10); dir = diff; }
   }
-  if (test) for (let i = 0; i < n; i++) if (test(i)) { mask[i] = 1; count++; }
+  const mode = rule?.colour || (cfg ? 'red' : 'sign');
+  if (test) {
+    for (let i = 0; i < n; i++) {
+      if (!test(i)) continue;
+      const rose = mode === 'cyan' || (mode === 'sign' && dir && dir(i) > 0);
+      mask[i] = rose ? 2 : 1;
+      count++;
+      if (rose) cyan++; else red++;
+    }
+  }
+  const focus = count ? largestCluster(mask, grid.rows, grid.cols) : null;
 
   // ----- captions -----
   const dates = { first: first.date, last: last.date };
@@ -126,7 +142,8 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
   let captionTpl = trap ? cfg.trap.caption : cfg?.caption;
   if (live && /\{badge/.test(captionTpl || '')) captionTpl = captionTpl.replace(/\s*·\s*badge \{badge\}: \{badge_reason\}/, '');   // Live Ops asks you to guess the badge
   const caption = fill(captionTpl, { numbers, method, dates, qc }) || '';
-  const outline = test ? (fill((trap ? cfg.trap.change : cfg?.change)?.outline || '', { numbers, method, dates }) || '') : '';
+  const legend = test ? (fill(rule?.legend || '', { numbers, method, dates, threshold: rule?.diff_abs_gte ?? null }) || '') : '';
+  const swatch = red && cyan ? 'both' : red ? 'red' : cyan ? 'cyan' : '';
   const stepCaptions = steps.map((l) => fill(cfg?.stepCaption, { numbers, method, dates: { ...dates, date: l.date }, layer: l }) || '');
 
   // Jakarta: blocks sink by the measured motion, exaggerated so the largest value on the scale is maxWorldM
@@ -136,15 +153,39 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
     sink = { factor: Math.round(cfg.sink.maxWorldM / (maxMm / 1000)) };
   }
   return {
-    caseId, trap, steps, mask, count, caption, outline, stepCaptions, sink,
+    caseId, trap, steps, mask, count, red, cyan, focus, caption, legend, swatch, stepCaptions, sink,
     label: trap ? cfg.trap.label : null,
     trapAvailable, trapButton: cfg?.trap?.button || null,
   };
 }
 
+// The largest group of touching flashing blocks (8 neighbours): where the camera glides in CHANGE
+function largestCluster(mask, rows, cols) {
+  const seen = new Uint8Array(mask.length), stack = new Int32Array(mask.length);
+  let best = null;
+  for (let s = 0; s < mask.length; s++) {
+    if (!mask[s] || seen[s]) continue;
+    let sp = 0, cnt = 0, sr = 0, sc = 0, r0 = rows, r1 = -1, c0 = cols, c1 = -1;
+    stack[sp++] = s; seen[s] = 1;
+    while (sp) {
+      const i = stack[--sp], r = (i / cols) | 0, c = i % cols;
+      cnt++; sr += r; sc += c;
+      if (r < r0) r0 = r; if (r > r1) r1 = r; if (c < c0) c0 = c; if (c > c1) c1 = c;
+      for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+        const rr = r + dr, cc = c + dc;
+        if (rr < 0 || rr >= rows || cc < 0 || cc >= cols) continue;
+        const j = rr * cols + cc;
+        if (mask[j] && !seen[j]) { seen[j] = 1; stack[sp++] = j; }
+      }
+    }
+    if (!best || cnt > best.blocks) best = { blocks: cnt, r: sr / cnt, c: sc / cnt, spanRows: r1 - r0 + 1, spanCols: c1 - c0 + 1 };
+  }
+  return best;
+}
+
 // ---------------------------------------------------------------------------------------------
 // The loop and its controls. adapter = { setPair(a, b), setMix(t), setChange(on), setMask(mask),
-//   setOn(bool, plan), setBanner(b | null), setLabel(text | null) }
+//   setOn(bool, plan), setBanner(b | null), setLabel(text | null), focus(cluster | null) }
 export function createReplay({ slot, adapter, onTrapToggle }) {
   const box = document.createElement('div');
   box.className = 'terrain-hud rp';
@@ -190,7 +231,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
     }
     if (ph.kind === 'change') {
       return { main: `CHANGE · ${fmtShort(s[0].date)} → ${fmtDate(s[s.length - 1].date)}`, short: `CHANGE · ${fmtShort(s[0].date)} → ${fmtShort(s[s.length - 1].date)}`,
-        sub: join(plan.caption, sinkNote), key: plan.outline, phase: 'change' };
+        sub: join(plan.caption, sinkNote), key: plan.legend, swatch: plan.swatch, phase: 'change' };
     }
     const d = s[ph.at].date;
     const word = ph.kind === 'before' ? 'BEFORE' : ph.kind === 'after' ? 'AFTER' : 'PASS';
@@ -220,6 +261,9 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
       curPhase = i;
       adapter.setBanner(bannerFor(ph));
       adapter.setLabel(plan.label && (ph.kind === 'after' || ph.kind === 'change') ? plan.label : null);
+      // the camera glides to the largest flashing cluster in CHANGE, and back at the next BEFORE
+      if (ph.kind === 'change') adapter.focus?.(plan.focus);
+      else if (ph.kind === 'before') adapter.focus?.(null);
     }
     range.value = String(Math.round((t / total) * 1000));
   }
@@ -261,6 +305,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
   function stop() {
     on = false;
     plan = null;
+    adapter.focus?.(null);
     box.hidden = true;
     adapter.setOn(false, null);
     adapter.setBanner(null);
@@ -296,6 +341,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
       if (!plan || !on) return;
       on = false;
       setPlaying(false);
+      adapter.focus?.(null);
       adapter.setOn(false, plan);
       adapter.setBanner(null);
       adapter.setLabel(null);
@@ -322,7 +368,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
       if (!plan) return null;
       const ph = phases[curPhase] || null;
       return { phase: ph?.kind, t: Math.round(t), total, playing, frozen, speed, on, trap: plan.trap,
-        dates: plan.steps.map((s) => s.date), outlined: plan.count, caption: plan.caption, label: plan.label,
+        dates: plan.steps.map((s) => s.date), outlined: plan.count, red: plan.red, cyan: plan.cyan, focus: plan.focus, legend: plan.legend, caption: plan.caption, label: plan.label,
         sinkFactor: plan.sink?.factor || null, phaseIndex: curPhase, phases: phases.map((p) => ({ kind: p.kind, t0: p.t0, ms: p.ms })) };
     },
   };

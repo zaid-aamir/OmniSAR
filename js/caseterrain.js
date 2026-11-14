@@ -166,6 +166,7 @@ export function createCaseTerrain(container) {
   let blend = null;                  // { from, to, t0 } while block colours move to a new layer
   let seaMesh = null, seaShare = 0, noDataCount = 0, seaName = null, blockH = null;
   let numbersNow = null, replayCfg = null, replayLimit = null, replayBanner = null, replaySink = null;
+  let glide = null, homeView = null;     // CHANGE: the camera glides to the flashing cluster and back
   let flashMesh = null, flashT0 = -1e9;
   let play = null;                   // { seq, k, timer, done } while Play runs
   const colour = new THREE.Color();
@@ -184,9 +185,10 @@ export function createCaseTerrain(container) {
   const replayU = {
     uMix: { value: 0 },          // 0 = before colours, 1 = after colours
     uReplayOn: { value: 0 },     // 0 = the stepper's layer (instance colours), 1 = the replay's pair
-    uChgOn: { value: 0 },        // CHANGE phase: outline + rise + dim (eased 0..1)
-    uRise: { value: 0.22 },      // changed blocks grow 22% taller in the CHANGE phase
-    uTime: { value: 0 },         // seconds, for the 1 Hz outline pulse (limit: 3 flashes a second)
+    uChgOn: { value: 0 },        // CHANGE phase: flash + rise + grey (eased 0..1)
+    uRise: { value: 0.22 },      // flashing blocks grow 22% taller in the CHANGE phase
+    uTime: { value: 0 },         // seconds, for the flash
+    uFlashHz: { value: 1.5 },    // flashes per second (limit: 3)
     uSinkOn: { value: 0 },       // Jakarta: blocks move down by the measured motion (exaggerated)
     uHatch: { value: 20 },       // stripes per km for no-data land
   };
@@ -200,27 +202,29 @@ export function createCaseTerrain(container) {
       varying float vChg; varying vec2 vFaceUv; varying float vNoData; varying vec3 vWPos;`)
       .replace('#include <color_vertex>', `#include <color_vertex>
       if (uReplayOn > 0.5) vColor.xyz = color.xyz * mix(aColA, aColB, uMix);
-      vColor.xyz *= mix(1.0, mix(0.4, 1.0, aChg), uChgOn * uReplayOn);          // CHANGE: the rest dims to 40%`)
+      // CHANGE: every block NOT past the threshold turns a flat 25% grey (keeping its face shading)
+      vColor.xyz = mix(vColor.xyz, vec3(0.051) * color.x, uChgOn * uReplayOn * (1.0 - step(0.5, aChg)));`)
       .replace('#include <begin_vertex>', `#include <begin_vertex>
-      transformed.y *= 1.0 + aChg * uRise * uChgOn * uReplayOn;                  // CHANGE: changed blocks rise
+      transformed.y *= 1.0 + step(0.5, aChg) * uRise * uChgOn * uReplayOn;       // CHANGE: flashing blocks rise
       transformed.y += uSinkOn * mix(aSinkA, aSinkB, uMix);                      // Jakarta: measured motion
       vChg = aChg; vFaceUv = aFaceUv; vNoData = aNoData;
       vWPos = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>
-      uniform float uChgOn; uniform float uReplayOn; uniform float uTime; uniform float uHatch;
+      uniform float uChgOn; uniform float uReplayOn; uniform float uTime; uniform float uHatch; uniform float uFlashHz;
       varying float vChg; varying vec2 vFaceUv; varying float vNoData; varying vec3 vWPos;`)
       .replace('#include <color_fragment>', `#include <color_fragment>
       if (vNoData > 0.5) {                                                       // no-data land: hatched grey
         float st = step(0.5, fract((vWPos.x + vWPos.z) * uHatch));
         diffuseColor.rgb = mix(vec3(0.05), vec3(0.16), st);
       }
-      if (uChgOn * uReplayOn > 0.0 && vChg > 0.5) {                               // CHANGE: pulsing cyan outline
-        vec2 q = abs(vFaceUv - 0.5) * 2.0;
-        float edge = smoothstep(0.58, 0.74, max(q.x, q.y));
-        float pulse = 0.6 + 0.4 * sin(uTime * 6.2831853);                         // 1 pulse a second
-        diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.133, 0.973, 0.871), edge * pulse * uChgOn);
-      }`);
+      // CHANGE: blocks past the threshold flash between their own colour and RED (the radar value fell,
+      // #FF3B30) or CYAN (it rose, #66FCF1), 1.5 times a second, and glow (emissive, below)
+      vec3 flashCol = mix(vec3(1.0, 0.0423, 0.0296), vec3(0.133, 0.973, 0.879), step(1.5, vChg));
+      float flashK = step(0.5, vChg) * uChgOn * uReplayOn * (0.5 + 0.5 * sin(uTime * 6.2831853 * uFlashHz));
+      diffuseColor.rgb = mix(diffuseColor.rgb, flashCol, flashK);`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+      totalEmissiveRadiance += flashCol * flashK * 0.8;`);
   }
   function patchAlert(shader) {
     Object.assign(shader.uniforms, alertU);
@@ -339,6 +343,7 @@ export function createCaseTerrain(container) {
     flashMesh.renderOrder = 1;
     scene.add(flashMesh);
     const span = Math.max(rows, cols) * km;
+    glide = null; homeView = null;
     camera.position.set(0, span * 0.75, span * 0.8);
     controls.target.set(0, 0, 0);
     controls.minDistance = span * 0.08;
@@ -484,8 +489,8 @@ export function createCaseTerrain(container) {
     $('tv-pass-sub').textContent = sub;
     $('tv-pass-sub').hidden = !sub;
     const rule = isDated(layer) && flashRule(caseId, layer, method);
-    const keyText = replayBanner ? (replayBanner.key ? `Cyan outline: ${replayBanner.key.replace(/^outlined: /, '')}` : '')
-      : (rule ? `Cyan outline: ${rule.text}` : '');
+    const keyText = replayBanner ? (replayBanner.key || '') : (rule ? `Cyan outline: ${rule.text}` : '');
+    $('tv-pass-key').dataset.swatch = replayBanner?.swatch || '';      // red / cyan / both flash swatch
     $('tv-pass-key').hidden = !keyText;
     $('tv-pass-key-text').textContent = keyText;
     $('tv-pass').dataset.phase = replayBanner?.phase || '';
@@ -641,6 +646,12 @@ export function createCaseTerrain(container) {
     alertU.uAlertT.value = (now - alertT0) / 1000;
     replayU.uTime.value = now / 1000;
     replay.tick(now);
+    if (glide) {                                       // camera glide (about 1 s, eased)
+      const u = Math.min(1, (now - glide.start) / glide.ms), e = ease(u);
+      camera.position.lerpVectors(glide.p0, glide.p1, e);
+      controls.target.lerpVectors(glide.t0, glide.t1, e);
+      if (u >= 1) glide = null;
+    }
     if (blend) {
       const t = Math.min(1, (now - blend.t0) / (blend.ms || BLEND_MS)), e = ease(t);
       const { from, to } = blend, arr = mesh.instanceColor.array;
@@ -706,6 +717,27 @@ export function createCaseTerrain(container) {
       },
       setBanner(b) { replayBanner = b; if (grid?.layers[layerIndex]) updateWhen(); },
       setLabel(text) { const el = $('rp-label'); el.textContent = text || ''; el.hidden = !text; },
+      // CHANGE: glide to frame the largest flashing cluster; null = glide back to where the view was.
+      // In Live Ops it stays put while a card is waiting for an answer (no moving target mid-question).
+      focus(cluster) {
+        if (!grid) return;
+        const startGlide = (p1, t1) => {
+          glide = { p0: camera.position.clone(), t0: controls.target.clone(), p1, t1, start: performance.now(), ms: 1000 };
+        };
+        if (!cluster) {
+          if (homeView) startGlide(homeView.p, homeView.t);
+          homeView = null;
+          return;
+        }
+        if (isLive() && document.querySelector('.lo-card .lo-answer:not(:disabled)')) return;
+        if (!homeView) homeView = { p: camera.position.clone(), t: controls.target.clone() };
+        const km = grid.block_m / 1000;
+        const t1 = new THREE.Vector3((cluster.c - grid.cols / 2 + 0.5) * km, 0, (cluster.r - grid.rows / 2 + 0.5) * km);
+        const dir = homeView.p.clone().sub(homeView.t).normalize();
+        const extent = Math.max(cluster.spanRows, cluster.spanCols) * km;
+        const dist = Math.min(homeView.p.distanceTo(homeView.t), Math.max(extent * 1.8, controls.minDistance * 1.5));
+        startGlide(t1.clone().addScaledVector(dir, dist), t1);
+      },
     },
   });
   // Build and start the replay for the open case (limit = Live Ops event date, trap = Jebel Ali's toggle)
@@ -888,6 +920,23 @@ export function createCaseTerrain(container) {
       toggle: () => replay.toggle(),
       setSpeed: (x) => replay.setSpeed(x),
       trap: (on) => startReplay({ trap: on }),
+    },
+    // tests: the screen point (client px) of the top of the flashing block nearest the camera's focus
+    replayProbe() {
+      const st = replay.state, plan = replay.plan;
+      if (!st || !plan?.focus || !grid) return null;
+      const km = grid.block_m / 1000, f = plan.focus;
+      let best = -1, bd = Infinity;
+      cells.forEach((i, k) => {
+        if (!plan.mask[i]) return;
+        const r = Math.floor(i / grid.cols), c = i % grid.cols, d = (r - f.r) ** 2 + (c - f.c) ** 2;
+        if (d < bd) { bd = d; best = k; }
+      });
+      if (best < 0) return null;
+      const i = cells[best], r = Math.floor(i / grid.cols), c = i % grid.cols;
+      const v = new THREE.Vector3((c - grid.cols / 2 + 0.5) * km, blockH[best] * (1 + replayU.uRise.value), (r - grid.rows / 2 + 0.5) * km).project(camera);
+      const rect = renderer.domElement.getBoundingClientRect();
+      return { x: rect.left + (v.x + 1) / 2 * rect.width, y: rect.top + (1 - v.y) / 2 * rect.height, colour: plan.mask[i] === 2 ? 'cyan' : 'red' };
     },
     // tests: show the hover tooltip as if the pointer were at (clientX, clientY); false = no free spot
     testTip(clientX, clientY) {
