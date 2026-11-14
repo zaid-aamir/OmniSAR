@@ -1,8 +1,11 @@
 {
   "about": "Cases whose numbers file exists. Written by tools/update_results.py - do not edit by hand.",
-  "generated": "2026-11-14T00:26Z",
+  "generated": "2026-11-14T01:39Z",
   "measured": {
+    "al-ain": "cases/al-ain.numbers.json",
+    "big-sur": "cases/big-sur.numbers.json",
     "jakarta": "cases/jakarta.numbers.json",
-    "jebel-ali": "cases/jebel-ali.numbers.json"
+    "jebel-ali": "cases/jebel-ali.numbers.json",
+    "tonle-sap": "cases/tonle-sap.numbers.json"
   }
 }

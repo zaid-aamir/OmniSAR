@@ -197,7 +197,7 @@
       "title": "Can we see the sea rising?",
       "kind": "image",
       "src": "assets/cases/jakarta/ev-noise.png",
-      "caption": "In each 12-day pair the air alone moves the signal by up to 31 mm across the box. Sea-level rise over the same months is around a millimetre (citation pending): far too small to see this way.",
+      "caption": "In each 12-day pair the air alone moves the signal by up to 31 mm across the box. Global sea level rose about 4.5 mm in the whole of 2024 (NASA Sea Level Change, 2025), so over these months it is around a millimetre: far too small to see this way.",
       "source": "NISAR GUNW correction layers",
       "bin": "trap",
       "trap": 16
@@ -272,10 +272,17 @@
       {
         "id": "pumping",
         "label": "Groundwater pumped from under the city",
-        "detail": "Published studies link Jakarta's sinking to groundwater being pumped out faster than it refills. Radar can't see this; it comes from other sources.",
+        "detail": "Published studies link Jakarta's sinking to groundwater being pumped out faster than it refills: Abidin et al. (2011) name groundwater extraction as a main cause and report about 1–15 cm of sinking a year, up to about 20–28 cm at some places. Radar can't see the pumping; this comes from the published study.",
         "source": "Published sources",
         "basis": "published",
-        "citation": [],
+        "citation": [
+          {
+            "outlet": "Abidin et al., Natural Hazards 59:1753–1771",
+            "date": "2011",
+            "title": "Land subsidence of Jakarta (Indonesia) and its relation with urban development",
+            "url": "https://doi.org/10.1007/s11069-011-9866-9"
+          }
+        ],
         "hidden": false,
         "opens": {
           "layer": null,
@@ -286,10 +293,17 @@
       {
         "id": "compaction",
         "label": "Soft ground squeezes together",
-        "detail": "As water leaves the soft clay layers, they compact and the surface above drops. Also from published sources, not measured by us.",
+        "detail": "As water leaves the soft clay layers, they compact and the surface above drops (Abidin et al. 2011). Also from published sources, not measured by us.",
         "source": "Published sources",
         "basis": "published",
-        "citation": [],
+        "citation": [
+          {
+            "outlet": "Abidin et al., Natural Hazards 59:1753–1771",
+            "date": "2011",
+            "title": "Land subsidence of Jakarta (Indonesia) and its relation with urban development",
+            "url": "https://doi.org/10.1007/s11069-011-9866-9"
+          }
+        ],
         "hidden": false,
         "opens": {
           "layer": null,
@@ -386,7 +400,7 @@
   "verdict": {
     "pending": "Evidence pending — this case's measurements are being processed.",
     "cantProve": [
-      "Who or what caused the sinking: that comes from published studies (citation pending).",
+      "Who or what caused the sinking: the groundwater link comes from published studies (Abidin et al. 2011), not from our radar.",
       "What will happen to Jakarta in the future.",
       "Absolute movement: our numbers are relative to central Jakarta, which may itself be moving."
     ]

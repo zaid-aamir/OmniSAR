@@ -146,7 +146,8 @@
       "bucket": "earth",
       "title": "Sea-level rise is too slow to see",
       "fools": "Sea level rises a few millimetres a year. A few months of radar can't show it.",
-      "proof": "Global sea level rises by millimetres per year (citation pending). In each of our 12-day Jakarta pairs, the air alone moves the signal by up to 46 mm.",
+      "proof": "NASA reports that global sea level rose about 4.5 mm in 2024, up from about 2.1 mm a year in 1993 (NASA Sea Level Change, Feb 2025). In each of our 12-day Jakarta pairs, the air alone moves the signal by up to 46 mm.",
+      "citation": [{"outlet": "NASA Sea Level Change", "date": "Feb 2025", "title": "Rate of sea level rise doubled over 30 years, new study shows", "url": "https://sealevel.nasa.gov/news/280/rate-of-sea-level-rise-doubled-over-30-years-new-study-shows/"}],
       "handling": "OmniSAR measures land motion, not sea level, and says so.",
       "inApp": true
     },

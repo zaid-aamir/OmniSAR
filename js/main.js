@@ -63,10 +63,19 @@ async function start() {
     onBack: backToGlobe,
     onOpen: openMystery,
   });
-  const markers = createMarkers(globe, data.cases, { onSelect: selectCase });
+  const markers = createMarkers(globe, data.cases, { onSelect: selectCase, onTip: (t) => panel.showTip(t) });
   const timeline = createTimeline(document.getElementById('timeline'), data.cases, {
     onCross: (id) => markers.pulse(id),
+    onDay: (iso) => markers.setDate(iso),
   });
+  // Unverified tips: a saved snapshot of NASA EONET natural events (tools/fetch_eonet.py).
+  // If the file is missing the globe simply shows no tips.
+  fetch('cases/eonet.json').then((r) => (r.ok ? r.json() : null)).then((e) => {
+    if (!e) return;
+    markers.setTips(e.events);
+    panel.setTipCount(e.events.length);
+    timeline.refresh();
+  }).catch(() => {});
 
   // Case terrain: the local blocky view of a case box (covers the globe while open)
   const terrain = createCaseTerrain(area);

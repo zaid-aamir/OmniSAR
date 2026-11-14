@@ -1,0 +1,500 @@
+{
+ "about": "Unverified tips: natural events from NASA EONET, saved by tools/fetch_eonet.py. Not checked by OmniSAR.",
+ "source": "NASA EONET API v3 (eonet.gsfc.nasa.gov)",
+ "query": "https://eonet.gsfc.nasa.gov/api/v3/events?start=2026-06-01&end=2026-11-10&category=wildfires,floods,severeStorms,volcanoes&status=all",
+ "fetched": "2026-11-14T01:35Z",
+ "rule": "active 2026-06-01 to 2026-11-10; categories wildfires, floods, severeStorms, volcanoes; at most 10 per category, evenly spread in time",
+ "events_in_window": {
+  "wildfires": 5675,
+  "floods": 309,
+  "severeStorms": 63,
+  "volcanoes": 1
+ },
+ "events": [
+  {
+   "id": "EONET_20300",
+   "title": "BORDER 6 Wildfire, San Diego, California",
+   "category": "Wildfire",
+   "date": "2026-06-01",
+   "lat": 32.567,
+   "lon": -116.764,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_20300",
+   "sources": [
+    {
+     "id": "IRWIN",
+     "url": "https://irwin.doi.gov/observer/incidents/bff9f3bf-cefe-437c-9b82-231526500ef1"
+    }
+   ]
+  },
+  {
+   "id": "EONET_20294",
+   "title": "Flood in Italy 1103923",
+   "category": "Flood",
+   "date": "2026-06-01",
+   "lat": 45.57,
+   "lon": 9.773,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_20294",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1103923"
+    }
+   ]
+  },
+  {
+   "id": "EONET_20279",
+   "title": "Typhoon Jangmi",
+   "category": "Severe storm",
+   "date": "2026-06-01",
+   "lat": 24.5,
+   "lon": 127.3,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_20279",
+   "sources": [
+    {
+     "id": "EO",
+     "url": "https://science.nasa.gov/earth/earth-observatory/typhoon-jangmi/"
+    },
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/wp0626.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_20710",
+   "title": "Nevados del Chillan Volcano, Chile",
+   "category": "Volcano",
+   "date": "2026-06-15",
+   "lat": -36.868,
+   "lon": -71.378,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_20710",
+   "sources": [
+    {
+     "id": "SIVolcano",
+     "url": "https://volcano.si.edu/volcano.cfm?vn=357070"
+    }
+   ]
+  },
+  {
+   "id": "EONET_20608",
+   "title": "Flood in Austria 1103957",
+   "category": "Flood",
+   "date": "2026-06-18",
+   "lat": 47.605,
+   "lon": 15.672,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_20608",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1103957"
+    }
+   ]
+  },
+  {
+   "id": "EONET_21015",
+   "title": "Wildfire Gold Mountain, Ouray, Colorado",
+   "category": "Wildfire",
+   "date": "2026-06-27",
+   "lat": 38.052,
+   "lon": -107.682,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21015",
+   "sources": [
+    {
+     "id": "IRWIN",
+     "url": "https://irwin.doi.gov/observer/incidents/2026-COGMF-000099"
+    }
+   ]
+  },
+  {
+   "id": "EONET_20877",
+   "title": "Super Typhoon Bavi",
+   "category": "Severe storm",
+   "date": "2026-07-01",
+   "lat": 9.7,
+   "lon": 162.4,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_20877",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/wp0926.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_21253",
+   "title": "Flood in Myanmar 1104011",
+   "category": "Flood",
+   "date": "2026-07-03",
+   "lat": 92.947,
+   "lon": 20.881,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21253",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104011"
+    }
+   ]
+  },
+  {
+   "id": "EONET_21540",
+   "title": "Wildfire in Canada 1029603",
+   "category": "Wildfire",
+   "date": "2026-07-20",
+   "lat": 65.462,
+   "lon": -123.636,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21540",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1029603"
+    }
+   ]
+  },
+  {
+   "id": "EONET_21773",
+   "title": "Flood in Malaysia 1104052",
+   "category": "Flood",
+   "date": "2026-07-23",
+   "lat": 117.885,
+   "lon": 4.243,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21773",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104052"
+    }
+   ]
+  },
+  {
+   "id": "EONET_21712",
+   "title": "Hurricane Genevieve",
+   "category": "Severe storm",
+   "date": "2026-07-24",
+   "lat": 8.9,
+   "lon": -101.2,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_21712",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/ep0726.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_22327",
+   "title": "Wildfire in The Democratic Republic of Congo, Angola 1030215",
+   "category": "Wildfire",
+   "date": "2026-08-03",
+   "lat": -8.782,
+   "lon": 21.922,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_22327",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1030215"
+    }
+   ]
+  },
+  {
+   "id": "EONET_23396",
+   "title": "Flood in India 1104121",
+   "category": "Flood",
+   "date": "2026-08-08",
+   "lat": 77.53,
+   "lon": 29.734,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23396",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104121"
+    }
+   ]
+  },
+  {
+   "id": "EONET_22561",
+   "title": "Tropical Storm Nangka",
+   "category": "Severe storm",
+   "date": "2026-08-13",
+   "lat": 26.5,
+   "lon": 148.0,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_22561",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/wp1626.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_23106",
+   "title": "Wildfire in Angola 1030893",
+   "category": "Wildfire",
+   "date": "2026-08-14",
+   "lat": -10.709,
+   "lon": 18.941,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23106",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1030893"
+    }
+   ]
+  },
+  {
+   "id": "EONET_23398",
+   "title": "Wildfire in Algeria 1031194",
+   "category": "Wildfire",
+   "date": "2026-08-25",
+   "lat": 36.685,
+   "lon": 6.21,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23398",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1031194"
+    }
+   ]
+  },
+  {
+   "id": "EONET_23529",
+   "title": "Flood in New Zealand 1104126",
+   "category": "Flood",
+   "date": "2026-08-26",
+   "lat": 169.377,
+   "lon": -45.001,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23529",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104126"
+    }
+   ]
+  },
+  {
+   "id": "EONET_23611",
+   "title": "Hurricane Karina",
+   "category": "Severe storm",
+   "date": "2026-08-27",
+   "lat": 10.8,
+   "lon": -111.5,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23611",
+   "sources": [
+    {
+     "id": "EO",
+     "url": "https://science.nasa.gov/earth/earth-observatory/a-trio-of-tropical-cyclones-in-the-pacific/"
+    },
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/ep1126.tcw"
+    },
+    {
+     "id": "NOAA_NHC",
+     "url": "https://www.nhc.noaa.gov/archive/2026/KARINA.shtml"
+    }
+   ]
+  },
+  {
+   "id": "EONET_23739",
+   "title": "Tropical Storm Edouard",
+   "category": "Severe storm",
+   "date": "2026-09-01",
+   "lat": 28.6,
+   "lon": -91.8,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_23739",
+   "sources": [
+    {
+     "id": "EO",
+     "url": "https://science.nasa.gov/earth/earth-observatory/a-trio-of-tropical-cyclones-in-the-pacific/"
+    },
+    {
+     "id": "NOAA_NHC",
+     "url": "https://www.nhc.noaa.gov/archive/2026/EDOUARD.shtml"
+    }
+   ]
+  },
+  {
+   "id": "EONET_24247",
+   "title": "Wildfire in Angola 1031899",
+   "category": "Wildfire",
+   "date": "2026-09-09",
+   "lat": -16.514,
+   "lon": 20.499,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24247",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1031899"
+    }
+   ]
+  },
+  {
+   "id": "EONET_24515",
+   "title": "Flood in Democratic Republic of Congo 1104166",
+   "category": "Flood",
+   "date": "2026-09-14",
+   "lat": 28.842,
+   "lon": -2.507,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24515",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104166"
+    }
+   ]
+  },
+  {
+   "id": "EONET_24785",
+   "title": "Tropical Cyclone 01B",
+   "category": "Severe storm",
+   "date": "2026-09-22",
+   "lat": 17.5,
+   "lon": 85.0,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24785",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/io0126.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_25264",
+   "title": "Wildfire in Indonesia 1032749",
+   "category": "Wildfire",
+   "date": "2026-09-27",
+   "lat": -3.137,
+   "lon": 111.855,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25264",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1032749"
+    }
+   ]
+  },
+  {
+   "id": "EONET_24938",
+   "title": "Flood in France 1104202",
+   "category": "Flood",
+   "date": "2026-09-28",
+   "lat": 43.946,
+   "lon": 3.706,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_24938",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104202"
+    }
+   ]
+  },
+  {
+   "id": "EONET_25046",
+   "title": "Typhoon Koguma",
+   "category": "Severe storm",
+   "date": "2026-10-05",
+   "lat": 10.9,
+   "lon": 168.2,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25046",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/wp2726.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_25502",
+   "title": "Flood in Thailand 1104241",
+   "category": "Flood",
+   "date": "2026-10-17",
+   "lat": 6.925,
+   "lon": 100.056,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25502",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104241"
+    }
+   ]
+  },
+  {
+   "id": "EONET_25710",
+   "title": "Wildfire in Nigeria 1033147",
+   "category": "Wildfire",
+   "date": "2026-10-20",
+   "lat": 12.349,
+   "lon": 13.231,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25710",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1033147"
+    }
+   ]
+  },
+  {
+   "id": "EONET_25589",
+   "title": "Hurricane Vance",
+   "category": "Severe storm",
+   "date": "2026-10-21",
+   "lat": 9.4,
+   "lon": -99.5,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25589",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/ep2226.tcw"
+    },
+    {
+     "id": "NOAA_NHC",
+     "url": "https://www.nhc.noaa.gov/archive/2026/VANCE.shtml"
+    }
+   ]
+  },
+  {
+   "id": "EONET_26159",
+   "title": "Tropical Cyclone 03S",
+   "category": "Severe storm",
+   "date": "2026-11-07",
+   "lat": -13.5,
+   "lon": 52.6,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_26159",
+   "sources": [
+    {
+     "id": "JTWC",
+     "url": "https://www.metoc.navy.mil/jtwc/products/sh0327.tcw"
+    }
+   ]
+  },
+  {
+   "id": "EONET_26330",
+   "title": "Flood in Myanmar 1104280",
+   "category": "Flood",
+   "date": "2026-11-09",
+   "lat": 21.911,
+   "lon": 98.555,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_26330",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=FL&eventid=1104280"
+    }
+   ]
+  },
+  {
+   "id": "EONET_26370",
+   "title": "Wildfire in Australia 1033787",
+   "category": "Wildfire",
+   "date": "2026-11-10",
+   "lat": -21.8,
+   "lon": 116.335,
+   "link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_26370",
+   "sources": [
+    {
+     "id": "GDACS",
+     "url": "https://www.gdacs.org/report.aspx?eventtype=WF&eventid=1033787"
+    }
+   ]
+  }
+ ]
+}

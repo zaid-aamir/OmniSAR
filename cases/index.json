@@ -5,8 +5,16 @@
       "id": "jebel-ali",
       "name": "Jebel Ali",
       "place": "Dubai, United Arab Emirates",
-      "centre": [24.99, 55.02],
-      "box": [54.95, 24.93, 55.12, 25.06],
+      "centre": [
+        24.99,
+        55.02
+      ],
+      "box": [
+        54.95,
+        24.93,
+        55.12,
+        25.06
+      ],
       "question": "What appeared here between June and October 2026?",
       "mysteryFile": "cases/jebel-ali.json",
       "numbersFile": "cases/jebel-ali.numbers.json",
@@ -21,28 +29,64 @@
       "id": "big-sur",
       "name": "Big Sur",
       "place": "California, United States",
-      "centre": [35.95, -121.50],
-      "box": [-121.85, 35.80, -121.25, 36.35],
-      "question": "Which burned slopes above Highway 1 move first when the rain comes?",
-      "mysteryFile": null,
-      "numbersFile": "cases/big-sur.numbers.json"
+      "centre": [
+        35.95,
+        -121.5
+      ],
+      "box": [
+        -121.85,
+        35.8,
+        -121.25,
+        36.35
+      ],
+      "question": "Which burned slopes above Highway 1 lost their cover, and has rain started to fall on them?",
+      "mysteryFile": "cases/big-sur.json",
+      "numbersFile": "cases/big-sur.numbers.json",
+      "analysis": {
+        "track": "135",
+        "direction": "A",
+        "note": "We analyse only the ascending track-135 passes: comparing passes from different directions is trap 7.",
+        "trap": 7
+      }
     },
     {
       "id": "tonle-sap",
       "name": "Tonle Sap",
       "place": "Cambodia",
-      "centre": [12.80, 104.20],
-      "box": [104.0, 12.6, 104.4, 13.0],
+      "centre": [
+        12.8,
+        104.2
+      ],
+      "box": [
+        104.0,
+        12.6,
+        104.4,
+        13.0
+      ],
       "question": "How much forest went underwater that ordinary water maps missed?",
-      "mysteryFile": null,
-      "numbersFile": "cases/tonle-sap.numbers.json"
+      "mysteryFile": "cases/tonle-sap.json",
+      "numbersFile": "cases/tonle-sap.numbers.json",
+      "analysis": {
+        "track": "083",
+        "direction": "A",
+        "note": "We analyse only the ascending track-083 passes: comparing passes from different directions is trap 7.",
+        "trap": 7
+      }
     },
     {
       "id": "jakarta",
       "name": "Jakarta",
       "place": "Indonesia",
-      "centre": [-6.11, 106.85],
-      "box": [106.70, -6.20, 107.00, -6.05],
+      "centre": [
+        -6.11,
+        106.85
+      ],
+      "box": [
+        106.7,
+        -6.2,
+        107.0,
+        -6.05
+      ],
       "question": "Is the ground really dropping, or is it the air?",
       "mysteryFile": "cases/jakarta.json",
       "numbersFile": "cases/jakarta.numbers.json"
@@ -51,11 +95,25 @@
       "id": "al-ain",
       "name": "Al Ain",
       "place": "Abu Dhabi, United Arab Emirates",
-      "centre": [24.49, 55.55],
-      "box": [55.45, 24.40, 55.65, 24.58],
+      "centre": [
+        24.49,
+        55.55
+      ],
+      "box": [
+        55.45,
+        24.4,
+        55.65,
+        24.58
+      ],
       "question": "Which farms went quiet — and is that normal?",
-      "mysteryFile": null,
-      "numbersFile": "cases/al-ain.numbers.json"
+      "mysteryFile": "cases/al-ain.json",
+      "numbersFile": "cases/al-ain.numbers.json",
+      "analysis": {
+        "track": "056",
+        "direction": "A",
+        "note": "We analyse only the ascending track-056 passes: comparing passes from different directions is trap 7.",
+        "trap": 7
+      }
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
  "case": "jakarta",
- "generated": "2026-11-14T00:26Z",
+ "generated": "2026-11-14T01:39Z",
  "measured": [
   {
    "label": "Fastest-sinking district (2 km)",
@@ -38,8 +38,9 @@
   },
   {
    "label": "Compared with published rates",
-   "value": "citation pending",
-   "unit": ""
+   "value": "≈ -6.5 cm a year if it kept going",
+   "unit": "",
+   "note": "Our fastest district moved -19 mm in 108 days; scaled to a year that is about 6.5 cm. Abidin et al. (2011, Natural Hazards 59:1753–1771) report Jakarta subsidence of about 1–15 cm a year, up to about 20–28 cm a year at some places, with groundwater extraction a main cause. Our number sits inside that range, but 108 days of provisional data is not a yearly rate: it doesn't cover a full wet and dry season."
   }
  ],
  "check": {
@@ -658,8 +659,8 @@
    "NISAR L2 GUNW product specification JPL D-102272 Rev E: corrections stored, not applied"
   ],
   "script": "tools/process_jakarta.py",
-  "script_version": "1.0.1",
-  "script_sha256": "c6a7c38a17246825bacf7dfc146128a772621e2ab77a3dc1e54441e9dafb5735",
+  "script_version": "1.0.2",
+  "script_sha256": "0eef5a2c2ed7d693b51e1d639142a1c77e90ac2b05ee0b103ca7ce9b9ad9f392",
   "helpers_sha256": "d71853edabb0fb095ed99c2470163d6f05bd3687c088343e553c6e298e2c51c6"
  }
 }

@@ -12,6 +12,7 @@ export function statusChip(status) {
 }
 
 export function createPanel(root, cases, { onPick, onBack, onOpen }) {
+  let tipCount = 0;
   function showHome() {
     root.innerHTML = `
       <p class="eyebrow">Case files</p>
@@ -31,7 +32,8 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
               </span>
             </button>
           </li>`).join('')}
-      </ol>`;
+      </ol>
+      ${tipCount ? `<p class="panel-note">Grey columns are ${tipCount} unverified tips: natural events from NASA EONET (fires, floods, storms, volcanoes), 1 Jun – 10 Nov 2026. They appear as the timeline reaches their dates. Nobody has checked them with radar.</p>` : ''}`;
     root.querySelectorAll('.case-row').forEach((btn) =>
       btn.addEventListener('click', () => onPick(btn.dataset.id)));
   }
@@ -63,11 +65,34 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     wireTrapChips(root);
   }
 
+  // An unverified tip from NASA EONET: title, date, source links, and a clear "no check yet"
+  function showTip(t) {
+    root.innerHTML = `
+      <button class="link-btn" id="back-btn">← Back to globe</button>
+      <p class="eyebrow">Unverified tip · NASA EONET</p>
+      <h1 class="panel-title">${esc(t.title)}</h1>
+      <dl class="facts">
+        <div><dt>Type</dt><dd>${esc(t.category)}</dd></div>
+        <div><dt>Date</dt><dd>${esc(t.date)}</dd></div>
+        <div><dt>Where</dt><dd class="mono">${t.lat.toFixed(2)}°, ${t.lon.toFixed(2)}°</dd></div>
+        <div><dt>Status</dt><dd><span class="status status-unverified">No check yet</span></dd></div>
+      </dl>
+      <p class="panel-text">This is a tip from NASA's Earth Observatory Natural Event Tracker, which collects reports of natural events from other sources. OmniSAR hasn't looked at it with radar, so there's no mystery and no verdict.</p>
+      <p class="panel-text">${t.sources.filter((s) => /^https:\/\//.test(s.url)).map((s) => `<a class="tag cite" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">Source: ${esc(s.id)}</a>`).join(' ')}
+        ${/^https:\/\//.test(t.link || '') ? `<a class="tag cite" href="${esc(t.link)}" target="_blank" rel="noopener noreferrer">EONET record</a>` : ''}</p>`;
+    root.querySelector('#back-btn').addEventListener('click', onBack);
+  }
+
+  function setTipCount(n) {
+    tipCount = n;
+    if (root.querySelector('.case-list')) showHome();
+  }
+
   function note(text) {
     const el = root.querySelector('#open-note');
     if (el) { el.textContent = text; el.hidden = false; }
   }
 
   showHome();
-  return { showHome, showCase, note, root };
+  return { showHome, showCase, showTip, setTipCount, note, root };
 }

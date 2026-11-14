@@ -5,6 +5,9 @@
 //
 // Colour = the fixed "pending" data colour while a case is under investigation.
 // A beacon never claims a change date; it only marks where a question is being asked.
+//
+// "Unverified tips" (NASA EONET natural events) are thin grey columns. Each one appears only once
+// the timeline reaches its date. They are tips, not findings: nothing about them is checked.
 
 import * as THREE from 'three';
 import { latLonToVector } from './globe.js';
@@ -13,6 +16,8 @@ const COLUMN_WIDTH = 0.009;   // globe radius = 1, so ~0.5° wide (Jebel Ali and
 const COLUMN_HEIGHT = 0.12;
 const PULSE_MS = 1400;
 const HIT_PX = 22;            // how close (in screen pixels) the pointer must be to hover a beacon
+const TIP_WIDTH = 0.005;
+const TIP_HEIGHT = 0.06;
 
 function cssColour(name) {
   return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -30,7 +35,7 @@ function orientedMatrix(lat, lon, size, lift) {
   return m;
 }
 
-export function createMarkers(globe, cases, { onSelect }) {
+export function createMarkers(globe, cases, { onSelect, onTip }) {
   const pending = new THREE.Color(cssColour('--data-pending'));
   const measured = new THREE.Color(cssColour('--data-nisar'));
   const group = new THREE.Group();
@@ -66,6 +71,24 @@ export function createMarkers(globe, cases, { onSelect }) {
       normal: latLonToVector(lat, lon),
     };
   });
+
+  // --- Unverified tips (EONET), added later with setTips() ---
+  const tipMaterial = new THREE.MeshLambertMaterial({ color: new THREE.Color(cssColour('--data-unverified') || '#8a8f98') });
+  let tips = [];
+  function setTips(list) {
+    tips = list.map((t) => {
+      const column = new THREE.Mesh(box, tipMaterial);
+      column.matrixAutoUpdate = false;
+      column.matrix.copy(orientedMatrix(t.lat, t.lon, new THREE.Vector3(TIP_WIDTH, TIP_HEIGHT, TIP_WIDTH), 0.002 + TIP_HEIGHT / 2));
+      column.visible = false;
+      group.add(column);
+      return { ...t, kind: 'tip', column, top: latLonToVector(t.lat, t.lon, 1.002 + TIP_HEIGHT), normal: latLonToVector(t.lat, t.lon) };
+    });
+  }
+  // Show only the tips whose date the timeline has reached
+  function setDate(iso) {
+    for (const t of tips) t.column.visible = t.date <= iso;
+  }
 
   // --- Pulses ---
   const ringScale = new THREE.Matrix4();
@@ -103,7 +126,9 @@ export function createMarkers(globe, cases, { onSelect }) {
     const rect = globe.renderer.domElement.getBoundingClientRect();
     let best = null;
     let bestD = HIT_PX;
-    for (const b of beacons) {
+    // case beacons first, so a tip right next to a case never steals its click
+    for (const b of [...beacons, ...tips.filter((t) => t.column.visible)]) {
+      if (best && b.kind === 'tip') break;
       toCamera.copy(globe.camera.position).sub(b.top);
       if (toCamera.dot(b.normal) <= 0) continue;            // behind the globe
       screen.copy(b.top).project(globe.camera);
@@ -121,7 +146,7 @@ export function createMarkers(globe, cases, { onSelect }) {
     canvas.style.cursor = hit ? 'pointer' : '';
     label.hidden = !hit;
     if (hit) {
-      label.textContent = hit.b.name;
+      label.textContent = hit.b.kind === 'tip' ? `Unverified tip: ${hit.b.title}` : hit.b.name;
       label.style.left = `${hit.x}px`;
       label.style.top = `${hit.y}px`;
     }
@@ -134,10 +159,12 @@ export function createMarkers(globe, cases, { onSelect }) {
   canvas.addEventListener('pointerup', (e) => {
     if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 5) return;
     const hit = beaconAt(e.clientX, e.clientY);
-    if (hit) onSelect(hit.b.id);
+    if (hit) (hit.b.kind === 'tip' ? onTip?.(hit.b) : onSelect(hit.b.id));
   });
 
   return {
+    setTips,
+    setDate,
     pulse(id) {
       const b = beacons.find((x) => x.id === id);
       if (b) b.pulseStart = performance.now();

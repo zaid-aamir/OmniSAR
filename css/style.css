@@ -272,6 +272,7 @@ body {
   border: 1px solid currentColor;
 }
 .status-under-investigation { color: var(--data-pending); }
+.status-unverified { color: var(--data-unverified); }
 .status-measured { color: var(--data-nisar); }
 
 .link-btn {
@@ -392,6 +393,8 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
 .trap-card p { margin: 0; font-size: 14px; color: var(--text); }
 .trap-card .primary-btn { margin-top: 18px; }
 .trap-later { margin-top: 12px !important; font: 12px var(--font-data) !important; color: var(--data-pending) !important; }
+.trap-cite { font-size: 12px !important; color: var(--muted) !important; }
+.trap-cite a { color: var(--data-nisar); }
 
 /* ---------- Narrow screens: stack the panel under the globe ---------- */
 @media (max-width: 860px) {

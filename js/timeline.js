@@ -3,6 +3,7 @@
 //  - Ticks show the selected case's REAL pass dates (from cases/passes.json).
 //  - NASA's data gap (27 Jul - 10 Aug 2026, no NISAR data anywhere) is shaded and labelled.
 //  - Moving across a case's pass date tells main.js, which makes that case's beacon pulse.
+//  - Every move also reports the date (onDay), so unverified tips appear on their own dates.
 
 const DAY = 86400000;
 const START = Date.UTC(2026, 5, 1);    // 1 Jun 2026 (months count from 0)
@@ -17,7 +18,7 @@ const fmt = (day) => new Date(START + day * DAY).toLocaleDateString('en-GB',
 // Position along the track, matching where the slider's 14 px thumb centre sits
 const pos = (day) => `calc(7px + (100% - 14px) * ${day / TOTAL_DAYS})`;
 
-export function createTimeline(root, cases, { onCross }) {
+export function createTimeline(root, cases, { onCross, onDay }) {
   root.innerHTML = `
     <div class="tl-head">
       <span class="timeline-label">NISAR passes</span>
@@ -85,6 +86,7 @@ export function createTimeline(root, cases, { onCross }) {
       }
     }
     current = day;
+    onDay?.(new Date(START + day * DAY).toISOString().slice(0, 10));
     slider.value = day;
     dateEl.textContent = fmt(day);
     updateCaseText();
@@ -110,6 +112,7 @@ export function createTimeline(root, cases, { onCross }) {
   setDay(0);
 
   return {
+    refresh() { setDay(current); onDay?.(new Date(START + current * DAY).toISOString().slice(0, 10)); },
     // Show one case's real passes as ticks (or none with null)
     setCase(c) {
       selected = c;

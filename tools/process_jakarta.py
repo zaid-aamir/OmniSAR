@@ -44,7 +44,7 @@ from process_jebel_ali import diverging, font, fmt_date, sha256
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
-SCRIPT_VERSION = "1.0.1"   # 1.0.1: reference picker treats no-data coherence as 0 (v1.0 kept a NaN window by accident)
+SCRIPT_VERSION = "1.0.2"   # 1.0.2: published-rate comparison (Abidin et al. 2011) and sea-level citation, text only; 1.0.1: reference picker treats no-data coherence as 0 (v1.0 kept a NaN window by accident)
 CASE = "jakarta"
 IFG = "/science/LSAR/GUNW/grids/frequencyA/unwrappedInterferogram/HH"
 CUBE = "/science/LSAR/GUNW/metadata/radarGrid"
@@ -278,7 +278,7 @@ def fill_mystery(results, per_dir, badge, chains):
     ev["gap"].update(src=A + "ev-gap.png", bin="trap", trap=14,
         caption="NASA has no data from 27 Jul to 10 Aug 2026. A chain of only 12-day pairs would break here; the 24-day pairs bridge it.")
     ev["sea-level"].update(src=A + "ev-noise.png", bin="trap", trap=16,
-        caption=f"In each 12-day pair the air alone moves the signal by up to {max(spreads):.0f} mm across the box. Sea-level rise over the same months is around a millimetre (citation pending): far too small to see this way.")
+        caption=f"In each 12-day pair the air alone moves the signal by up to {max(spreads):.0f} mm across the box. Global sea level rose about 4.5 mm in the whole of 2024 (NASA Sea Level Change, 2025), so over these months it is around a millimetre: far too small to see this way.")
     tg = {t["id"]: t for t in m["toggles"]}
     tg["atmosphere"]["layers"] = {"off": {"src": A + "tg-atm-off.png", "label": "Corrections off"}, "on": {"src": A + "tg-atm-on.png", "label": "Ionosphere + troposphere subtracted"}}
     tg["mask"]["layers"] = {"off": {"src": A + "tg-mask-off.png", "label": "No coherence mask"}, "on": {"src": A + "tg-mask-on.png", "label": "Coherence 0.4 or more only"}}
@@ -523,7 +523,7 @@ def main():
             dr.rectangle([x_ + j_ * 26, 170 - v_ / mx * 130, x_ + j_ * 26 + 22, 170], fill=col_)
         dr.text((x_, 176), r_["pair"][5:10] + ">" + r_["pair"][19:24], fill=(190, 190, 190), font=font(10))
     dr.text((40, 6), f"How much the AIR moved the signal across our box in each pair (5-95% spread, mm). Tallest: {mx:.0f} mm.", fill=(235, 235, 235), font=font(12))
-    dr.text((40, 24), "yellow = ionosphere, blue = troposphere (humid air). Sea-level rise over these months is about a millimetre (citation pending).", fill=(190, 190, 190), font=font(11))
+    dr.text((40, 24), "yellow = ionosphere, blue = troposphere (humid air). Sea level: ~4.5 mm per year in 2024 (NASA), about a millimetre over these months.", fill=(190, 190, 190), font=font(11))
     made["ev-noise"] = nc
     # low land (Terrarium <= 10 m)
     hh_ = asc["d"]["h"]
@@ -580,7 +580,11 @@ def main():
         {"label": "Descending (18:11 local)", "value": direction_line("descending", rd), "unit": ""},
         {"label": "Land under 10 m in the box", "value": ra["low_land_km2"], "unit": "km²", "note": f"of {ra['land_km2']} km² of land (AWS Terrarium surface heights)"},
         {"label": "People on that low land", "value": "pending", "unit": "", "note": "No login-free numeric population source used yet; we don't read numbers off picture tiles."},
-        {"label": "Compared with published rates", "value": "citation pending", "unit": ""},
+        {"label": "Compared with published rates", "value": (f"≈ {fastest['mm'] * 365 / days / 10:+.1f} cm a year if it kept going" if fastest else "—"), "unit": "",
+         "note": (f"Our fastest district moved {fastest['mm']:+.0f} mm in {days} days; scaled to a year that is about {abs(fastest['mm']) * 365 / days / 10:.1f} cm. "
+                  "Abidin et al. (2011, Natural Hazards 59:1753–1771) report Jakarta subsidence of about 1–15 cm a year, up to about 20–28 cm a year at some places, "
+                  "with groundwater extraction a main cause. Our number sits inside that range, but 108 days of provisional data is not a yearly rate: "
+                  "it doesn't cover a full wet and dry season.") if fastest else None},
     ]
     if both_usable:
         check_text = (f"Two directions, two times of day: {sum(r['agree'] for r in agree_rows)} of {n_sh} shared 2 km districts agree "
