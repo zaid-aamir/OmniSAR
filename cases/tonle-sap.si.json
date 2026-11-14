@@ -1,0 +1,221 @@
+{
+  "case": "tonle-sap",
+  "about": "SI Agent offline answers for Tonle Sap. Written only from cases/tonle-sap.json, cases/tonle-sap.numbers.json and cases/traps.json. 'used' names the number or card each answer comes from.",
+  "overview": "Open water in our box grew from 874.5 km² on 19 Jun to 1284.4 km² on 17 Oct. NISAR's L-band also found forest standing in water: 205.8 km² on 30 Aug, of which the C-band water map calls 202.6 km² 'not water'.",
+  "suggested": [
+    "forest",
+    "grow",
+    "agree",
+    "harm"
+  ],
+  "dataUsed": [
+    {
+      "icon": "radar",
+      "name": "NISAR GCOV",
+      "meta": "track 083 asc · 3 passes"
+    },
+    {
+      "icon": "wave",
+      "name": "NASA OPERA DSWx-S1",
+      "meta": "C-band water check"
+    },
+    {
+      "icon": "drop",
+      "name": "NASA POWER",
+      "meta": "rain since 1 May"
+    },
+    {
+      "icon": "file",
+      "name": "NASA CMR",
+      "meta": "pass dates"
+    },
+    {
+      "icon": "mountain",
+      "name": "AWS Terrarium",
+      "meta": "heights"
+    }
+  ],
+  "qa": [
+    {
+      "id": "forest",
+      "q": "How much flooded forest did water maps miss?",
+      "keywords": [
+        "forest",
+        "missed",
+        "miss",
+        "hidden",
+        "under",
+        "flooded forest"
+      ],
+      "a": "Flooded forest peaked at 205.8 km² on 30 Aug; the C-band water map calls 202.6 km² of it 'not water'. On 17 Oct it was 75.5 km², 74.5 km² of it missed by the C-band map. This is L-band only, so it is Moderate by definition: no independent check sees under trees.",
+      "used": "Measured: Flooded forest 30 Aug · Flooded forest 17 Oct"
+    },
+    {
+      "id": "grow",
+      "q": "How much did the lake grow?",
+      "keywords": [
+        "grow",
+        "grew",
+        "open water",
+        "size",
+        "expand",
+        "bigger",
+        "pulse",
+        "area"
+      ],
+      "a": "Open water in our box was 874.5 km² on 19 Jun, 1062.4 km² on 30 Aug and 1284.4 km² on 17 Oct. Water means HH ≤ −16 dB and HV ≤ −22 dB. That is the yearly flood pulse, measured on 3 passes.",
+      "used": "Measured: Open water 19 Jun · 30 Aug · 17 Oct"
+    },
+    {
+      "id": "agree",
+      "q": "Does NISAR agree with the other water map?",
+      "keywords": [
+        "agree",
+        "agreement",
+        "check",
+        "dswx",
+        "opera",
+        "compare",
+        "independent",
+        "sure",
+        "moderate"
+      ],
+      "a": "On open water, NISAR agrees with OPERA DSWx-S1 on 98% of pixels on 19 Jun, 90% on 30 Aug and 79% on 17 Oct. Two of three dates reach 80%, which counts as Strong for open water. The case is capped at Moderate because flooded forest is L-band only.",
+      "used": "Independent check (DSWx-S1) · badge reason"
+    },
+    {
+      "id": "harm",
+      "q": "Is this flood unusual or harmful?",
+      "keywords": [
+        "harmful",
+        "harm",
+        "unusual",
+        "normal",
+        "bad",
+        "danger",
+        "disaster",
+        "damage",
+        "dangerous"
+      ],
+      "a": "Radar measures water, not harm. The lake's yearly pulse is normal: every wet season it swells to several times its dry-season size. Whether this year's flood is harmful or unusual is something the radar can't prove.",
+      "used": "Verdict: what the radar can't prove · case tip"
+    },
+    {
+      "id": "about",
+      "q": "What is this case about?",
+      "keywords": [
+        "question",
+        "summary",
+        "overview",
+        "explain case"
+      ],
+      "a": "Every wet season Cambodia's Tonle Sap lake swells, and the forests around its shores stand in water for months. Ordinary water maps find open water well, but water under trees is much harder to see. The question: how much forest went underwater that ordinary water maps missed?",
+      "used": "Case tip and question"
+    },
+    {
+      "id": "bright",
+      "q": "Why does flooded forest look bright?",
+      "keywords": [
+        "bright",
+        "double bounce",
+        "trunk",
+        "trunks",
+        "corner"
+      ],
+      "a": "Water under trees forms a corner with the trunks, so the beam bounces straight back: very bright in HH (double bounce). Our rule: forest on 19 Jun whose HH rose to −5 dB or more. NISAR's 24 cm L-band waves reach the trunks; C-band's 5.6 cm waves mostly stop at the canopy.",
+      "used": "Measured: Flooded forest (note) · lesson: Dark water, bright forest"
+    },
+    {
+      "id": "wind",
+      "q": "Why does some water not look dark?",
+      "keywords": [
+        "not dark",
+        "rough",
+        "wind",
+        "ripples",
+        "floating",
+        "plants",
+        "grey",
+        "trap 11"
+      ],
+      "a": "Wind ripples and floating plants roughen water and scatter the beam back. On 17 Oct, 13.0 km² that the C-band map calls open water looked too bright to NISAR to count as water (trap 11). 'Not dark' doesn't always mean 'not water'.",
+      "used": "Card: Water that doesn't look dark · trap 11"
+    },
+    {
+      "id": "gap",
+      "q": "Why is there a gap in the passes?",
+      "keywords": [
+        "gap",
+        "july",
+        "august",
+        "no data",
+        "trap 14",
+        "skip"
+      ],
+      "a": "NASA's catalogue lists 22 NISAR pass days over Tonle Sap from 1 Jun to 10 Nov, with nothing from 27 Jul to 10 Aug. A flood-pulse curve has to skip that gap, not draw a line through it as if it were measured (trap 14).",
+      "used": "Card: Two weeks with no passes · trap 14"
+    },
+    {
+      "id": "rain",
+      "q": "How much rain fell?",
+      "keywords": [
+        "rain",
+        "monsoon",
+        "mm"
+      ],
+      "a": "1214.5 mm of rain fell since 1 May, from NASA POWER (MERRA-2), over 194 days with data. It is a regional number for the area, not a value for each block.",
+      "used": "Measured: Rain since 1 May"
+    },
+    {
+      "id": "deep",
+      "q": "How deep is the water under the trees?",
+      "keywords": [
+        "deep",
+        "depth",
+        "metres",
+        "how deep"
+      ],
+      "a": "That isn't in OmniSAR's data for this case. The radar maps where water is, not how deep it is under the trees.",
+      "used": "Verdict: what the radar can't prove"
+    },
+    {
+      "id": "future",
+      "q": "What will the lake do next year?",
+      "keywords": [
+        "future",
+        "next year",
+        "will happen",
+        "predict"
+      ],
+      "a": "OmniSAR can't say: what the lake will do next year is beyond what radar can prove. We report only measured passes: 19 Jun, 30 Aug and 17 Oct 2026.",
+      "used": "Verdict: what the radar can't prove · Measured: Passes analysed"
+    },
+    {
+      "id": "passes",
+      "q": "Which passes were analysed?",
+      "keywords": [
+        "pass",
+        "analysed",
+        "analyzed",
+        "track",
+        "which"
+      ],
+      "a": "3 passes: 19 Jun, 30 Aug and 17 Oct 2026, NISAR GCOV track 083, ascending, frame 008. The latest one processed for this case is 17 Oct.",
+      "used": "Measured: Passes analysed · source files"
+    },
+    {
+      "id": "bands",
+      "q": "What is the difference between L-band and C-band?",
+      "keywords": [
+        "l-band",
+        "c-band",
+        "wavelength",
+        "difference",
+        "sentinel-1",
+        "band"
+      ],
+      "a": "NISAR's L-band waves are 24 cm long; Sentinel-1's C-band waves are 5.6 cm. Long waves slip past leaves and reach the trunks and the water below. That is why the C-band map misses most of our flooded forest: 74.5 of 75.5 km² on 17 Oct.",
+      "used": "Lesson: Why L-band sees under trees · Measured: Flooded forest 17 Oct"
+    }
+  ]
+}

@@ -5,7 +5,7 @@
 // and one shared floating box shows them on screen. Words inside buttons, links, headings,
 // code and measured values are left alone.
 
-const TERMS = [
+export const TERMS = [
   ['backscatter', /\bbackscatter\b/i, 'The part of the radar beam that bounces back to the satellite; bright = a lot came back.'],
   ['HH', /\bHH\b/, 'Sent and received with horizontal waves: strong from walls, flooded trunks and bare ground facing the satellite.'],
   ['HV', /\bHV\b/, 'Sent horizontal, received vertical: only things that scramble the wave, like leaves and crops, send much back.'],

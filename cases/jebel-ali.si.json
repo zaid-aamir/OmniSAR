@@ -1,0 +1,237 @@
+{
+  "case": "jebel-ali",
+  "about": "SI Agent offline answers for Jebel Ali. Written only from cases/jebel-ali.json, cases/jebel-ali.numbers.json, cases/index.json and cases/traps.json. 'used' names the number or card each answer comes from.",
+  "overview": "NISAR's HH echo rose by 3 dB or more over 497.6 ha in 144 patches between 18 Jun and 16 Oct: new structures, by the radar's rule. The 28 Oct pass was left out by our interference check. Whether water became land can't be told here: sea and sand look equally dark.",
+  "suggested": [
+    "appeared",
+    "oct28",
+    "waterland",
+    "sure"
+  ],
+  "dataUsed": [
+    {
+      "icon": "radar",
+      "name": "NISAR GCOV",
+      "meta": "track 056 asc · 3 passes, 2 used"
+    },
+    {
+      "icon": "globe",
+      "name": "NASA HLS photos",
+      "meta": "18 Jun · 14 Oct"
+    },
+    {
+      "icon": "file",
+      "name": "NASA CMR",
+      "meta": "pass dates"
+    },
+    {
+      "icon": "warn",
+      "name": "NASA GIBS tiles",
+      "meta": "zoom-10 test only"
+    }
+  ],
+  "qa": [
+    {
+      "id": "appeared",
+      "q": "What appeared here between June and October?",
+      "keywords": [
+        "appeared",
+        "new",
+        "build",
+        "change",
+        "hectares",
+        "ha",
+        "patches"
+      ],
+      "a": "NISAR's HH echo rose by 3 dB or more over 497.6 ha, in 144 patches of 1 ha or more, between 18 Jun and 16 Oct. A big HH rise is what new walls and structures do (double bounce). The radar rule says 'new structures', not what they are or who built them.",
+      "used": "Measured: New structures (HH rose ≥ 3 dB)"
+    },
+    {
+      "id": "oct28",
+      "q": "Why was the 28 Oct pass left out?",
+      "keywords": [
+        "28",
+        "october 28",
+        "left out",
+        "excluded",
+        "exclude",
+        "interference",
+        "flagged",
+        "glow",
+        "trap 8"
+      ],
+      "a": "On 28 Oct our box read +6.3 dB brighter in HH while the whole NISAR frame moved only +0.1 dB. That is interference, not the ground (trap 8). Our interference check, declared before the run, flagged it, so the pass is left out.",
+      "used": "Card: Two-date change: 18 Jun vs 28 Oct · Measured: Interference check"
+    },
+    {
+      "id": "waterland",
+      "q": "Did any water turn into land?",
+      "keywords": [
+        "water",
+        "land",
+        "sea",
+        "reclaim",
+        "reclaimed",
+        "reclamation",
+        "sand",
+        "coast"
+      ],
+      "a": "Radar alone can't say here. Open sea and desert sand are about equally dark in HH: −17.1 dB vs −16.9 dB on 18 Jun (trap 11). So OmniSAR reports 'not separable' instead of a water-to-land number.",
+      "used": "Measured: Water ↔ land · card: Two dark patches"
+    },
+    {
+      "id": "sure",
+      "q": "How sure is OmniSAR?",
+      "keywords": [
+        "sure",
+        "moderate",
+        "quality",
+        "trust",
+        "reliable"
+      ],
+      "a": "The badge is Moderate: radar only, with the photo check still pending. The radar quality check passed: dark and bright ground changed by similar amounts (+0.7 dB apart). But there is only 1 pass before and 1 after, so one bad date can't be outvoted yet.",
+      "used": "Badge · Measured: Radar quality check · Passes compared"
+    },
+    {
+      "id": "about",
+      "q": "What is this case about?",
+      "keywords": [
+        "question",
+        "summary",
+        "overview",
+        "explain case"
+      ],
+      "a": "NISAR has imaged this coast west of Dubai about every 12 days since 18 June 2026, through cloud, dust and darkness. The question: what appeared here between June and October 2026? Radar can answer part of that, and it tries to fool you at least five times on the way.",
+      "used": "Case tip and question"
+    },
+    {
+      "id": "oct16",
+      "q": "Why is 16 Oct used if it was flagged?",
+      "keywords": [
+        "16",
+        "october 16",
+        "hv only",
+        "warning",
+        "care",
+        "flagged hv"
+      ],
+      "a": "16 Oct is flagged in HV only: the box read −10.3 dB vs −0.8 dB for the whole frame. The change rule uses HH, where the box moved −0.9 dB vs the frame's −0.2 dB, so the pass is used. Treat this result with care.",
+      "used": "Measured: Passes compared"
+    },
+    {
+      "id": "method",
+      "q": "Why not just compare the first and last image?",
+      "keywords": [
+        "first",
+        "last",
+        "two date",
+        "two dates",
+        "method",
+        "median",
+        "compare"
+      ],
+      "a": "One bad date is enough to fool you (trap 8). Comparing 18 Jun with 28 Oct would turn the +6.3 dB interference patch into a giant fake change. The plan is the median of three passes per side; with only 1 before and 1 after, that median card is still pending.",
+      "used": "Card: Two-date change · card: Median change (pending)"
+    },
+    {
+      "id": "beforejune",
+      "q": "What was here before June?",
+      "keywords": [
+        "before june",
+        "earlier",
+        "may",
+        "start",
+        "history",
+        "trap 6",
+        "empty"
+      ],
+      "a": "NISAR's record here starts on 18 Jun 2026: NASA's catalogue lists no earlier pass over this box. Empty weeks mean 'not imaged', not 'nothing there' (trap 6). Anything earlier would need another satellite, clearly labelled.",
+      "used": "Card: No NISAR images before 18 June · trap 6"
+    },
+    {
+      "id": "zoom",
+      "q": "Can I zoom in to see individual buildings?",
+      "keywords": [
+        "zoom",
+        "individual",
+        "closer",
+        "trap 2"
+      ],
+      "a": "Not on NISAR map tiles. One zoom-10 tile address, requested 5 times on 14 Nov 2026, came back as 5 different images (trap 2). Our numbers come from the science files; sharper views must use other sources, clearly labelled.",
+      "used": "Card: NISAR map tile at zoom 10 · trap 2"
+    },
+    {
+      "id": "photos",
+      "q": "What do the satellite photos show?",
+      "keywords": [
+        "photo",
+        "sentinel-2",
+        "palm",
+        "port",
+        "basin"
+      ],
+      "a": "NASA HLS photos of the box from 18 Jun and 14 Oct 2026 show ground clearly changed around the port basin and the Palm. A team member is still comparing each radar hotspot with those photos, so the photo check is pending.",
+      "used": "Card: Satellite photos: June vs October · Independent check"
+    },
+    {
+      "id": "who",
+      "q": "Who built this, and was it allowed?",
+      "keywords": [
+        "who built",
+        "blame",
+        "illegal",
+        "allowed",
+        "legal",
+        "permit",
+        "responsible",
+        "owner",
+        "company",
+        "government"
+      ],
+      "a": "Radar can't see who, why or whether anything was allowed. It measures how the ground scatters microwaves. OmniSAR only says what changed, where, when, and how sure we are.",
+      "used": "Verdict: what the radar can't prove · limits card"
+    },
+    {
+      "id": "interference",
+      "q": "What is the interference check?",
+      "keywords": [
+        "interference check",
+        "rfi",
+        "radio",
+        "blob",
+        "blobs",
+        "whole frame"
+      ],
+      "a": "Every pass is compared with the whole NISAR frame: if our box moves far more than the frame, the pass is flagged. Here 2 of 2 later passes were flagged: 16 Oct (in HV only) and 28 Oct (HH +6.3 dB vs +0.1 dB for the frame). We use HH only and remove each date's smooth background.",
+      "used": "Measured: Interference check"
+    },
+    {
+      "id": "bounce",
+      "q": "What is double bounce?",
+      "keywords": [
+        "double bounce",
+        "bright",
+        "wall",
+        "walls",
+        "corner",
+        "hh"
+      ],
+      "a": "The beam hits flat ground, then a wall, and comes straight back to the satellite. That makes new buildings and harbour walls very bright in HH. It is why this case looks for HH rising by 3 dB or more.",
+      "used": "Lesson: HH and double bounce · Measured: New structures"
+    },
+    {
+      "id": "direction",
+      "q": "Which direction does the radar look from?",
+      "keywords": [
+        "direction",
+        "ascending",
+        "descending",
+        "track",
+        "trap 7",
+        "angle"
+      ],
+      "a": "This case uses only ascending passes on track 056. NISAR also passes going south, but walls look different from each side, so mixing the two directions fakes change (trap 7).",
+      "used": "Case analysis note · trap 7"
+    }
+  ]
+}

@@ -145,5 +145,14 @@ NASA Earthdata login).
 AI coding assistants (Claude) helped write the code and processing scripts. The game design, case choices, data
 testing, the 17 traps and every result check were done by the team. No AI-generated images, audio or data are used.
 
-There is **no AI inside the product**: every text you read in OmniSAR is pre-written, every reply to a choice is
-pre-written, and every number comes from the processing scripts above.
+Every reply to a choice in OmniSAR is pre-written, and every number comes from the processing scripts above.
+
+**SI Agent and Grok.** Each case terrain has an "SI Agent" dropdown that sums up the case and answers questions.
+- Its suggested questions, and typed questions by default, use **pre-written answers** (`cases/<id>.si.json`), written
+  only from that case's own files and labelled "OmniSAR answer". A typed question is matched to the nearest one by keywords.
+- **Optional Grok layer (xAI).** If `js/si-config.js` holds a proxy address, a typed question is sent with the open case's
+  data (numbers, evidence-card captions, trap cards, glossary terms) to our own proxy, a Cloudflare Worker kept outside
+  this repo, which asks xAI's Grok to answer only from that data. Those replies are labelled "AI answer (Grok): can be
+  wrong. The numbers come from OmniSAR's measured data." If the proxy fails, times out (8 s) or hits its rate limit,
+  the pre-written answer is shown instead. In this version the proxy address is empty, so the Grok layer is off.
+- The site never holds an API key: the key exists only as a secret inside the Worker.

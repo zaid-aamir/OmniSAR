@@ -1,0 +1,237 @@
+{
+  "case": "jakarta",
+  "about": "SI Agent offline answers for Jakarta. Written only from cases/jakarta.json, cases/jakarta.numbers.json and cases/traps.json. 'used' names the number or card each answer comes from.",
+  "overview": "After air corrections, 28.8 km² of land moved down 30 mm or more over 108 days (26 Jun → 12 Oct, ascending), relative to central Jakarta. But the two directions agree in only 37 of 99 districts, so the air can't be ruled out: Weak.",
+  "suggested": [
+    "really",
+    "fastest",
+    "directions",
+    "yearly"
+  ],
+  "dataUsed": [
+    {
+      "icon": "radar",
+      "name": "NISAR GUNW (provisional)",
+      "meta": "asc track 010 · 8 pairs"
+    },
+    {
+      "icon": "radar",
+      "name": "NISAR GUNW (provisional)",
+      "meta": "desc track 018 · 8 pairs"
+    },
+    {
+      "icon": "mountain",
+      "name": "AWS Terrarium",
+      "meta": "land under 10 m"
+    },
+    {
+      "icon": "file",
+      "name": "NASA CMR",
+      "meta": "data gap"
+    },
+    {
+      "icon": "wave",
+      "name": "NASA Sea Level Change",
+      "meta": "sea-level card"
+    }
+  ],
+  "qa": [
+    {
+      "id": "really",
+      "q": "Is Jakarta really sinking, or is it the air?",
+      "keywords": [
+        "sink",
+        "air",
+        "really",
+        "real",
+        "weak",
+        "sure",
+        "rule out"
+      ],
+      "a": "OmniSAR can't rule out the air: the badge is Weak. The ascending chain shows 28.8 km² of land down 30 mm or more, but the two directions agree in only 37 of 99 shared 2 km districts (r = −0.55). Real sinking should look similar at dawn and at dusk.",
+      "used": "Badge · Independent check · Measured: Land sinking ≥ 30 mm"
+    },
+    {
+      "id": "fastest",
+      "q": "Where is it sinking fastest?",
+      "keywords": [
+        "fastest",
+        "where",
+        "most",
+        "district",
+        "worst",
+        "35"
+      ],
+      "a": "Near 6.194° S, 106.979° E: −35 mm over 108 days (26 Jun → 12 Oct), in the ascending chain. It is a vertical equivalent, relative to central Jakarta, which may itself be moving.",
+      "used": "Measured: Fastest-sinking district (2 km)"
+    },
+    {
+      "id": "directions",
+      "q": "Why do the two directions disagree?",
+      "keywords": [
+        "directions",
+        "disagree",
+        "ascending",
+        "descending",
+        "dawn",
+        "dusk",
+        "two",
+        "trap 14"
+      ],
+      "a": "Ascending passes are at 05:39 local time and descending ones at 18:11: two times of day, two different skies. Humid air delays the signal differently at dawn and at dusk. Ascending: median −11 mm; descending: median −1 mm.",
+      "used": "Card: Ascending vs descending · Measured: Ascending · Descending"
+    },
+    {
+      "id": "yearly",
+      "q": "How fast is that per year?",
+      "keywords": [
+        "year",
+        "yearly",
+        "per year",
+        "annual",
+        "rate",
+        "cm",
+        "published",
+        "abidin"
+      ],
+      "a": "−35 mm in 108 days scales to about −11.7 cm a year if it kept going. Abidin et al. (2011) report Jakarta subsidence of about 1–15 cm a year, up to about 20–28 cm a year at some places. But 108 days of provisional data is not a yearly rate.",
+      "used": "Measured: Compared with published rates"
+    },
+    {
+      "id": "about",
+      "q": "What is this case about?",
+      "keywords": [
+        "question",
+        "summary",
+        "overview",
+        "explain case"
+      ],
+      "a": "NISAR flew over Jakarta every 12 days from late June to October 2026, going north before dawn and south in the evening. Comparing the radar wave's phase between passes can measure ground movement of a few millimetres, but the signal also passes through wet tropical air. The question: is the ground really dropping, or is it the air?",
+      "used": "Case tip and question"
+    },
+    {
+      "id": "airsize",
+      "q": "How much does the air fake motion?",
+      "keywords": [
+        "air",
+        "fake",
+        "correction",
+        "corrections",
+        "trap 15",
+        "how much"
+      ],
+      "a": "Across our pairs, humid air alone shifts the signal by 6–31 mm across the box. NASA ships the air corrections but doesn't apply them, so we subtract the ionosphere and troposphere ourselves (trap 15).",
+      "used": "Card: One pair, straight from NASA's file · trap 15"
+    },
+    {
+      "id": "coherence",
+      "q": "What is coherence?",
+      "keywords": [
+        "coherence",
+        "mask",
+        "masked",
+        "0.4",
+        "stable",
+        "63"
+      ],
+      "a": "Coherence is how stable the signal stayed between two passes, from 0 to 1. Below 0.4 (the bay, fields, building sites) the phase is noise, so we mask it. In the first pair only 63% of the box passes.",
+      "used": "Card: The coherence map"
+    },
+    {
+      "id": "sealevel",
+      "q": "Can the radar see sea level rising?",
+      "keywords": [
+        "sea level",
+        "sea",
+        "ocean",
+        "rising",
+        "trap 16"
+      ],
+      "a": "No. In each 12-day pair the air alone moves the signal by up to 31 mm. Global sea level rose about 4.5 mm in the whole of 2024 (NASA Sea Level Change, 2025), so over these months it is around a millimetre, far too small to see this way (trap 16).",
+      "used": "Card: Can we see the sea rising? · trap 16"
+    },
+    {
+      "id": "lowland",
+      "q": "How much of the land is low-lying?",
+      "keywords": [
+        "low",
+        "low land",
+        "10 m",
+        "elevation",
+        "below",
+        "height"
+      ],
+      "a": "330.1 km² of the 364.7 km² of land in the box is under 10 m (AWS Terrarium surface heights). Of the 28.8 km² sinking 30 mm or more, 25.2 km² is on that low land.",
+      "used": "Measured: Land under 10 m in the box · Land sinking ≥ 30 mm"
+    },
+    {
+      "id": "people",
+      "q": "How many people live on that low land?",
+      "keywords": [
+        "people",
+        "how many",
+        "live"
+      ],
+      "a": "That number is pending. We haven't used a login-free numeric population source yet, and we don't read numbers off picture tiles.",
+      "used": "Measured: People on that low land (pending)"
+    },
+    {
+      "id": "cause",
+      "q": "What causes the sinking?",
+      "keywords": [
+        "cause",
+        "causes",
+        "why",
+        "groundwater",
+        "blame",
+        "responsible",
+        "who caused"
+      ],
+      "a": "Our radar can't say. The groundwater link comes from published studies (Abidin et al. 2011), not from NISAR. Radar measures how the ground moved, not why.",
+      "used": "Verdict: what the radar can't prove"
+    },
+    {
+      "id": "gap",
+      "q": "What about the data gap?",
+      "keywords": [
+        "gap",
+        "july",
+        "august",
+        "24-day",
+        "bridge",
+        "missing"
+      ],
+      "a": "NASA has no data from 27 Jul to 10 Aug 2026. A chain of only 12-day pairs would break there, so 24-day pairs bridge it: 20 Jul → 13 Aug ascending and 21 Jul → 14 Aug descending (trap 14).",
+      "used": "Card: Two weeks with no data · source files"
+    },
+    {
+      "id": "phase",
+      "q": "How does phase become millimetres?",
+      "keywords": [
+        "phase",
+        "millimetres",
+        "millimeters",
+        "insar",
+        "wavelength",
+        "measure motion",
+        "4π"
+      ],
+      "a": "Movement = phase × wavelength ÷ 4π. NISAR's L-band wavelength is about 24 cm, so one full phase cycle is about 12 cm along the radar's line of sight. We chain 8 pairs per direction to cover 108 days.",
+      "used": "Lesson: From phase to millimetres"
+    },
+    {
+      "id": "future",
+      "q": "What will happen to Jakarta in the future?",
+      "keywords": [
+        "future",
+        "next",
+        "will happen",
+        "predict",
+        "underwater",
+        "drown"
+      ],
+      "a": "OmniSAR can't say what will happen to Jakarta in the future. Our numbers cover 108 days of provisional data and are relative to central Jakarta. Radar measures motion that happened, not what comes next.",
+      "used": "Verdict: what the radar can't prove"
+    }
+  ]
+}

@@ -3,6 +3,10 @@
 // link opens only when clicked (the app itself loads nothing from outside its own files).
 
 import { esc } from './util.js';
+import { SI_CONFIG } from './si-config.js';
+
+// Is the optional Grok layer of the SI Agent switched on (a proxy address in js/si-config.js)?
+const AI_ON = !!SI_CONFIG.proxyUrl;
 
 const link = (url, text) => `<a class="tag cite" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(text)}</a>`;
 
@@ -56,11 +60,15 @@ const VIEWS = {
     <h1 class="panel-title" tabindex="-1">Free, open, and honest about its limits</h1>
     <ul class="about-points">
       <li><strong>Free, no login, no install.</strong> It runs in any modern browser.</li>
-      <li><strong>No server.</strong> It is a set of static files; nothing you do is sent anywhere.</li>
+      <li><strong>No server of its own.</strong> It is a set of static files. ${AI_ON
+        ? 'The only thing ever sent anywhere is a question you type into the SI Agent: it goes, with the open case’s data, to our proxy and on to xAI’s Grok.'
+        : 'Nothing you do is sent anywhere.'}</li>
       <li><strong>Works even if NASA services are down.</strong> Pass dates, events, rain and pictures are saved snapshots made by our scripts.</li>
       <li><strong>Open source.</strong> ${link('https://github.com/zaid-aamir/OmniSAR', 'Code and processing scripts on GitHub')}</li>
       <li><strong>Live Ops is a replay.</strong> A replay of real 2026 NISAR passes on their real dates. In reality, processed NISAR data reaches users days after a pass.</li>
-      <li><strong>No AI inside the product.</strong> Every text and every reply is pre-written; every number comes from our processing scripts and NASA files.</li>
+      <li><strong>SI Agent answers.</strong> The SI Agent in each case terrain answers from pre-written answers built only from that case’s own files, labelled “OmniSAR answer”. ${AI_ON
+        ? 'A question you type is also sent to xAI’s Grok through our proxy, with this case’s data as its only source. Those replies are labelled “AI answer (Grok): can be wrong. The numbers come from OmniSAR’s measured data.” If Grok is slow or unavailable, the pre-written answer is shown instead.'
+        : 'An optional Grok (xAI) layer exists in the code but is switched off in this version, so no AI is used.'} Every other text and reply is pre-written; every number comes from our processing scripts and NASA files.</li>
       <li><strong>How AI was used.</strong> AI coding assistants helped write the code. The design, the cases, the 17 traps and every check are the team's.</li>
     </ul>`,
 };

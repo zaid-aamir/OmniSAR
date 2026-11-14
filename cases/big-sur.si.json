@@ -1,0 +1,261 @@
+{
+  "case": "big-sur",
+  "about": "SI Agent offline answers for Big Sur. Written only from cases/big-sur.json, cases/big-sur.numbers.json and cases/traps.json. 'used' names the number or card each answer comes from.",
+  "overview": "NISAR's HV canopy echo fell by 2 dB or more over 40.4 km² between 17 Jul and 15 Sep, 16.2 km² of it on slopes of 23° or more. The nearest burned steep patch, S01, is 259 m from Highway 1. 86% of the burn lies inside the official NIFC fire perimeters.",
+  "suggested": [
+    "burned",
+    "highway",
+    "rain",
+    "sure"
+  ],
+  "dataUsed": [
+    {
+      "icon": "radar",
+      "name": "NISAR GCOV",
+      "meta": "track 135 asc · 2 passes"
+    },
+    {
+      "icon": "fire",
+      "name": "NIFC WFIGS",
+      "meta": "fire perimeters"
+    },
+    {
+      "icon": "mountain",
+      "name": "AWS Terrarium",
+      "meta": "heights · slope"
+    },
+    {
+      "icon": "pin",
+      "name": "OpenStreetMap",
+      "meta": "Highway 1 line"
+    },
+    {
+      "icon": "drop",
+      "name": "NASA POWER",
+      "meta": "rain · soil wetness"
+    }
+  ],
+  "qa": [
+    {
+      "id": "burned",
+      "q": "How much ground burned?",
+      "keywords": [
+        "burn",
+        "area",
+        "km2",
+        "how much",
+        "lost",
+        "cover",
+        "canopy loss"
+      ],
+      "a": "NISAR's HV echo fell by 2 dB or more over 40.4 km² between 17 Jul and 15 Sep, counting patches of 5 ha or more. 16.2 km² of that is on slopes of 23° or more. Another 3.4 km² sits on radar-distorted slopes and is kept out of the headline as low confidence.",
+      "used": "Measured: Burned (NISAR HV fell ≥ 2 dB) · Burned on slopes ≥ 23° · Burn on radar-distorted slopes"
+    },
+    {
+      "id": "highway",
+      "q": "Which burned slopes are closest to Highway 1?",
+      "keywords": [
+        "road",
+        "closest",
+        "nearest",
+        "near",
+        "s01",
+        "s02",
+        "s03",
+        "distance"
+      ],
+      "a": "S01 is 259 m from the road: 10.0 ha, mean slope 31.8°, HV −4.2 dB. S02 is 931 m away (5.9 ha, 28.3°) and S03 is 1.2 km away (8.9 ha, 30.6°). All three are burned steep areas from the 17 Jul vs 15 Sep comparison.",
+      "used": "Measured: S01, S02, S03 burned steep areas near Highway 1"
+    },
+    {
+      "id": "rain",
+      "q": "Has rain fallen on the burn scar?",
+      "keywords": [
+        "rain",
+        "wet",
+        "wetness",
+        "soil",
+        "gwettop",
+        "moisture"
+      ],
+      "a": "27.6 mm of rain fell at the box centre from 26 Aug to 10 Nov, with 1 day of 10 mm or more (NASA POWER). Surface wetness on 10 Nov was 0.3, on a scale from 0 (dry) to 1 (saturated). Both are regional numbers, not per slope, and they are measured rain, not a forecast.",
+      "used": "Measured: Rain on the scar since 26 Aug · Surface wetness (GWETTOP)"
+    },
+    {
+      "id": "sure",
+      "q": "How sure is OmniSAR about this burn map?",
+      "keywords": [
+        "sure",
+        "moderate",
+        "check",
+        "perimeter",
+        "nifc",
+        "agree",
+        "verify",
+        "independent"
+      ],
+      "a": "The badge is Moderate. 86% of our burned area lies inside the NIFC Timber and Plaskett perimeters, but we detect only 20% of the perimeter area. Strong needs both numbers at 60% or more; one out of two gives Moderate.",
+      "used": "Independent check (NIFC perimeters) · badge rule"
+    },
+    {
+      "id": "about",
+      "q": "What is this case about?",
+      "keywords": [
+        "question",
+        "summary",
+        "overview",
+        "explain case"
+      ],
+      "a": "Two wildfires burned the Santa Lucia Mountains above Highway 1 in August 2026: Timber from 9 Aug and Plaskett from 26 Aug. The question: which burned slopes above Highway 1 lost their cover, and has rain started to fall on them? NISAR imaged the area on 17 Jul, before both fires, and on 15 Sep.",
+      "used": "Case tip and question"
+    },
+    {
+      "id": "smoke",
+      "q": "How can radar see a burn through smoke?",
+      "keywords": [
+        "smoke",
+        "cloud",
+        "night",
+        "through",
+        "hv",
+        "canopy echo",
+        "radar see"
+      ],
+      "a": "HV is the echo that bounces around inside branches and leaves, so a lot of canopy gives a lot of HV. When fire removes the canopy, HV falls. NISAR's L-band radar sees through smoke and cloud, so the 15 Sep pass mapped the burn anyway.",
+      "used": "Card: HV fell inside the fire area · lesson: HV and canopy"
+    },
+    {
+      "id": "timber",
+      "q": "Why was so little of the Timber fire detected?",
+      "keywords": [
+        "timber",
+        "plaskett",
+        "detected",
+        "missed",
+        "miss",
+        "0%",
+        "low severity"
+      ],
+      "a": "Inside the Timber perimeter (mapped 9 Oct) we detect 0%, and the median HV change is +0.1 dB. Plaskett is 34% detected, with a median of −1.0 dB. Where HV barely changed, our rule finds no canopy loss; the radar alone can't say why, for example a low-severity fire or a fire that grew after our 15 Sep pass.",
+      "used": "Independent check (NIFC perimeters)"
+    },
+    {
+      "id": "geometry",
+      "q": "What are radar-distorted slopes?",
+      "keywords": [
+        "distorted",
+        "distortion",
+        "geometry",
+        "layover",
+        "shadow",
+        "facing away",
+        "fake change",
+        "trap 9"
+      ],
+      "a": "On 17% of the land the radar's view is distorted: layover, radar shadow, or steep slopes facing away from the satellite. Brightness changes there can be geometry, not fire (trap 9). So the 3.4 km² of 'burn' there is reported separately as low confidence.",
+      "used": "Card: Big changes on some steep slopes · trap 9"
+    },
+    {
+      "id": "dark",
+      "q": "Is dark ground after the fire burned?",
+      "keywords": [
+        "dark",
+        "bare",
+        "smooth",
+        "darkest"
+      ],
+      "a": "Not necessarily. The darkest tenth of land in HV after the fire (≤ −23 dB) is 100% outside the fire perimeters, and 99% of it did not get darker since July. Dark ground is often just smooth or bare; only the change counts (trap 11).",
+      "used": "Card: Dark ground after the fire · trap 11"
+    },
+    {
+      "id": "speckle",
+      "q": "What is speckle, and does it fake a burn?",
+      "keywords": [
+        "speckle",
+        "grainy",
+        "noise",
+        "single pixel",
+        "pixels",
+        "filter",
+        "trap 10"
+      ],
+      "a": "Speckle is radar graininess: single pixels jump between dates even when nothing changed. Outside the fire, single 10 m pixels 'change' with a spread of 2.3 dB, enough to fake a burn. Filtered to 30 m and smoothed, the spread drops to 0.3 dB (trap 10).",
+      "used": "Card: Single pixels that 'changed' a lot · trap 10"
+    },
+    {
+      "id": "slope23",
+      "q": "Why count slopes of 23° or more?",
+      "keywords": [
+        "23",
+        "degree",
+        "degrees",
+        "usgs",
+        "staley",
+        "threshold"
+      ],
+      "a": "23° is the slope term of the USGS post-fire debris-flow likelihood model (Staley et al. 2016, 2017). Slope comes from AWS Terrarium heights at about 30 m. 16.2 km² of the burn is on slopes that steep.",
+      "used": "Measured: Burned on slopes ≥ 23°"
+    },
+    {
+      "id": "landslide",
+      "q": "Will there be a landslide or debris flow?",
+      "keywords": [
+        "landslide",
+        "debris",
+        "mudslide",
+        "debris flow",
+        "future",
+        "danger",
+        "risk",
+        "collapse",
+        "dangerous"
+      ],
+      "a": "OmniSAR can't say. Whether or when a debris flow or landslide will happen needs rain intensity, soils and official models. We report only the measured burn, slope and rain, never a forecast.",
+      "used": "Verdict: what the radar can't prove"
+    },
+    {
+      "id": "passes",
+      "q": "Which passes were compared?",
+      "keywords": [
+        "pass",
+        "compared",
+        "before",
+        "after",
+        "july",
+        "september",
+        "track"
+      ],
+      "a": "One pass before and one after: 17 Jul and 15 Sep 2026, NISAR GCOV track 135, ascending, frame 020. Using one direction avoids trap 7. 3×3 filtering and the 5 ha patch rule keep speckle out.",
+      "used": "Measured: Passes compared · source files"
+    },
+    {
+      "id": "who",
+      "q": "Who or what started the fires?",
+      "keywords": [
+        "who started",
+        "started",
+        "arson",
+        "blame",
+        "cause",
+        "responsible",
+        "caused"
+      ],
+      "a": "Radar can't see that. NISAR measures how the ground scatters microwaves, not how or why a fire started, or who started it. The fire start dates here (Timber 9 Aug, Plaskett 26 Aug) come from the case tip, not from the radar.",
+      "used": "Verdict: what the radar can't prove · limits card"
+    },
+    {
+      "id": "regional",
+      "q": "Is the rain number for each slope?",
+      "keywords": [
+        "per slope",
+        "each slope",
+        "regional",
+        "coarse",
+        "trap 17",
+        "one slope"
+      ],
+      "a": "No. NASA POWER rain and soil wetness come in squares about 50 km across, much bigger than one hillside (trap 17). So 27.6 mm means 'rain has fallen on the area', not rain measured on S01.",
+      "used": "Trap 17 · Measured: Rain on the scar since 26 Aug"
+    }
+  ]
+}

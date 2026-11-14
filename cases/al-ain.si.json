@@ -1,0 +1,209 @@
+{
+  "case": "al-ain",
+  "about": "SI Agent offline answers for Al Ain. Written only from cases/al-ain.json, cases/al-ain.numbers.json and cases/traps.json. 'used' names the number or card each answer comes from.",
+  "overview": "All four farm circles are Fallow by NISAR's radar rule on 28 Oct: none has a crop echo of +3 dB or more above the desert. But MODIS greenness disagrees for Pivot A, and the HLS photo check hasn't arrived, so the badge is Unchecked (radar only).",
+  "suggested": [
+    "quiet",
+    "normal",
+    "modis",
+    "sure"
+  ],
+  "dataUsed": [
+    {
+      "icon": "radar",
+      "name": "NISAR GCOV",
+      "meta": "track 056 asc · 3 passes"
+    },
+    {
+      "icon": "leaf",
+      "name": "MODIS NDVI (ORNL DAAC)",
+      "meta": "26-year history"
+    },
+    {
+      "icon": "clock",
+      "name": "NASA AppEEARS (HLS)",
+      "meta": "check pending"
+    }
+  ],
+  "qa": [
+    {
+      "id": "quiet",
+      "q": "Which farms went quiet?",
+      "keywords": [
+        "quiet",
+        "crop",
+        "fallow",
+        "which",
+        "active",
+        "pivots",
+        "circles",
+        "inactive"
+      ],
+      "a": "By the radar rule, all four pivots are Fallow on 28 Oct: none has a crop echo of +3 dB or more above the desert. Pivots C and D have been quiet for years in the MODIS record (last green years 2021 and 2023). Pivots A and B were green this summer.",
+      "used": "Measured: Pivot A–D · card: Four farm circles, two dates"
+    },
+    {
+      "id": "normal",
+      "q": "Is that normal?",
+      "keywords": [
+        "normal",
+        "usual",
+        "years",
+        "history",
+        "long term",
+        "26"
+      ],
+      "a": "Only time can tell. In 26 years of MODIS greenness, Pivots A and B were green this summer, while C and D have been quiet for years. One quiet season is not the same as a farm left for years.",
+      "used": "Card: 26 years of greenness"
+    },
+    {
+      "id": "modis",
+      "q": "Why does MODIS disagree about Pivot A?",
+      "keywords": [
+        "modis",
+        "disagree",
+        "disagrees",
+        "ndvi",
+        "conflict",
+        "warning"
+      ],
+      "a": "Radar says Pivot A is fallow, but MODIS NDVI was 0.67 on 16 Oct. MODIS pixels are 250 m, a third of a circle, so it is our history source, not the formal check. It suggests our 3 dB rule misses some green crops; we don't change a rule after seeing results, so the HLS check will decide.",
+      "used": "Measured: Warning: MODIS disagrees"
+    },
+    {
+      "id": "sure",
+      "q": "How sure is OmniSAR?",
+      "keywords": [
+        "sure",
+        "unchecked",
+        "check",
+        "hls",
+        "appeears",
+        "badge",
+        "trust"
+      ],
+      "a": "The badge is Unchecked (radar only). The NASA HLS photo-based NDVI check needs AppEEARS files that haven't been downloaded yet. When they arrive: 75% or more of pivots agreeing = Strong, 50–74% = Moderate, below that = Weak.",
+      "used": "Badge · badge reason · Independent check"
+    },
+    {
+      "id": "about",
+      "q": "What is this case about?",
+      "keywords": [
+        "question",
+        "summary",
+        "overview",
+        "explain case"
+      ],
+      "a": "North-west of Al Ain, centre-pivot sprinklers make green circles in the desert, each about 800 m across. Some look green, some look bare. The question: which farms went quiet, and is that normal? One picture can't tell you; time can.",
+      "used": "Case tip and question"
+    },
+    {
+      "id": "how",
+      "q": "How does radar see crops?",
+      "keywords": [
+        "see",
+        "detect",
+        "grow",
+        "plants",
+        "hv",
+        "leaves",
+        "stems",
+        "radar see"
+      ],
+      "a": "As a crop grows, its leaves and stems twist more of the beam into the HV echo, so HV rises; at harvest it falls back. We compare each pivot with a desert control on the same date. A crop counts as present at +3 dB or more above the desert.",
+      "used": "Lesson: HV follows the growing cycle · method"
+    },
+    {
+      "id": "pivota",
+      "q": "What happened at Pivot A?",
+      "keywords": [
+        "pivot a"
+      ],
+      "a": "Pivot A's crop echo above the desert was +1.5 dB on 18 Jun, +6.5 dB on 16 Oct and +2.4 dB on 28 Oct. On the latest pass it is below +3 dB, so the class is Fallow. MODIS says it was green this summer (NDVI 0.67 on 16 Oct).",
+      "used": "Measured: Pivot A · Pivot A pass series"
+    },
+    {
+      "id": "pivotb",
+      "q": "What happened at Pivot B?",
+      "keywords": [
+        "pivot b"
+      ],
+      "a": "Pivot B's crop echo above the desert was +2.2 dB on 18 Jun, −1.3 dB on 16 Oct and +1.2 dB on 28 Oct: Fallow. MODIS calls it green this summer, with NDVI 0.18 on 16 Oct.",
+      "used": "Measured: Pivot B · Pivot B pass series"
+    },
+    {
+      "id": "pivotc",
+      "q": "What happened at Pivot C?",
+      "keywords": [
+        "pivot c"
+      ],
+      "a": "Pivot C's crop echo above the desert was −0.8 dB on 18 Jun, −1.2 dB on 16 Oct and −0.8 dB on 28 Oct: Fallow. MODIS says it has been quiet for years; its last green year was 2021.",
+      "used": "Measured: Pivot C · Pivot C pass series"
+    },
+    {
+      "id": "pivotd",
+      "q": "What happened at Pivot D?",
+      "keywords": [
+        "pivot d"
+      ],
+      "a": "Pivot D's crop echo above the desert was −0.4 dB on 18 Jun, −0.8 dB on 16 Oct and −0.4 dB on 28 Oct: Fallow. MODIS says it has been quiet for years; its last green year was 2023.",
+      "used": "Measured: Pivot D · Pivot D pass series"
+    },
+    {
+      "id": "tile",
+      "q": "Why are the farm circles blurry on the map?",
+      "keywords": [
+        "blurry",
+        "zoom",
+        "tile",
+        "280",
+        "trap 2",
+        "map"
+      ],
+      "a": "A farm circle is about 800 m across. At NISAR's 10 m science resolution it is clear; on a 280 m map tile, the sharpest NISAR tiles that work, it is a blur of about three pixels (trap 2).",
+      "used": "Card: The field on a map tile · trap 2"
+    },
+    {
+      "id": "dark",
+      "q": "Is the dark desert water?",
+      "keywords": [
+        "dark",
+        "water",
+        "sand",
+        "desert",
+        "trap 11"
+      ],
+      "a": "No. A simple 'dark = water' rule would call 283.8 km² of this desert 'water'; it's smooth sand. Calm water and dry sand both send the beam away, so both look dark (trap 11).",
+      "used": "Card: Dark ground next to the farms · trap 11"
+    },
+    {
+      "id": "why",
+      "q": "Why did the farms stop?",
+      "keywords": [
+        "why",
+        "stop",
+        "stopped",
+        "who decided",
+        "abandoned",
+        "reason",
+        "blame",
+        "allowed",
+        "planted again"
+      ],
+      "a": "Radar can't say why any farm went quiet, or who decided it. It only shows whether a crop echo is there. Whether a quiet field will be planted again is also beyond what radar can prove.",
+      "used": "Verdict: what the radar can't prove"
+    },
+    {
+      "id": "passes",
+      "q": "Which passes were used?",
+      "keywords": [
+        "pass",
+        "used",
+        "interference",
+        "track"
+      ],
+      "a": "3 of 3 passes: 18 Jun, 16 Oct and 28 Oct 2026, NISAR GCOV track 056, ascending. The interference check found no patch over Al Ain on any pass.",
+      "used": "Measured: Passes used"
+    }
+  ]
+}
