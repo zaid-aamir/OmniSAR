@@ -9,10 +9,11 @@ import { trapChip, wireTrapChips } from './trapcard.js';
 import { mountMinigame } from './minigame.js';
 import { mountGraph } from './graph.js';
 import { openCustody } from './custody.js';
+import { recordCase } from './progress.js';
 
 const STEP_NAMES = {
   tip: 'The tip', choice: 'Your call', evidence: 'Sort the evidence', toggles: 'Interrogate',
-  graph: 'Cause and effect', verdict: 'Verdict', lesson: 'Radar lesson',
+  graph: 'Cause and effect', verdict: 'Verdict', lesson: 'What you learned',
 };
 
 // Source tag: cyan only for NISAR (a fixed data colour), plain for every other source
@@ -29,6 +30,27 @@ export function citationLinks(list) {
       ? `<a class="tag cite" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${text}</a>`
       : `<span class="tag cite">${text}</span>`;
   }).join('');
+}
+
+// Which traps this case put in the player's way, and how they did:
+//   caught = met it and never fell for it; fell = picked a trap answer or mis-sorted a trap card at least once
+export function trapSummary(mystery) {
+  const caught = new Set();
+  const fell = new Set();
+  for (const [cid, c] of Object.entries(mystery.data.choices)) {
+    c.options.forEach((o, i) => {
+      const t = o.trap ?? o.limit;
+      if (t == null || o.correct) return;
+      (mystery.tried.has(`choice:${cid}:${i}`) ? fell : caught).add(t);
+    });
+  }
+  for (const card of mystery.sortableCards()) {
+    if (card.bin !== 'trap') continue;
+    (mystery.tried.has(`card:${card.id}`) ? fell : caught).add(card.trap);
+  }
+  for (const t of fell) caught.delete(t);
+  const order = (a, b) => (typeof a === 'number' ? a : 99) - (typeof b === 'number' ? b : 99);
+  return { caught: [...caught].sort(order), fell: [...fell].sort(order) };
 }
 
 export function runWalkthrough(root, mystery, { onExit }) {
@@ -55,10 +77,14 @@ export function runWalkthrough(root, mystery, { onExit }) {
           : `<button class="primary-btn" id="wt-next" ${m.isStepDone() ? '' : 'disabled'}>Next →</button>`}
       </div>`;
 
-    root.querySelector('#wt-exit').addEventListener('click', onExit);
+    root.querySelector('#wt-exit').addEventListener('click', () => onExit());
     root.querySelector('#wt-back').addEventListener('click', () => { m.back(); render(); });
     root.querySelector('#wt-next')?.addEventListener('click', () => { m.next(); render(); });
-    root.querySelector('#wt-finish')?.addEventListener('click', onExit);
+    root.querySelector('#wt-finish')?.addEventListener('click', () => {
+      const s = trapSummary(m);
+      recordCase(m.info.id, { ...s, badge: m.numbers?.badge || null, lessons: m.data.lesson.points.map((p) => p.head) });
+      onExit({ finished: true });
+    });
 
     root.querySelectorAll('[data-choice]').forEach((btn) => btn.addEventListener('click', () => {
       lastAnswer[`choice:${btn.dataset.choice}`] = m.answerChoice(btn.dataset.choice, Number(btn.dataset.i));
@@ -172,11 +198,20 @@ export function runWalkthrough(root, mystery, { onExit }) {
       <p>${trapChip('who-why', 'Why not? Open the card')}</p>`;
   }
 
+  // "What you learned": the radar lesson, then every trap this case put in your way
   function renderLesson() {
     const l = mystery.data.lesson;
+    const s = trapSummary(mystery);
+    const chips = (list) => list.map((t) => trapChip(t, typeof t === 'number' ? `Trap #${t}` : 'What radar can’t prove')).join(' ');
     return `
-      <h2 class="wt-title">${esc(l.title)}</h2>
-      ${l.points.map((p) => `<h3 class="wt-sub">${esc(p.head)}</h3><p class="panel-text">${esc(p.text)}</p>`).join('')}`;
+      <h2 class="wt-title">What you learned</h2>
+      <p class="eyebrow">${esc(l.title)}</p>
+      ${l.points.map((p) => `<h3 class="wt-sub">${esc(p.head)}</h3><p class="panel-text">${esc(p.text)}</p>`).join('')}
+      <h3 class="wt-sub">Traps in this case</h3>
+      ${s.caught.length ? `<p class="panel-text"><span class="recap-ok">✓ Caught without falling for them:</span> ${chips(s.caught)}</p>` : ''}
+      ${s.fell.length ? `<p class="panel-text"><span class="recap-bad">✗ Fooled you once (now you know):</span> ${chips(s.fell)}</p>` : ''}
+      ${!s.caught.length && !s.fell.length ? '<p class="panel-text">This case had no trap questions.</p>' : ''}
+      <p class="evidence-caption">Press “Finish case” to save this case to your investigation.</p>`;
   }
 
   render();

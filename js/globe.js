@@ -8,7 +8,9 @@ import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 const EARTH_RADIUS_M = 6371000;
 const BASE_DEPTH = 0.02;   // how far each block reaches below sea level (globe radius = 1)
-const GAP = 0.86;          // block width as a share of its cell: the 14% gap shows as a thin dark edge
+const GAP = 0.86;          // block width (east-west) as a share of its cell: the 14% gap shows as a thin dark edge
+const GAP_NS = 0.95;       // north-south the rows nearly touch: rows have different block counts, so wide gaps
+                           // between them looked like dark seam lines (polish list, 14 Nov)
 const SIDE_SHADE = 0.68;   // block sides are drawn this much darker than the top
 
 // Latitude/longitude (degrees) -> point in 3D. Every file uses this one function,
@@ -116,7 +118,7 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     const widthEast = THREE.MathUtils.degToRad(c.widthDeg) * Math.cos(THREE.MathUtils.degToRad(c.lat));
 
     m.makeBasis(east, up, third);                                // turn the box to face outward
-    m.scale(new THREE.Vector3(widthEast * GAP, top - bottom, cellRad * GAP));
+    m.scale(new THREE.Vector3(widthEast * GAP, top - bottom, cellRad * GAP_NS));
     m.setPosition(up.multiplyScalar((top + bottom) / 2));
     mesh.setMatrixAt(i, m);
 

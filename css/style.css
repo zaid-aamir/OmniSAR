@@ -123,6 +123,9 @@ body {
   font-size: 11px;
   color: var(--muted);
   pointer-events: none;
+  background: rgba(5, 7, 10, 0.72);     /* stays readable over bright blocks (polish list) */
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 
 /* ---------- Side panel (the mystery lives here) ---------- */
@@ -498,3 +501,30 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
 .custody-table td { padding: 3px 0; word-break: break-word; font-family: var(--font-data); }
 .custody-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
 .terrain-tip[hidden], .terrain-view[hidden] { display: none; }
+
+/* ---------- Recap and end screen ---------- */
+.recap-ok { color: var(--data-nisar); font-weight: 600; }
+.recap-bad { color: var(--ui-wrong, #e07a6a); font-weight: 600; }
+.solved { font: 11px var(--font-data); color: var(--data-nisar); margin-left: 4px; }
+.end-list { padding-left: 20px; margin: 14px 0; display: grid; gap: 10px; font-size: 14px; color: var(--text); }
+#end-btn, #reset-btn { margin-top: 10px; }
+
+/* ---------- Keyboard focus: always visible ---------- */
+.option:focus-visible, .ghost-btn:focus-visible, .primary-btn:focus-visible, .link-btn:focus-visible,
+.graph-node:focus-visible, .trap-chip:focus-visible, .case-row:focus-visible, .tl-btn:focus-visible,
+.toggle input:focus-visible, .sort-card:focus-visible, a.tag:focus-visible {
+  outline: 2px solid var(--data-nisar);
+  outline-offset: 2px;
+}
+
+/* ---------- Loading states ---------- */
+.loading-text { font: 12px var(--font-data); color: var(--muted); }
+.loading-text::after { content: ' …'; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+
+/* ---------- No sideways scrolling in the panel ---------- */
+/* Long source tags and "Filed: Trap #8 · …" lines used to push the panel wider than the screen. */
+.panel { overflow-x: hidden; }
+.sort-card, .evidence-card, .graph-detail, .facts dd { min-width: 0; overflow-wrap: anywhere; }
+.evidence-source .tag, .sort-filed, .sort-feedback { white-space: normal; overflow-wrap: anywhere; }
+.custody code, .custody td { overflow-wrap: anywhere; }

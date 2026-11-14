@@ -5,7 +5,7 @@
 // Charts are drawn from the case's numbers file (real values only). The rule "every hidden
 // node must be predicted before you can go on" lives in engine.js.
 
-import { esc } from './util.js';
+import { esc, focusKey, restoreFocus } from './util.js';
 import { citationLinks, sourceTag } from './walkthrough.js';
 
 function get(obj, path) {
@@ -98,6 +98,7 @@ export function mountGraph(host, mystery, { onChange }) {
   }
 
   function render() {
+    const key = focusKey(host);            // keep keyboard focus where it was (see util.js)
     const W = 320, step = 92, H = nodes.length * step;
     const pos = Object.fromEntries(nodes.map((n, i) => [n.id, { x: W / 2, y: 40 + i * step }]));
     host.innerHTML = `
@@ -123,6 +124,7 @@ export function mountGraph(host, mystery, { onChange }) {
       replies[b.dataset.node] = mystery.answerNode(b.dataset.node, Number(b.dataset.i));
       render();
     }));
+    restoreFocus(host, key, `[data-pick="${CSS.escape(selected || '')}"]`);
     onChange?.();
   }
 

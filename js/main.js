@@ -109,8 +109,21 @@ async function start() {
       panel.note('This mystery’s case file is still being written.');
       return;
     }
-    const mystery = await loadMystery(c);
-    runWalkthrough(panel.root, mystery, { onExit: () => { showGlobe(); panel.showCase(c); } });
+    // loading state: the button says what's happening, and a failure is said plainly
+    const btn = panel.root.querySelector('#open-btn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '<span class="loading-text">Opening case file</span>'; }
+    let mystery;
+    try {
+      mystery = await loadMystery(c);
+    } catch (err) {
+      console.error(err);
+      if (btn) { btn.disabled = false; btn.textContent = 'Open mystery'; }
+      panel.note('This case file could not be loaded. Check your connection and try again.');
+      return;
+    }
+    runWalkthrough(panel.root, mystery, {
+      onExit: (how) => { showGlobe(); if (how?.finished && panel.allDone()) panel.showEnd(); else panel.showCase(c); },
+    });
     // Opening a case moves the view down to its blocky terrain, if the case has a grid yet
     const opened = await terrain.open(c, mystery.numbers?.files?.grid, { onBackToGlobe: showGlobe });
     if (opened) globe.setPaused(true);

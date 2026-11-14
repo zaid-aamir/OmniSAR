@@ -6,6 +6,7 @@
 import { STATUS_TEXT } from './cases.js';
 import { esc } from './util.js';
 import { trapChip, wireTrapChips } from './trapcard.js';
+import { caseProgress, finishedCount, resetProgress } from './progress.js';
 
 export function statusChip(status) {
   return `<span class="status status-${status}">${esc(STATUS_TEXT[status] || status)}</span>`;
@@ -13,7 +14,9 @@ export function statusChip(status) {
 
 export function createPanel(root, cases, { onPick, onBack, onOpen }) {
   let tipCount = 0;
+  const ids = cases.map((c) => c.id);
   function showHome() {
+    const done = finishedCount(ids);
     root.innerHTML = `
       <p class="eyebrow">Case files</p>
       <h1 class="panel-title">Pick a mystery on the globe</h1>
@@ -27,15 +30,49 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
             <button class="case-row" data-id="${esc(c.id)}">
               <span class="case-num">${i + 1}</span>
               <span class="case-row-text">
-                <span class="case-row-name">${esc(c.name)} ${statusChip(c.status)}</span>
+                <span class="case-row-name">${esc(c.name)} ${statusChip(c.status)}${caseProgress(c.id)?.done ? ' <span class="solved">✓ solved</span>' : ''}</span>
                 <span class="case-row-q">${esc(c.question)}</span>
               </span>
             </button>
           </li>`).join('')}
       </ol>
+      ${done ? `<p class="panel-note">${done} of ${cases.length} cases solved.</p>
+        <button class="${done === cases.length ? 'primary-btn' : 'ghost-btn'}" id="end-btn">${done === cases.length ? 'Your investigation: all five solved' : 'Your investigation so far'}</button>` : ''}
       ${tipCount ? `<p class="panel-note">Grey columns are ${tipCount} unverified tips: natural events from NASA EONET (fires, floods, storms, volcanoes), 1 Jun – 10 Nov 2026. They appear as the timeline reaches their dates. Nobody has checked them with radar.</p>` : ''}`;
     root.querySelectorAll('.case-row').forEach((btn) =>
       btn.addEventListener('click', () => onPick(btn.dataset.id)));
+    root.querySelector('#end-btn')?.addEventListener('click', showEnd);
+  }
+
+  // End screen: every finished case with its badge, the lessons and the traps the player met
+  function showEnd() {
+    const done = cases.filter((c) => caseProgress(c.id)?.done);
+    const caught = new Set(done.flatMap((c) => caseProgress(c.id).caught || []));
+    const fell = new Set(done.flatMap((c) => caseProgress(c.id).fell || []));
+    for (const t of fell) caught.delete(t);
+    const chips = (list) => [...list].map((t) => trapChip(t, typeof t === 'number' ? `#${t}` : 'Limits')).join(' ');
+    root.innerHTML = `
+      <button class="link-btn" id="back-btn">← Back to globe</button>
+      <p class="eyebrow">Your investigation</p>
+      <h1 class="panel-title">${done.length === cases.length ? 'All five cases solved' : `${done.length} of ${cases.length} cases solved`}</h1>
+      <p class="panel-text">You met ${caught.size + fell.size} different traps and caught ${caught.size} of them without falling for them.
+        OmniSAR has ${17} numbered traps in all; each card says how we proved it with real data.</p>
+      ${caught.size ? `<p class="panel-text"><span class="recap-ok">✓ Caught:</span> ${chips(caught)}</p>` : ''}
+      ${fell.size ? `<p class="panel-text"><span class="recap-bad">✗ Fooled you once:</span> ${chips(fell)}</p>` : ''}
+      <ol class="end-list">
+        ${cases.map((c) => {
+          const p = caseProgress(c.id);
+          return `<li><strong>${esc(c.name)}</strong> ${p?.done ? `<span class="tag tag-nisar">Evidence: ${esc(p.badge || 'pending')}</span>` : '<span class="pending-text">not solved yet</span>'}
+            ${p?.done ? `<br><span class="evidence-caption">Learned: ${p.lessons.map(esc).join(' · ')}</span>` : ''}</li>`;
+        }).join('')}
+      </ol>
+      <h3 class="wt-sub">What radar can't prove, in every case</h3>
+      <p class="panel-text">Who did something, why, whether it was allowed, or what will happen next. Radar measures how the ground scatters microwaves and how it moves. ${trapChip('who-why', 'Open the card')}</p>
+      <button class="ghost-btn" id="reset-btn">Start again (clear progress)</button>`;
+    root.querySelector('#back-btn').addEventListener('click', onBack);
+    root.querySelector('#reset-btn').addEventListener('click', () => { resetProgress(); showHome(); });
+    wireTrapChips(root);
+    root.closest('.panel')?.scrollTo({ top: 0 });       // a new view always starts at its top
   }
 
   function showCase(c) {
@@ -63,6 +100,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
     root.querySelector('#back-btn').addEventListener('click', onBack);
     root.querySelector('#open-btn').addEventListener('click', () => onOpen(c.id));
     wireTrapChips(root);
+    root.closest('.panel')?.scrollTo({ top: 0 });
   }
 
   // An unverified tip from NASA EONET: title, date, source links, and a clear "no check yet"
@@ -81,6 +119,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
       <p class="panel-text">${t.sources.filter((s) => /^https:\/\//.test(s.url)).map((s) => `<a class="tag cite" href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">Source: ${esc(s.id)}</a>`).join(' ')}
         ${/^https:\/\//.test(t.link || '') ? `<a class="tag cite" href="${esc(t.link)}" target="_blank" rel="noopener noreferrer">EONET record</a>` : ''}</p>`;
     root.querySelector('#back-btn').addEventListener('click', onBack);
+    root.closest('.panel')?.scrollTo({ top: 0 });
   }
 
   function setTipCount(n) {
@@ -94,5 +133,5 @@ export function createPanel(root, cases, { onPick, onBack, onOpen }) {
   }
 
   showHome();
-  return { showHome, showCase, showTip, setTipCount, note, root };
+  return { showHome, showCase, showTip, showEnd, setTipCount, note, allDone: () => finishedCount(ids) === ids.length, root };
 }

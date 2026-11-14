@@ -7,7 +7,7 @@
 // from our numbers. Cards whose evidence doesn't exist yet show "Evidence pending" and are
 // not part of the game. The rules and the score live in engine.js.
 
-import { esc } from './util.js';
+import { esc, focusKey, restoreFocus } from './util.js';
 import { loadTraps, openTrap } from './trapcard.js';
 
 export async function mountMinigame(host, mystery, { onChange }) {
@@ -45,6 +45,7 @@ export async function mountMinigame(host, mystery, { onChange }) {
   }
 
   function render() {
+    const key = focusKey(host);            // keep keyboard focus where it was (see util.js)
     const s = mystery.cardScore();
     host.innerHTML = `
       <div class="sort-bins">
@@ -57,7 +58,11 @@ export async function mountMinigame(host, mystery, { onChange }) {
         <h3 class="wt-sub">Not in the game yet</h3>
         ${pending.map((e) => `<article class="evidence-card"><h3>${esc(e.title)}</h3><div class="pending-box">Evidence pending</div><p class="evidence-caption">${esc(e.caption)}</p></article>`).join('')}` : ''}`;
     wire();
-    onChange?.();
+    onChange?.();                          // first, so "Next" is enabled before we may focus it
+    // if the focused button vanished (card filed), go to the next card that still needs sorting;
+    // when every card is filed, go to the "Next" button
+    restoreFocus(host, key, '.sort-card:not(.is-filed) [data-sort]');
+    if (key && !host.contains(document.activeElement)) document.getElementById('wt-next')?.focus();
   }
 
   function sort(id, bin) {

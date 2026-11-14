@@ -41,6 +41,8 @@ export function createCaseTerrain(container) {
   const view = document.createElement('div');
   view.className = 'terrain-view';
   view.hidden = true;
+  view.tabIndex = 0;                       // focusable, so the arrow keys can step through layers
+  view.setAttribute('aria-label', 'Case terrain: arrow keys change the layer');
   view.innerHTML = `
     <div class="terrain-hud terrain-top">
       <div>
@@ -193,7 +195,16 @@ export function createCaseTerrain(container) {
     // Show a case's terrain. Returns false if the case has no grid yet (globe stays).
     async open(caseInfo, gridPath, { onBackToGlobe } = {}) {
       if (!gridPath) return false;
-      grid = await fetch(gridPath).then((r) => r.json());
+      view.hidden = false;                                   // show the view at once, with a loading line
+      $('tv-case').textContent = `${caseInfo.name} · case terrain`;
+      $('tv-layer').innerHTML = '<span class="loading-text">Loading case terrain</span>';
+      try {
+        grid = await fetch(gridPath).then((r) => r.json());
+      } catch (err) {
+        console.error(err);
+        view.hidden = true;
+        return false;
+      }
       layerIndex = Math.max(0, grid.layers.findIndex((l) => l.id === grid.default_layer));
       onGlobe = onBackToGlobe;
       $('tv-case').textContent = `${caseInfo.name} · case terrain`;
