@@ -153,6 +153,22 @@ def label_clusters(flag):
     return clusters
 
 
+def clean_json(obj):
+    """Make data safe for JSON that browsers can read: NaN and infinity become null (None),
+    numpy numbers become plain numbers. Python would otherwise write 'NaN', which isn't JSON."""
+    if isinstance(obj, dict):
+        return {k: clean_json(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple)):
+        return [clean_json(v) for v in obj]
+    if isinstance(obj, (np.floating, float)):
+        return None if not math.isfinite(float(obj)) else float(obj)
+    if isinstance(obj, np.integer):
+        return int(obj)
+    if isinstance(obj, np.bool_):
+        return bool(obj)
+    return obj
+
+
 GIBS_WMS = "https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi"
 
 

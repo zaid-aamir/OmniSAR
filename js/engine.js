@@ -3,6 +3,8 @@
 // the game live in one place:
 //   - the steps run in the order the case file lists them
 //   - a "choice" step is done once the player has picked the correct option
+//   - an "evidence" step (the sorting game) is done once every card that has real evidence is
+//     filed correctly (and, for a trap, named correctly); cards still pending are not in the game
 //   - a "graph" step is done once every hidden node has been predicted correctly
 //   - the player can't go forward until the current step is done
 //   - the verdict uses the case's numbers file ONLY if results.json lists it;
@@ -39,6 +41,7 @@ class Mystery {
 
   isStepDone(step = this.step) {
     if (step.type === 'choice') return this.solved.has(`choice:${step.choice}`);
+    if (step.type === 'evidence') return this.sortableCards().every((c) => this.isCardSolved(c.id));
     if (step.type === 'graph') return this.hiddenNodes().every((n) => this.solved.has(`node:${n.id}`));
     return true;   // reading steps are done as soon as you've seen them
   }
@@ -58,6 +61,34 @@ class Mystery {
     if (option.correct) this.solved.add(`node:${nodeId}`);
     else this.tried.add(`node:${nodeId}:${i}`);
     return option;
+  }
+
+  // ---------- evidence-sorting game ----------
+  // A card is in the game only if its evidence exists (an image or a data file) and isn't pending.
+  sortableCards() {
+    return this.data.evidence.filter((e) => !e.pending && e.src && (e.bin === 'real' || e.bin === 'trap'));
+  }
+
+  isCardSolved(id) { return this.solved.has(`card:${id}`); }
+
+  // Player files card `id` in bin 'real' or 'trap'; for a trap, trapId is the trap they named
+  // (null while they haven't named it yet). Score = cards filed right on the first attempt.
+  answerCard(id, bin, trapId) {
+    const card = this.data.evidence.find((e) => e.id === id);
+    const binRight = card.bin === bin;
+    const correct = binRight && (bin === 'real' || trapId === card.trap);
+    if (correct) this.solved.add(`card:${id}`);
+    else this.tried.add(`card:${id}`);
+    return { correct, binRight };
+  }
+
+  cardScore() {
+    const cards = this.sortableCards();
+    return {
+      total: cards.length,
+      filed: cards.filter((c) => this.isCardSolved(c.id)).length,
+      firstTry: cards.filter((c) => this.isCardSolved(c.id) && !this.tried.has(`card:${c.id}`)).length,
+    };
   }
 
   next() {

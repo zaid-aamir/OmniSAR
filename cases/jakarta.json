@@ -1,0 +1,415 @@
+{
+  "id": "jakarta",
+  "format": 1,
+  "about": "Mystery file for Jakarta. The question, place and box live in cases/index.json. All text is pre-written; every choice has its own reply. Evidence images, their captions' numbers and each card's correct answer are filled in by tools/process_jakarta.py from our analysis.",
+  "numbersFile": "cases/jakarta.numbers.json",
+  "tip": {
+    "title": "A city that may be moving",
+    "text": [
+      "NISAR flew over Jakarta every 12 days from late June to October 2026, once going north before dawn and once going south in the evening.",
+      "By comparing the radar wave's phase between two passes, it can measure ground movement of a few millimetres. But the same signal also passes through wet tropical air.",
+      "Your question: is the ground really dropping, or is it the air?"
+    ]
+  },
+  "steps": [
+    {
+      "type": "tip"
+    },
+    {
+      "type": "choice",
+      "choice": "phase"
+    },
+    {
+      "type": "choice",
+      "choice": "smooth-slope"
+    },
+    {
+      "type": "evidence",
+      "title": "Sort the evidence",
+      "text": "Each card is a real exhibit from our processing of NASA's files. Is it a real ground change, or a trap? If it's a trap, name it."
+    },
+    {
+      "type": "choice",
+      "choice": "blank-areas"
+    },
+    {
+      "type": "toggles",
+      "title": "Interrogate the evidence",
+      "text": "Each switch shows the same data processed two ways, so you can see what each step changes."
+    },
+    {
+      "type": "graph",
+      "title": "Cause and effect",
+      "text": "Fill in the hidden links. Each link is either measured by a satellite or comes from published sources."
+    },
+    {
+      "type": "choice",
+      "choice": "what-can-we-say"
+    },
+    {
+      "type": "verdict"
+    },
+    {
+      "type": "lesson"
+    }
+  ],
+  "choices": {
+    "phase": {
+      "prompt": "NISAR's wavelength is 24 cm. Between two passes, the phase at one spot changes by half a cycle. How far did that spot move towards or away from the radar?",
+      "options": [
+        {
+          "text": "About 24 cm: one wavelength.",
+          "correct": false,
+          "reply": "Not quite. The wave travels to the ground AND back, so every centimetre the ground moves changes the path by two centimetres. A full cycle is only half a wavelength of movement: 12 cm. Half a cycle is about 6 cm."
+        },
+        {
+          "text": "About 12 cm: half a wavelength.",
+          "correct": false,
+          "reply": "Close, but that is a FULL cycle. Because the wave goes there and back, one full cycle of phase means 12 cm of movement along the line of sight. Half a cycle is half that: about 6 cm."
+        },
+        {
+          "text": "About 6 cm: a quarter of a wavelength.",
+          "correct": true,
+          "reply": "Right. The wave makes a round trip, so movement = phase × wavelength ÷ 4π. One full cycle (2π) is 12 cm along the line of sight; half a cycle is about 6 cm."
+        }
+      ]
+    },
+    "smooth-slope": {
+      "prompt": "In one raw pair, the 'motion' slopes smoothly across the whole city, from one side to the other. What is it most likely to be?",
+      "options": [
+        {
+          "text": "The whole city tilting.",
+          "correct": false,
+          "trap": 15,
+          "reply": "Cities don't tilt as one smooth sheet in 12 days. A smooth slope across tens of kilometres is the classic sign of the air: water vapour and the charged upper atmosphere slow the wave by different amounts across the scene."
+        },
+        {
+          "text": "The air: humid air and the ionosphere delay the signal by different amounts across the scene.",
+          "correct": true,
+          "reply": "Yes. NASA stores estimates of both delays in each file but doesn't apply them. We subtract them before measuring anything; you can switch that on and off later."
+        },
+        {
+          "text": "Sea level rising.",
+          "correct": false,
+          "trap": 16,
+          "reply": "Sea level rises by millimetres per year, and it doesn't change the height of the land the radar is looking at. It can't make a slope across a whole city in 12 days."
+        }
+      ]
+    },
+    "blank-areas": {
+      "prompt": "Jakarta Bay, some fields and building sites are blank in the motion map. Why?",
+      "options": [
+        {
+          "text": "Nothing moved there.",
+          "correct": false,
+          "trap": 15,
+          "reply": "Blank isn't 'no motion'. It means we couldn't measure: water, crops and construction change so much between passes that the phase becomes random noise."
+        },
+        {
+          "text": "The surface changed too much between passes (low coherence), so the phase there is noise and we hide it.",
+          "correct": true,
+          "reply": "Right. Coherence measures how similar the radar echo stayed. Below 0.4 we don't trust the phase, so those pixels are masked rather than turned into fake motion."
+        },
+        {
+          "text": "NASA deleted that part of the data.",
+          "correct": false,
+          "trap": 14,
+          "reply": "The data is there; it just isn't trustworthy. We hide it on purpose, because random phase would look like random motion."
+        }
+      ]
+    },
+    "what-can-we-say": {
+      "prompt": "Some districts moved down relative to central Jakarta during these months. What can you say?",
+      "options": [
+        {
+          "text": "Jakarta will be underwater by 2030.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "That's a forecast, and a few months of radar can't support it. These measurements say how the ground moved between June and October 2026, not what will happen next."
+        },
+        {
+          "text": "A specific factory caused this.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "Radar can't see who or why. It measures movement, not causes. Naming a company goes beyond the evidence."
+        },
+        {
+          "text": "Parts of the city moved down by the amounts we measured, relative to central Jakarta. How sure we are depends on the checks, and the cause has to come from other sources.",
+          "correct": true,
+          "reply": "Exactly as far as the evidence goes. The numbers are relative to our reference area, their strength depends on the two-direction check, and the 'why' comes from published studies, not from the radar."
+        }
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "id": "raw-pair",
+      "title": "One pair, straight from NASA's file",
+      "kind": "image",
+      "src": "assets/cases/jakarta/ev-atmosphere.png",
+      "caption": "One pair, 26 Jun to 8 Jul, as NASA ships it (left) and after we subtract the ionosphere and troposphere (right). Across our pairs, humid air alone shifts the signal by 6-31 mm across the box.",
+      "source": "NISAR GUNW, ascending track 010",
+      "bin": "trap",
+      "trap": 15
+    },
+    {
+      "id": "motion",
+      "title": "Motion after corrections, 8 pairs chained",
+      "kind": "image",
+      "src": "assets/cases/jakarta/motion_overlay.png",
+      "caption": "Ground motion after corrections, all 8 ascending pairs chained (108 days). 6.6 km² of land moved down 30 mm or more (blue), relative to central Jakarta.",
+      "source": "NISAR GUNW, ascending track 010",
+      "bin": "real",
+      "trap": null
+    },
+    {
+      "id": "coherence",
+      "title": "The coherence map",
+      "kind": "image",
+      "src": "assets/cases/jakarta/ev-coherence.png",
+      "caption": "Where coherence is below 0.4 (the bay, fields, building sites) the phase is noise. Only 63% of this pair's box passes; we mask the rest.",
+      "source": "NISAR GUNW, ascending track 010",
+      "bin": "trap",
+      "trap": 15
+    },
+    {
+      "id": "two-directions",
+      "title": "Ascending vs descending",
+      "kind": "image",
+      "src": "assets/cases/jakarta/ev-asc-desc.png",
+      "caption": "The descending frame we have covers only part of the box and is mostly incoherent there, so the second direction can't be used yet: a file problem, not a ground signal.",
+      "source": "NISAR GUNW, tracks 010 and 018",
+      "bin": "trap",
+      "trap": 14
+    },
+    {
+      "id": "gap",
+      "title": "Two weeks with no data",
+      "kind": "image",
+      "src": "assets/cases/jakarta/ev-gap.png",
+      "caption": "NASA has no data from 27 Jul to 10 Aug 2026. A chain of only 12-day pairs would break here; the 24-day pairs bridge it.",
+      "source": "NASA CMR file catalogue",
+      "bin": "trap",
+      "trap": 14
+    },
+    {
+      "id": "sea-level",
+      "title": "Can we see the sea rising?",
+      "kind": "image",
+      "src": "assets/cases/jakarta/ev-noise.png",
+      "caption": "In each 12-day pair the air alone moves the signal by up to 31 mm across the box. Sea-level rise over the same months is around a millimetre (citation pending): far too small to see this way.",
+      "source": "NISAR GUNW correction layers",
+      "bin": "trap",
+      "trap": 16
+    }
+  ],
+  "toggles": [
+    {
+      "id": "atmosphere",
+      "label": "Atmosphere corrections off ↔ on",
+      "trap": 15,
+      "layers": {
+        "off": {
+          "src": "assets/cases/jakarta/tg-atm-off.png",
+          "label": "Corrections off"
+        },
+        "on": {
+          "src": "assets/cases/jakarta/tg-atm-on.png",
+          "label": "Ionosphere + troposphere subtracted"
+        }
+      },
+      "disabled": null,
+      "explains": "Off: the phase as NASA ships it. On: we subtract NASA's ionosphere and troposphere estimates. The smooth slope across the city mostly disappears."
+    },
+    {
+      "id": "mask",
+      "label": "Coherence mask off ↔ on",
+      "trap": 15,
+      "layers": {
+        "off": {
+          "src": "assets/cases/jakarta/tg-mask-off.png",
+          "label": "No coherence mask"
+        },
+        "on": {
+          "src": "assets/cases/jakarta/tg-mask-on.png",
+          "label": "Coherence 0.4 or more only"
+        }
+      },
+      "disabled": null,
+      "explains": "Off: every pixel, including water and fields where the phase is noise. On: only pixels with coherence of 0.4 or more."
+    },
+    {
+      "id": "chain",
+      "label": "One pair ↔ All pairs chained",
+      "trap": 14,
+      "layers": {
+        "off": {
+          "src": "assets/cases/jakarta/tg-pair.png",
+          "label": "One 12-day pair"
+        },
+        "on": {
+          "src": "assets/cases/jakarta/tg-chain.png",
+          "label": "All pairs chained"
+        }
+      },
+      "disabled": null,
+      "explains": "One 12-day pair shows mostly noise. Adding the pairs date by date lets steady motion build up while random air effects partly cancel."
+    },
+    {
+      "id": "direction",
+      "label": "Ascending ↔ Descending",
+      "trap": 7,
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off: the descending frame we have (018/091) covers only part of the box and is mostly incoherent there. The frame that covers it (092) is still downloading.",
+      "explains": "Two directions, two times of day, different air. If both see the same districts sinking, the motion is in the ground."
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "pumping",
+        "label": "Groundwater pumped from under the city",
+        "detail": "Published studies link Jakarta's sinking to groundwater being pumped out faster than it refills. Radar can't see this; it comes from other sources.",
+        "source": "Published sources",
+        "basis": "published",
+        "citation": [],
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": "From published sources"
+        }
+      },
+      {
+        "id": "compaction",
+        "label": "Soft ground squeezes together",
+        "detail": "As water leaves the soft clay layers, they compact and the surface above drops. Also from published sources, not measured by us.",
+        "source": "Published sources",
+        "basis": "published",
+        "citation": [],
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": "From published sources"
+        }
+      },
+      {
+        "id": "insar",
+        "label": "Ground moves away from the radar",
+        "detail": "Measured by NISAR interferograms: the phase change between passes, corrected for the air, chained over 108 days.",
+        "source": "NISAR L-band GUNW (interferograms)",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "If the ground under part of the city drops, what should NISAR measure there, pair after pair?",
+        "options": [
+          {
+            "text": "The distance to the radar grows a little every pair",
+            "correct": true,
+            "reply": "Yes. Sinking ground moves away from the satellite, so the path gets longer and the phase keeps changing in the same direction. Chained together, those small steps add up."
+          },
+          {
+            "text": "The ground gets brighter",
+            "correct": false,
+            "reply": "Brightness is about how rough or built-up the surface is, not its height. Sinking is measured with phase, not brightness."
+          },
+          {
+            "text": "Nothing: radar can't see a few centimetres",
+            "correct": false,
+            "reply": "It can. Phase measures the round-trip path to a fraction of the 24 cm wavelength, so millimetres to centimetres show up, if the air is corrected and the surface stays coherent."
+          }
+        ],
+        "opens": {
+          "layer": "assets/cases/jakarta/motion_overlay.png",
+          "chart": {
+            "title": "Fastest-sinking 2 km district: motion since 26 Jun",
+            "path": "results.fastest_district.series.ascending",
+            "x": "date",
+            "y": "mm",
+            "label": "Ascending",
+            "unit": "mm",
+            "zero": true
+          },
+          "badge": "numbers"
+        }
+      },
+      {
+        "id": "lowland",
+        "label": "Much of that land is under 10 m",
+        "detail": "Measured from AWS Terrarium elevation (a surface model, so buildings can add height). Low land matters because every centimetre of sinking brings it closer to sea level.",
+        "source": "AWS Terrarium elevation (SRTM-based)",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "Why does it matter whether the sinking land is low-lying?",
+        "options": [
+          {
+            "text": "Low land near the sea has the least height to lose before water reaches it",
+            "correct": true,
+            "reply": "Right. The same few centimetres matter much more on land just above sea level than on a hill."
+          },
+          {
+            "text": "Low land always sinks faster",
+            "correct": false,
+            "reply": "Height doesn't cause sinking; the soil and the water underneath do. Low land just has less margin."
+          },
+          {
+            "text": "It doesn't matter",
+            "correct": false,
+            "reply": "It does: on land a few metres above the sea, centimetres add up to flood risk over years. (That's a reason to watch, not a forecast.)"
+          }
+        ],
+        "opens": {
+          "layer": "assets/cases/jakarta/ev-lowland.png",
+          "chart": null,
+          "badge": "AWS Terrarium"
+        }
+      }
+    ],
+    "edges": [
+      [
+        "pumping",
+        "compaction"
+      ],
+      [
+        "compaction",
+        "insar"
+      ],
+      [
+        "insar",
+        "lowland"
+      ]
+    ]
+  },
+  "verdict": {
+    "pending": "Evidence pending — this case's measurements are being processed.",
+    "cantProve": [
+      "Who or what caused the sinking: that comes from published studies (citation pending).",
+      "What will happen to Jakarta in the future.",
+      "Absolute movement: our numbers are relative to central Jakarta, which may itself be moving."
+    ]
+  },
+  "lesson": {
+    "title": "What this case teaches about radar",
+    "points": [
+      {
+        "head": "Phase",
+        "text": "Besides brightness, a radar echo has a phase: where in its wave cycle it arrives. Compare two passes and the change in phase tells you how much the round-trip distance changed."
+      },
+      {
+        "head": "From phase to millimetres",
+        "text": "Movement = phase × wavelength ÷ 4π. NISAR's L-band wavelength is about 24 cm, so one full cycle is about 12 cm of movement along the radar's line of sight."
+      },
+      {
+        "head": "Coherence",
+        "text": "Phase only means something where the surface stays similar between passes. Water, crops and building sites scramble it, so we mask anything below 0.4 coherence instead of inventing motion."
+      },
+      {
+        "head": "Two directions",
+        "text": "The air delays the signal differently at dawn and at dusk. If ascending (dawn) and descending (dusk) passes both see the same districts sinking, the motion is in the ground."
+      }
+    ]
+  }
+}

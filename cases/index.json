@@ -44,7 +44,7 @@
       "centre": [-6.11, 106.85],
       "box": [106.70, -6.20, 107.00, -6.05],
       "question": "Is the ground really dropping, or is it the air?",
-      "mysteryFile": null,
+      "mysteryFile": "cases/jakarta.json",
       "numbersFile": "cases/jakarta.numbers.json"
     },
     {

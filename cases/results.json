@@ -1,7 +1,8 @@
 {
   "about": "Cases whose numbers file exists. Written by tools/update_results.py - do not edit by hand.",
-  "generated": "2026-11-13T23:47Z",
+  "generated": "2026-11-14T00:26Z",
   "measured": {
+    "jakarta": "cases/jakarta.numbers.json",
     "jebel-ali": "cases/jebel-ali.numbers.json"
   }
 }

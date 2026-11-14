@@ -1,12 +1,12 @@
 {
  "case": "jebel-ali",
- "generated": "2026-11-13T23:47Z",
+ "generated": "2026-11-14T00:15Z",
  "measured": [
   {
-   "label": "Candidate new structures (HH rose ≥ 3 dB)",
-   "value": 275.8,
-   "unit": "ha",
-   "note": "in 108 patches of 1 ha or more — candidates only: the radar quality check failed (below), so some may be interference, not change"
+   "label": "New structures",
+   "value": "not reliable yet",
+   "unit": "",
+   "note": "The 28 Oct pass is contaminated by interference, most likely radio interference (box HH +6.3 dB while the frame moved +0.1 dB). A radar-only area isn't reliable yet; a median of three passes per side is pending."
   },
   {
    "label": "Water ↔ land",
@@ -22,9 +22,9 @@
   },
   {
    "label": "Interference check",
-   "value": "anomaly found",
+   "value": "1 of 1 passes flagged",
    "unit": "",
-   "note": "On 2026-10-28 our box is +6.3 dB brighter in HH while the whole frame moved +0.1 dB: a broad bright patch over Dubai. We use HH only and remove each date's smooth background."
+   "note": "28 Oct: box HH +6.3 dB vs whole frame +0.1 dB (compared with 18 Jun). We use HH only and remove each date's smooth background."
   },
   {
    "label": "Radar quality check",
@@ -43,8 +43,16 @@
   "NISAR_L2_PR_GCOV_023_056_A_014_4005_DHDH_A_20260618T014305_20260618T014336_P05023_N_F_J_001.h5",
   "NISAR_L2_PR_GCOV_034_056_A_014_4005_DHDH_A_20261028T014300_20261028T014333_P05036_N_F_J_001.h5"
  ],
+ "custody_extra": [
+  {
+   "label": "Contaminated candidate area",
+   "value": 275.8,
+   "unit": "ha",
+   "note": "pixels where HH rose >= 3 dB, in 108 patches >= 1 ha; not shown in the verdict because the radar quality check failed"
+  }
+ ],
  "method": {
-  "declared": "2026-11-14T03:55+04:00, before any change map was computed",
+  "declared": "2026-11-14T03:33+04:00, before any change map was computed (first run 03:39)",
   "inputs": "NISAR L2 GCOV, track 056, ascending, frame 014, mode 4005 (10 m), finished files only",
   "before_window": [
    "2026-06-18",
@@ -127,6 +135,22 @@
    "water-to-land": 0.0,
    "land-to-water": 0.0
   },
+  "area_shown_in_verdict": false,
+  "contaminated_candidate_area_ha": 275.8,
+  "pass_medians": [
+   {
+    "date": "2026-06-18",
+    "side": "before",
+    "hh_box_median_db": -10.8,
+    "hv_box_median_db": -11.2
+   },
+   {
+    "date": "2026-10-28",
+    "side": "after",
+    "hh_box_median_db": -4.53,
+    "hv_box_median_db": -12.61
+   }
+  ],
   "area_ha_before_cluster_filter": {
    "new-structures": 1232.9,
    "water-to-land": 0.0,
@@ -518,8 +542,8 @@
    ]
   },
   "script": "tools/process_jebel_ali.py",
-  "script_version": "1.0",
-  "script_sha256": "4d34da92d39c5d3f3362d3ab911640a5c35ec137a61bd148a3ab0a2bf67751f7",
+  "script_version": "1.1",
+  "script_sha256": "db1f0c85fd36d5c392bbe94aa892a86adc8fdd085f4c7fd5ccf23ceda3d0c7c6",
   "helpers_sha256": "e71f9a96fa177aa4f9713fe60baf672f78d8f36e9a49d88865eeb72d77992bf9"
  }
 }

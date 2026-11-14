@@ -7,7 +7,8 @@
   },
   "traps": [
     {
-      "id": 1, "bucket": "data",
+      "id": 1,
+      "bucket": "data",
       "title": "Raw NISAR files are huge, in a science format, behind a login",
       "fools": "You expect to open a picture. Instead each file is hundreds of MB to several GB of HDF5, and downloading needs a NASA Earthdata login.",
       "proof": "The official radar image files we use are about 5 GB each; interferogram files are 2–2.5 GB.",
@@ -15,15 +16,17 @@
       "inApp": true
     },
     {
-      "id": 2, "bucket": "data",
+      "id": 2,
+      "bucket": "data",
       "title": "NASA's NISAR map tiles break at close zoom",
       "fools": "Zoom in past level 9 (about 280 m pixels) and the tile server sends random garbage or errors that look like real detail.",
-      "proof": "The same tile address returned 4 different images in 5 requests at zoom 10, from two different networks.",
-      "handling": "NISAR map tiles are used only up to zoom 9. Closer than that, the map hands over to Sentinel-1 (30 m) with a visible source badge.",
-      "inApp": false
+      "proof": "We asked NASA's server for the same zoom-10 NISAR tile 5 times on 14 Nov 2026 and got 4 different images back (on 13 Nov: 4 different images in 5 requests, from two networks).",
+      "handling": "OmniSAR never takes a number from NISAR map tiles: every value comes from the science files. Sharper views use other satellites, always labelled.",
+      "inApp": true
     },
     {
-      "id": 3, "bucket": "data",
+      "id": 3,
+      "bucket": "data",
       "title": "Published date lists lag behind reality",
       "fools": "The server's list of available dates stopped at 23 Oct, so you would think there was no newer data.",
       "proof": "Tiles for 28–29 Oct existed and loaded even though the list didn't include them.",
@@ -31,7 +34,8 @@
       "inApp": true
     },
     {
-      "id": 4, "bucket": "data",
+      "id": 4,
+      "bucket": "data",
       "title": "The colour meaning isn't written on the map",
       "fools": "The NISAR map is in false colour, but the map server doesn't say what the colours mean.",
       "proof": "It is in ASF's NISAR documentation: red and blue show HH (the direct echo), green shows HV (the plant-and-roughness echo).",
@@ -39,7 +43,8 @@
       "inApp": false
     },
     {
-      "id": 5, "bucket": "artefacts",
+      "id": 5,
+      "bucket": "artefacts",
       "title": "Most dates are blank",
       "fools": "NISAR images strips of the Earth, so on most days there is simply no image of your place. A blank day is not a 'no change' day.",
       "proof": "Scanning every date from Oct 2025 to Nov 2026 for four UAE points found images only every 12 days or so.",
@@ -47,7 +52,8 @@
       "inApp": true
     },
     {
-      "id": 6, "bucket": "artefacts",
+      "id": 6,
+      "bucket": "artefacts",
       "title": "No NISAR data over the UAE before 18 June 2026",
       "fools": "With no radar images before June, it's tempting to treat the area as 'empty' or unchanged before then.",
       "proof": "The same date scan, plus a check across a 1,000 km-wide area, found nothing before 18 Jun 2026.",
@@ -55,7 +61,8 @@
       "inApp": true
     },
     {
-      "id": 7, "bucket": "artefacts",
+      "id": 7,
+      "bucket": "artefacts",
       "title": "Passes come from two directions",
       "fools": "NISAR passes over the same place going north (ascending) and going south (descending). They look at slopes and walls from opposite sides, so comparing one with the other shows 'change' that is only the viewing angle.",
       "proof": "Over the UAE, passes arrive in pairs of days, one ascending and one descending, and slopes look different in each.",
@@ -63,15 +70,17 @@
       "inApp": true
     },
     {
-      "id": 8, "bucket": "artefacts",
-      "title": "Radio interference makes fake glowing blobs",
+      "id": 8,
+      "bucket": "artefacts",
+      "title": "Interference makes fake glowing patches",
       "fools": "Other radio signals on Earth leak into the radar and paint bright blobs. Compare two single dates and a blob looks like a huge change.",
-      "proof": "A large blob appeared over Dubai on the 28 Oct 2026 image and was gone on the other dates. A two-date comparison called it a change.",
-      "handling": "We compare the median (typical) image of several 'before' passes with the median of several 'after' passes. A one-off blob drops out; a change that stays is kept.",
-      "inApp": false
+      "proof": "In our Jebel Ali box, HH on 28 Oct 2026 was 6.3 dB brighter than on 18 Jun, while the whole NISAR frame moved only 0.1 dB. A two-date comparison would call almost the whole box 'new'.",
+      "handling": "We compare every pass with the whole frame, use the median of several passes, and don't report a radar-only area while a pass is contaminated.",
+      "inApp": true
     },
     {
-      "id": 9, "bucket": "earth",
+      "id": 9,
+      "bucket": "earth",
       "title": "Mountains create fake change",
       "fools": "Steep slopes facing towards or away from the satellite change brightness with the viewing angle, which can look like change.",
       "proof": "Jebel Hafeet showed 'change' that is a viewing-angle effect.",
@@ -79,23 +88,26 @@
       "inApp": false
     },
     {
-      "id": 10, "bucket": "artefacts",
+      "id": 10,
+      "bucket": "artefacts",
       "title": "Speckle: radar graininess",
       "fools": "Single radar pixels jump up and down between dates even when nothing changed.",
       "proof": "Single pixels jump up and down between dates in the NISAR images we compared.",
-      "handling": "We smooth first and read small blocks of pixels, never a single pixel.",
-      "inApp": false
+      "handling": "We average each 3×3 block of 10 m pixels (30 m result) before comparing dates, and ignore changed patches smaller than about 1 hectare.",
+      "inApp": true
     },
     {
-      "id": 11, "bucket": "earth",
+      "id": 11,
+      "bucket": "earth",
       "title": "Calm water and dry sand look the same",
       "fools": "Both are smooth, so the radar beam bounces away and both come back dark. 'New water' in a desert may just be dry sand.",
-      "proof": "NASA's documentation shows both as blue in the false-colour map.",
-      "handling": "'New water' in desert is marked uncertain and checked against a water map and photos.",
-      "inApp": false
+      "proof": "In our Jebel Ali box on 18 Jun 2026, open sea measured −17.1 dB in HH and desert sand −16.9 dB: practically the same.",
+      "handling": "Before reporting water turning into land (or back), OmniSAR checks whether sea and sand can be told apart on those dates. At Jebel Ali they can't, so we don't report it.",
+      "inApp": true
     },
     {
-      "id": 12, "bucket": "earth",
+      "id": 12,
+      "bucket": "earth",
       "title": "Cities hide floods",
       "fools": "Buildings bounce the radar strongly, so floodwater between them doesn't look dark the way open water does.",
       "proof": "During the March 2026 storm, NASA's radar water map barely flagged flooded Dubai streets (first look).",
@@ -103,7 +115,8 @@
       "inApp": false
     },
     {
-      "id": 13, "bucket": "data",
+      "id": 13,
+      "bucket": "data",
       "title": "Map tiles are pictures, not measurements",
       "fools": "The NISAR map tiles are pre-coloured images. Their colours are not calibrated radar values, so you can't measure from them.",
       "proof": "The tiles are 8-bit coloured PNG/JPEG images; the calibrated values are only in the science files.",
@@ -111,31 +124,35 @@
       "inApp": false
     },
     {
-      "id": 14, "bucket": "data",
+      "id": 14,
+      "bucket": "data",
       "title": "Ground-motion files: huge, uncorrected, with a gap",
       "fools": "Interferogram (InSAR) files are 2–2.5 GB each, the atmosphere corrections are included but not applied, and there is a NASA data gap from 27 Jul to 10 Aug 2026.",
-      "proof": "NASA's catalogue lists 27 files (59 GB) for Jakarta; ASF's documentation says the ionosphere and troposphere corrections are stored as extra layers, not applied.",
-      "handling": "We read only the layers we need for our areas, apply the corrections ourselves, and treat the time before and after the gap separately.",
-      "inApp": false
+      "proof": "For Jakarta we used 16 NASA interferogram files (2.3 GB each) and read only a 17 × 33 km box from each. The ionosphere and troposphere corrections are stored as extra layers, not applied; NASA has no data from 27 Jul to 10 Aug 2026; and the descending frame we downloaded covers only part of our box.",
+      "handling": "We read only the box, apply the stored corrections ourselves, bridge the gap with 24-day pairs, and say when a direction can't be used.",
+      "inApp": true
     },
     {
-      "id": 15, "bucket": "earth",
+      "id": 15,
+      "bucket": "earth",
       "title": "Humid air and changing surfaces fake or hide motion",
       "fools": "Water vapour slows the radar signal, which looks like the ground moved. Surfaces that change between passes scramble the measurement.",
-      "proof": "These are known InSAR limits, and summer air over the Gulf is very humid.",
-      "handling": "We mask out low-quality (low-coherence) pixels and only call it motion if it repeats across several pairs and both directions.",
-      "inApp": false
+      "proof": "In our Jakarta pairs, humid air alone shifts the signal by 6-31 mm across the box, and the ionosphere by 4-46 mm, in just 12 days. Water, fields and building sites drop below 0.4 coherence.",
+      "handling": "We subtract NASA's air corrections, mask coherence below 0.4, chain 8 pairs, and use two directions (dawn and dusk) when both are usable.",
+      "inApp": true
     },
     {
-      "id": 16, "bucket": "earth",
+      "id": 16,
+      "bucket": "earth",
       "title": "Sea-level rise is too slow to see",
       "fools": "Sea level rises a few millimetres a year. A few months of radar can't show it.",
-      "proof": "A few mm per year is far below what months of radar can measure.",
-      "handling": "Sea level appears only as context from NASA sea-level data; sinking land, which we can measure, is the part that adds to it.",
-      "inApp": false
+      "proof": "Global sea level rises by millimetres per year (citation pending). In each of our 12-day Jakarta pairs, the air alone moves the signal by up to 46 mm.",
+      "handling": "OmniSAR measures land motion, not sea level, and says so.",
+      "inApp": true
     },
     {
-      "id": 17, "bucket": "earth",
+      "id": 17,
+      "bucket": "earth",
       "title": "Soil moisture data is coarse",
       "fools": "NASA's SMAP soil moisture comes in 9 km squares, much bigger than one hillside.",
       "proof": "The SMAP grid is 9 km; the slopes we study are a few hundred metres across.",

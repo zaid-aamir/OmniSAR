@@ -9,6 +9,7 @@ import { createTimeline } from './timeline.js';
 import { createPanel } from './panel.js';
 import { loadMystery } from './engine.js';
 import { runWalkthrough } from './walkthrough.js';
+import { createCaseTerrain } from './caseterrain.js';
 
 const params = new URLSearchParams(location.search);
 const HOME_DISTANCE = 3.2;
@@ -67,7 +68,15 @@ async function start() {
     onCross: (id) => markers.pulse(id),
   });
 
+  // Case terrain: the local blocky view of a case box (covers the globe while open)
+  const terrain = createCaseTerrain(area);
+  function showGlobe() {
+    terrain.close();
+    globe.setPaused(false);
+  }
+
   function selectCase(id) {
+    showGlobe();
     const c = byId[id];
     globe.flyTo(c.centre[0], c.centre[1], CASE_DISTANCE);
     panel.showCase(c);
@@ -75,6 +84,7 @@ async function start() {
   }
 
   function backToGlobe() {
+    showGlobe();
     // pull back out to the home distance, staying above the same part of the world
     const dir = globe.camera.position.clone().normalize();
     const lat = Math.asin(dir.y) * 180 / Math.PI;
@@ -91,7 +101,10 @@ async function start() {
       return;
     }
     const mystery = await loadMystery(c);
-    runWalkthrough(panel.root, mystery, { onExit: () => panel.showCase(c) });
+    runWalkthrough(panel.root, mystery, { onExit: () => { showGlobe(); panel.showCase(c); } });
+    // Opening a case moves the view down to its blocky terrain, if the case has a grid yet
+    const opened = await terrain.open(c, mystery.numbers?.files?.grid, { onBackToGlobe: showGlobe });
+    if (opened) globe.setPaused(true);
   }
 
   // ?case=<id> opens straight onto a case (for testing and screenshots)
@@ -100,7 +113,7 @@ async function start() {
     if (params.has('play')) openMystery(params.get('case'));   // ?case=jebel-ali&play opens the walkthrough
   }
 
-  window.omnisar = { globe, data, selectCase };   // handy for poking at things in the browser console
+  window.omnisar = { globe, data, selectCase, terrain };   // handy for poking at things in the browser console
 }
 
 start();

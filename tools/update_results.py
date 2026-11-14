@@ -17,11 +17,15 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CASES_DIR = os.path.normpath(os.path.join(HERE, "..", "cases"))
 
 
+def _reject(name):
+    raise ValueError(f"{name} is not valid JSON for a browser - fix the script that wrote this file")
+
+
 def update():
     measured = {}
     for path in sorted(glob.glob(os.path.join(CASES_DIR, "*.numbers.json"))):
         with open(path, encoding="utf-8") as f:
-            json.load(f)                                   # refuse to list a file that isn't valid JSON
+            json.load(f, parse_constant=_reject)           # refuse a file that isn't valid JSON (incl. NaN)
         case_id = os.path.basename(path)[: -len(".numbers.json")]
         measured[case_id] = "cases/" + os.path.basename(path)
 

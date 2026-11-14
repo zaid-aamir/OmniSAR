@@ -40,11 +40,12 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 import nisar_io as nio
+import terrain
 import update_results
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)    # all-NaN tiles etc. are handled explicitly
 
-SCRIPT_VERSION = "1.0"
+SCRIPT_VERSION = "1.2"   # 1.1: display rule, terrain heights, per-pass medians; 1.2: single-pass cross-checks, NaN-safe JSON (METHOD unchanged)
 CASE = "jebel-ali"
 GRID = "/science/LSAR/GCOV/grids/frequencyA"
 DATA_DIR = os.path.join(nio.PROJECT, "data", "gcov")
@@ -54,11 +55,11 @@ NUMBERS = os.path.join(nio.REPO, "cases", f"{CASE}.numbers.json")
 FILE_PATTERN = "_056_A_014_4005_"
 
 # ---------------------------------------------------------------------------------------------
-# METHOD - fixed BEFORE looking at any change result (logged in why_log.md, Sat 14 Nov 03:55).
+# METHOD - fixed BEFORE looking at any change result (logged in why_log.md, Sat 14 Nov 03:33).
 # Copied word for word into the numbers file so anyone can check what we did.
 # ---------------------------------------------------------------------------------------------
 METHOD = {
-    "declared": "2026-11-14T03:55+04:00, before any change map was computed",
+    "declared": "2026-11-14T03:33+04:00, before any change map was computed (first run 03:39)",
     "inputs": "NISAR L2 GCOV, track 056, ascending, frame 014, mode 4005 (10 m), finished files only",
     "before_window": ["2026-06-18", "2026-07-12"],
     "after_window": ["2026-10-04", "2026-10-28"],
@@ -99,6 +100,11 @@ CLASS_NAMES = {1: "New structures (HH rose)", 2: "Water to land", 3: "Land to wa
 CLASS_RGBA = {1: (242, 142, 43, 230), 2: (255, 209, 102, 230), 3: (78, 155, 214, 230)}
 NODATA = 255
 HH_SHOW = (-25.0, 5.0)        # greyscale limits for NISAR crops in the photo kit (dB)
+
+
+def fmt_date(iso):
+    d = dt.date.fromisoformat(iso)
+    return f"{d.day} {d.strftime('%b')}"
 
 
 def log(*a):
@@ -467,7 +473,7 @@ def save_overlay(cls):
     Image.fromarray(rgba, "RGBA").save(os.path.join(ASSET_DIR, "change_overlay.png"), optimize=True)
 
 
-def save_grid(grid, passes_db, delta, cls, before_dates, after_dates):
+def save_grid(grid, passes_db, delta, cls, before_dates, after_dates, change_note=None):
     """Grid for the blocky case terrain. If there are more than ~60,000 pixels, m x m pixels are
     merged into one block (mean in linear power), and the true block size is written down."""
     rows, cols = delta.shape
@@ -490,12 +496,30 @@ def save_grid(grid, passes_db, delta, cls, before_dates, after_dates):
         share = (cb == code).mean(axis=2)
         block_cls[share >= 1 / 3] = code          # a block shows a class if >= 1/3 of its pixels have it
     px = abs(float(grid["x"][1] - grid["x"][0]))
+    bx = grid["x"][:C * m].reshape(C, m).mean(axis=1)
+    by = grid["y"][:R * m].reshape(R, m).mean(axis=1)
+    elev = terrain.grid_heights(bx, by, grid["proj"])
     corners = {}
     for name, (cx, cy) in {"nw": (0, 0), "ne": (C * m - 1, 0), "sw": (0, R * m - 1), "se": (C * m - 1, R * m - 1)}.items():
         lon, lat = nio.utm_to_lonlat(grid["x"][cx], grid["y"][cy], grid["proj"])
         corners[name] = [round(float(lat), 6), round(float(lon), 6)]
+    pass_layers = [{
+        "id": f"pass-{d}", "label": f"Pass {fmt_date(d)} 2026 ({s})", "date": d, "side": s,
+        "kind": "sequential", "unit": "dB", "scale": [-25, 5],
+        "what": "NISAR HH backscatter (how much of the radar beam came back)",
+        "source": f"NISAR L2 GCOV, track 056 ascending, {d}",
+        "values": q(merge_db(passes_db[d])),
+    } for s, ds in (("before", before_dates), ("after", after_dates)) for d in ds]
+    change_layer = {
+        "id": "change", "label": "Change: after vs before (background removed)", "date": f"{before_dates[0]} → {after_dates[-1]}",
+        "kind": "diverging", "unit": "dB", "scale": [-6, 6],
+        "what": "HH change after removing each side's smooth 2 km background (method in the numbers file)",
+        "source": "NISAR L2 GCOV, track 056 ascending; median of " + f"{len(before_dates)} before / {len(after_dates)} after passes",
+        "note": change_note,
+        "values": q(merge_mean(delta)),
+    }
     out = {
-        "about": "Blocky case terrain grid for Jebel Ali. Values are NISAR HH in dB x 10 (integers; null = no data). Row 0 = north, corners are block centres. Written by tools/process_jebel_ali.py.",
+        "about": "Blocky case terrain grid for Jebel Ali. Layer values are x10 integers (null = no data); row 0 = north; corners are block centres. Written by tools/process_jebel_ali.py.",
         "case": CASE,
         "rows": R, "cols": C,
         "merge": m,
@@ -503,19 +527,79 @@ def save_grid(grid, passes_db, delta, cls, before_dates, after_dates):
         "block_m": round(px * m, 1),
         "block_text": f"one block = {m}×{m} filtered pixels of {round(px)} m = {3 * m}×{3 * m} NISAR 10 m pixels ≈ {round(px * m)} m",
         "corners_latlon": corners,
-        "passes": [{"date": d, "side": s, "hh_db10": q(merge_db(passes_db[d]))}
-                   for s, ds in (("before", before_dates), ("after", after_dates)) for d in ds],
-        "delta_db10": q(merge_mean(delta)),
+        "layers": pass_layers + [change_layer],
+        "default_layer": "change",
         "class": block_cls.ravel().tolist(),
         "class_names": {str(k): v for k, v in CLASS_NAMES.items()},
-        "source": "NISAR L2 GCOV track 056 ascending frame 014 (NASA/ASF)",
+        "elev_dm": [int(round(v * 10)) for v in elev.ravel()],
+        "height_source": terrain.SOURCE,
     }
     with open(os.path.join(ASSET_DIR, "grid.json"), "w", encoding="utf-8") as f:
-        json.dump(out, f, separators=(",", ":"), ensure_ascii=False)
+        json.dump(nio.clean_json(out), f, separators=(",", ":"), ensure_ascii=False, allow_nan=False)
     return out
 
 
 # ------------------------------------------------------------------ main
+def analyse(boxes, before, after, grid, quiet=False):
+    """The whole change analysis (METHOD) for one set of before/after passes. Used for the
+    verdict and, unchanged, for the single-pass cross-checks."""
+    log_ = (lambda *a: None) if quiet else log
+    before_db = side_median(boxes, before)
+    after_db = side_median(boxes, after)
+    t = METHOD["tile_px"]
+    bg_b, bg_a = background(before_db, t), background(after_db, t)
+    delta = (after_db - bg_a) - (before_db - bg_b)
+    after_n = after_db - bg_a + bg_b                       # after, brightness-matched to before
+
+    sea = window_pixels(METHOD["sea_window"], grid)
+    land = window_pixels(METHOD["land_window"], grid)
+    t_water = float(np.nanpercentile(before_db[sea], 90))
+    t_land = float(np.nanpercentile(before_db[land], 10))
+    separable = t_water < t_land
+    refs = {
+        "sea_before_median_db": round(float(np.nanmedian(before_db[sea])), 2),
+        "desert_before_median_db": round(float(np.nanmedian(before_db[land])), 2),
+        "sea_after_matched_median_db": round(float(np.nanmedian(after_n[sea])), 2),
+        "desert_after_matched_median_db": round(float(np.nanmedian(after_n[land])), 2),
+        "sea_after_raw_median_db": round(float(np.nanmedian(after_db[sea])), 2),
+        "desert_after_raw_median_db": round(float(np.nanmedian(after_db[land])), 2),
+        "sea_pixels": int(np.isfinite(before_db[sea]).sum()), "desert_pixels": int(np.isfinite(before_db[land]).sum()),
+    }
+    log_(f"T_water {t_water:.2f} dB  T_land {t_land:.2f} dB  separable={separable}  refs {refs}")
+
+    cls = classify(before_db, after_n, delta, t_water, t_land, separable)
+    spots = hotspots(cls, grid)
+    top = spots[:10]
+
+    # gain-consistency check on unchanged pixels (rule in METHOD['gain_check'])
+    diffs = []
+    rows, cols = delta.shape
+    for i in range(0, rows, t):
+        for j in range(0, cols, t):
+            b = before_db[i:i + t, j:j + t]
+            d = delta[i:i + t, j:j + t]
+            ok = np.isfinite(b) & np.isfinite(d) & (cls[i:i + t, j:j + t] == 0)
+            if ok.sum() < 500:
+                continue
+            lo, hi = np.percentile(b[ok], [25, 75])
+            diffs.append(float(np.median(d[ok & (b <= lo)]) - np.median(d[ok & (b >= hi)])))
+    gain_med = float(np.median(diffs)) if diffs else float("nan")
+    gain_ok = bool(np.isfinite(gain_med) and abs(gain_med) <= METHOD["gain_limit_db"])
+    log_(f"gain check: median dark-minus-bright delta {gain_med:.2f} dB over {len(diffs)} tiles -> ok={gain_ok}")
+
+    px_ha = abs(float(grid["x"][1] - grid["x"][0])) ** 2 / 10000
+    kept = np.zeros_like(cls)
+    for h in spots:
+        kept[h["_members"][:, 0], h["_members"][:, 1]] = CLASS_CODES[h["class"]]
+    area = {name: round(float((kept == code).sum() * px_ha), 1) for name, code in CLASS_CODES.items() if code}
+    raw_area = {name: round(float((cls == code).sum() * px_ha), 1) for name, code in CLASS_CODES.items() if code}
+    log_(f"area in hotspots (ha): {area}   before the 1 ha cluster filter: {raw_area}   hotspots: {len(spots)}")
+    return {"before_db": before_db, "after_db": after_db, "after_n": after_n, "delta": delta, "t_water": t_water,
+            "t_land": t_land, "separable": separable, "refs": refs, "cls": cls, "spots": spots, "top": top,
+            "gain_med": gain_med, "gain_ok": gain_ok, "diffs": diffs, "kept": kept, "area": area, "raw_area": raw_area,
+            "sea": sea, "land": land, "t": t}
+
+
 def main():
     t0 = time.time()
     before, after = find_passes()
@@ -538,56 +622,31 @@ def main():
     for row in interference:
         log("  ", json.dumps(row))
 
-    before_db = side_median(boxes, before)
-    after_db = side_median(boxes, after)
-    t = METHOD["tile_px"]
-    bg_b, bg_a = background(before_db, t), background(after_db, t)
-    delta = (after_db - bg_a) - (before_db - bg_b)
-    after_n = after_db - bg_a + bg_b                       # after, brightness-matched to before
-
-    sea = window_pixels(METHOD["sea_window"], grid)
-    land = window_pixels(METHOD["land_window"], grid)
-    t_water = float(np.nanpercentile(before_db[sea], 90))
-    t_land = float(np.nanpercentile(before_db[land], 10))
-    separable = t_water < t_land
-    refs = {
-        "sea_before_median_db": round(float(np.nanmedian(before_db[sea])), 2),
-        "desert_before_median_db": round(float(np.nanmedian(before_db[land])), 2),
-        "sea_after_matched_median_db": round(float(np.nanmedian(after_n[sea])), 2),
-        "desert_after_matched_median_db": round(float(np.nanmedian(after_n[land])), 2),
-        "sea_after_raw_median_db": round(float(np.nanmedian(after_db[sea])), 2),
-        "desert_after_raw_median_db": round(float(np.nanmedian(after_db[land])), 2),
-        "sea_pixels": int(np.isfinite(before_db[sea]).sum()), "desert_pixels": int(np.isfinite(before_db[land]).sum()),
-    }
-    log(f"T_water {t_water:.2f} dB  T_land {t_land:.2f} dB  separable={separable}  refs {refs}")
-
-    cls = classify(before_db, after_n, delta, t_water, t_land, separable)
-    spots = hotspots(cls, grid)
-    top = spots[:10]
-
-    # gain-consistency check on unchanged pixels (rule in METHOD['gain_check'])
-    diffs = []
-    rows, cols = delta.shape
-    for i in range(0, rows, t):
-        for j in range(0, cols, t):
-            b = before_db[i:i + t, j:j + t]
-            d = delta[i:i + t, j:j + t]
-            ok = np.isfinite(b) & np.isfinite(d) & (cls[i:i + t, j:j + t] == 0)
-            if ok.sum() < 500:
-                continue
-            lo, hi = np.percentile(b[ok], [25, 75])
-            diffs.append(float(np.median(d[ok & (b <= lo)]) - np.median(d[ok & (b >= hi)])))
-    gain_med = float(np.median(diffs)) if diffs else float("nan")
-    gain_ok = bool(np.isfinite(gain_med) and abs(gain_med) <= METHOD["gain_limit_db"])
-    log(f"gain check: median dark-minus-bright delta {gain_med:.2f} dB over {len(diffs)} tiles -> ok={gain_ok}")
-
+    pass_medians = [{"date": p["date"], "side": "before" if p in before else "after",
+                     "hh_box_median_db": round(float(np.nanmedian(nio.power_to_db(boxes[p["date"]]["hh"]))), 2),
+                     "hv_box_median_db": round(float(np.nanmedian(nio.power_to_db(boxes[p["date"]]["hv"]))), 2)} for p in passes]
+    A = analyse(boxes, before, after, grid)
+    (before_db, after_db, after_n, delta, t_water, t_land, separable, refs, cls, spots, top, gain_med, gain_ok, diffs,
+     kept, area, raw_area, sea, land) = (A[k] for k in ("before_db", "after_db", "after_n", "delta", "t_water", "t_land",
+     "separable", "refs", "cls", "spots", "top", "gain_med", "gain_ok", "diffs", "kept", "area", "raw_area", "sea", "land"))
     px_ha = abs(float(grid["x"][1] - grid["x"][0])) ** 2 / 10000
-    kept = np.zeros_like(cls)
-    for h in spots:
-        kept[h["_members"][:, 0], h["_members"][:, 1]] = CLASS_CODES[h["class"]]
-    area = {name: round(float((kept == code).sum() * px_ha), 1) for name, code in CLASS_CODES.items() if code}
-    raw_area = {name: round(float((cls == code).sum() * px_ha), 1) for name, code in CLASS_CODES.items() if code}
-    log(f"area in hotspots (ha): {area}   before the 1 ha cluster filter: {raw_area}   hotspots: {len(spots)}")
+
+    # Cross-checks (same METHOD, nothing tuned): each after-pass on its own against the first
+    # before-pass, so a contaminated date can be told apart from a clean one.
+    cross_checks = []
+    if len(after) > 1 or len(before) > 1:
+        for p_after in after:
+            C = analyse(boxes, before[:1], [p_after], grid, quiet=True)
+            row = next((r for r in interference if r["pass"] == p_after["date"]), None)
+            cross_checks.append({"before": before[0]["date"], "after": p_after["date"],
+                                 "interference_over_box": row["anomaly_over_box"] if row else None,
+                                 "box_hh_change_db": row["HH"]["box_median_change_db"] if row else None,
+                                 "frame_hh_change_db": row["HH"]["frame_median_change_db"] if row else None,
+                                 "gain_check_db": round(C["gain_med"], 2), "gain_ok": C["gain_ok"],
+                                 "candidate_new_structures_ha": C["area"]["new-structures"],
+                                 "patches": sum(h["class"] == "new-structures" for h in C["spots"]),
+                                 "separable": C["separable"]})
+            log("  cross-check", json.dumps(cross_checks[-1]))
 
     # photo-check kit
     box = nio.case_box(CASE)
@@ -620,7 +679,8 @@ def main():
     any_anomaly = any(r["anomaly_over_box"] for r in interference)
     save_overlay(kept)
     passes_db = {p["date"]: nio.power_to_db(boxes[p["date"]]["hh"]) for p in passes}
-    grid_out = save_grid(grid, passes_db, delta, kept, [p["date"] for p in before], [p["date"] for p in after])
+    grid_out = save_grid(grid, passes_db, delta, kept, [p["date"] for p in before], [p["date"] for p in after],
+                         change_note=None if gain_ok else "Includes a contaminated pass (see the verdict): not a reliable change map yet.")
 
     corners = {}
     for name, (cx, cy) in {"nw": (0, 0), "ne": (-1, 0), "sw": (0, -1), "se": (-1, -1)}.items():
@@ -628,11 +688,20 @@ def main():
         corners[name] = [round(float(lat), 6), round(float(lon), 6)]
 
     n_new = sum(h["class"] == "new-structures" for h in spots)
-    measured = [
-        {"label": "Candidate new structures (HH rose ≥ 3 dB)", "value": area["new-structures"], "unit": "ha",
-         "note": f"in {n_new} patches of 1 ha or more" + ("" if gain_ok else
-                 " — candidates only: the radar quality check failed (below), so some may be interference, not change")},
-    ]
+    # Display rule (Zaid, 14 Nov 03:54): a radar-only area is shown ONLY if the radar quality check
+    # passes. Otherwise the verdict says the pass is contaminated and the area appears only in the
+    # chain of custody, labelled "contaminated candidate area".
+    if gain_ok:
+        measured = [{"label": "New structures (HH rose ≥ 3 dB)", "value": area["new-structures"], "unit": "ha",
+                     "note": f"in {n_new} patches of 1 ha or more"}]
+    else:
+        bad = next((r for r in interference if r["anomaly_over_box"]), interference[-1] if interference else None)
+        txt = (f"The {fmt_date(bad['pass'])} pass is contaminated by interference, most likely radio interference "
+               f"(box HH {bad['HH']['box_median_change_db']:+.1f} dB while the frame moved {bad['HH']['frame_median_change_db']:+.1f} dB). "
+               "A radar-only area isn't reliable yet") if bad else "A radar-only area isn't reliable yet"
+        txt += ("; a median of three passes per side is pending." if not (len(before) >= 3 and len(after) >= 3)
+                else ", even with a median of three passes per side.")
+        measured = [{"label": "New structures", "value": "not reliable yet", "unit": "", "note": txt}]
     if separable:
         measured += [
             {"label": "Water → land", "value": area["water-to-land"], "unit": "ha"},
@@ -645,10 +714,11 @@ def main():
                      "note": ("Median of several passes per side." if robust else
                               "Fewer than 3 passes per side, so a bad date can't be outvoted yet; more passes are downloading.")})
     if any_anomaly:
-        hh_i = interference[-1]["HH"]
-        measured.append({"label": "Interference check", "value": "anomaly found", "unit": "",
-                         "note": f"On {interference[-1]['pass']} our box is {hh_i['box_median_change_db']:+.1f} dB brighter in HH while the whole frame moved "
-                                 f"{hh_i['frame_median_change_db']:+.1f} dB: a broad bright patch over Dubai. We use HH only and remove each date's smooth background."})
+        flagged = [r for r in interference if r["anomaly_over_box"]]
+        measured.append({"label": "Interference check", "value": f"{len(flagged)} of {len(interference)} passes flagged", "unit": "",
+                         "note": "; ".join(f"{fmt_date(r['pass'])}: box HH {r['HH']['box_median_change_db']:+.1f} dB vs whole frame "
+                                           f"{r['HH']['frame_median_change_db']:+.1f} dB (compared with {fmt_date(r['compared_with'])})" for r in flagged)
+                                 + ". We use HH only and remove each date's smooth background."})
     measured.append({"label": "Radar quality check", "value": "passed" if gain_ok else "failed", "unit": "",
                      "note": (f"After removing the background, dark and bright ground changed by similar amounts ({gain_med:+.1f} dB apart)." if gain_ok else
                               f"After removing the background, dark ground still brightened {gain_med:.1f} dB more than bright ground, so the patch adds "
@@ -664,16 +734,22 @@ def main():
                          "radar only (photo check pending); " + ("radar quality checks passed" if radar_ok else
                           "no hotspots found" if gain_ok else "radar quality check failed (gain check)")),
         "sources": [p["file"] for p in passes],
+        "custody_extra": [] if gain_ok else [{"label": "Contaminated candidate area", "value": area["new-structures"], "unit": "ha",
+                                              "note": f"pixels where HH rose >= 3 dB, in {n_new} patches >= 1 ha; not shown in the verdict because the radar quality check failed"}],
         "method": METHOD,
         "results": {
             "thresholds": {"T_water_db": round(t_water, 2), "T_land_db": round(t_land, 2), "separable": separable, **refs},
             "area_ha_in_hotspots": area,
+            "area_shown_in_verdict": bool(gain_ok),
+            "contaminated_candidate_area_ha": None if gain_ok else area["new-structures"],
+            "pass_medians": pass_medians,
             "area_ha_before_cluster_filter": raw_area,
             "hotspot_count": len(spots),
             "top10": [{k: v for k, v in h.items() if not k.startswith("_")} for h in top],
             "interference": interference,
             "gain_check": {"median_dark_minus_bright_db": round(gain_med, 2), "tiles": len(diffs), "ok": gain_ok},
             "median_robust": robust,
+            "cross_checks": cross_checks,
             "photo_check": {"status": "done" if photo else "pending", "confirmed": confirmed, "total": total,
                             "answers": answers, "before": photo_before, "after": photo_after},
             "coherence_check": "not available: no NISAR interferogram on hand covers this box",
@@ -699,7 +775,7 @@ def main():
         },
     }
     with open(NUMBERS, "w", encoding="utf-8") as f:
-        json.dump(numbers, f, indent=1, ensure_ascii=False)
+        json.dump(nio.clean_json(numbers), f, indent=1, ensure_ascii=False, allow_nan=False)
     log(f"wrote {NUMBERS}  badge={badge}  grid {grid_out['rows']}x{grid_out['cols']} merge {grid_out['merge']}")
 
     # arrays kept OUTSIDE the repo so checkpoint C can draw evidence images from the same numbers
@@ -711,7 +787,8 @@ def main():
                         sea_rc=np.array([sea[0].start, sea[0].stop, sea[1].start, sea[1].stop]),
                         land_rc=np.array([land[0].start, land[0].stop, land[1].start, land[1].stop]),
                         t_water=t_water, t_land=t_land,
-                        dates=np.array([p["date"] for p in passes]))
+                        dates=np.array([p["date"] for p in passes]),
+                        **{f"hh_{p['date']}": nio.power_to_db(boxes[p["date"]]["hh"]) for p in passes})
     update_results.update()
     log(f"done in {time.time() - t0:.0f} s")
 

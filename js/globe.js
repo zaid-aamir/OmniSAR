@@ -159,7 +159,9 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
 
   // --- Draw every frame; other files can add their own per-frame work ---
   const frameCallbacks = [];
+  let paused = false;            // true while the case terrain view covers the globe
   renderer.setAnimationLoop((time) => {
+    if (paused) return;
     controls.update();
     frameCallbacks.forEach((fn) => fn(time));
     renderer.render(scene, camera);
@@ -202,6 +204,7 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     scene, camera, controls, renderer, meta,
     blockCount: cells.length,
     onFrame: (fn) => frameCallbacks.push(fn),
+    setPaused: (p) => { paused = p; },
     flyTo,
   };
 }

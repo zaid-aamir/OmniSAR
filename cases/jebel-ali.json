@@ -3,7 +3,6 @@
   "format": 1,
   "about": "Mystery file for Jebel Ali. The question, place and boxes live in cases/index.json. All text here is pre-written; every choice has its own reply. Evidence with src null is shown as 'Evidence pending' until the real image exists.",
   "numbersFile": "cases/jebel-ali.numbers.json",
-
   "tip": {
     "title": "A coast that keeps changing",
     "text": [
@@ -12,21 +11,52 @@
       "Radar can answer part of that. On the way, it will try to fool you at least five times."
     ]
   },
-
   "steps": [
-    { "type": "tip" },
-    { "type": "choice", "choice": "method" },
-    { "type": "choice", "choice": "before-june" },
-    { "type": "evidence", "title": "The evidence so far", "text": "These are the exhibits for this case. Some are real changes; some are traps. Read each one before you go on." },
-    { "type": "choice", "choice": "dark-patch" },
-    { "type": "choice", "choice": "zoom" },
-    { "type": "toggles", "title": "Interrogate the evidence", "text": "Each switch changes how the radar evidence is processed, so you can see which 'changes' survive." },
-    { "type": "graph", "title": "Cause and effect", "text": "Fill in the hidden links. Each link is something a satellite measured, or something a published source says." },
-    { "type": "choice", "choice": "what-can-we-say" },
-    { "type": "verdict" },
-    { "type": "lesson" }
+    {
+      "type": "tip"
+    },
+    {
+      "type": "choice",
+      "choice": "method"
+    },
+    {
+      "type": "choice",
+      "choice": "before-june"
+    },
+    {
+      "type": "evidence",
+      "title": "The evidence so far",
+      "text": "These are the exhibits for this case. Some are real changes; some are traps. Read each one before you go on."
+    },
+    {
+      "type": "choice",
+      "choice": "dark-patch"
+    },
+    {
+      "type": "choice",
+      "choice": "zoom"
+    },
+    {
+      "type": "toggles",
+      "title": "Interrogate the evidence",
+      "text": "Each switch changes how the radar evidence is processed, so you can see which 'changes' survive."
+    },
+    {
+      "type": "graph",
+      "title": "Cause and effect",
+      "text": "Fill in the hidden links. Each link is something a satellite measured, or something a published source says."
+    },
+    {
+      "type": "choice",
+      "choice": "what-can-we-say"
+    },
+    {
+      "type": "verdict"
+    },
+    {
+      "type": "lesson"
+    }
   ],
-
   "choices": {
     "method": {
       "prompt": "NISAR has images from 18 June to 28 October. How should we compare 'before' with 'after'?",
@@ -35,7 +65,7 @@
           "text": "Compare the first image (18 Jun) with the last one (28 Oct).",
           "correct": false,
           "trap": 8,
-          "reply": "That's the most common mistake. The 28 Oct image has a large bright blob over Dubai that is radio interference, not the ground. A two-date comparison would call it a giant new change. One bad day is enough to fool you."
+          "reply": "That's the most common mistake. On 28 Oct our whole box reads 6.3 dB brighter in HH, while the whole NISAR frame moved only 0.1 dB: a broad patch of interference over Dubai, not the ground. A two-date comparison would call it a giant new change. One bad day is enough to fool you."
         },
         {
           "text": "Use every pass we have, from both directions, to get more data.",
@@ -121,14 +151,13 @@
       ]
     }
   },
-
   "evidence": [
     {
       "id": "two-date",
       "title": "Two-date change: 18 Jun vs 28 Oct",
       "kind": "image",
-      "src": null,
-      "caption": "Change between just two NISAR images. A large bright area appears over Dubai.",
+      "src": "assets/cases/jebel-ali/ev-two-date.png",
+      "caption": "Change between just two NISAR images, 18 Jun and 28 Oct, with nothing removed. Our box reads +6.3 dB brighter in HH while the whole NISAR frame moved +0.1 dB: a broad patch over Dubai, not new buildings everywhere.",
       "source": "NISAR GCOV, track 056 ascending, 18 Jun and 28 Oct 2026",
       "bin": "trap",
       "trap": 8
@@ -138,27 +167,28 @@
       "title": "Median change: Jun–Jul vs Sep–Oct",
       "kind": "image",
       "src": null,
-      "caption": "Change between the median of several passes before and several passes after, same direction.",
+      "caption": "Median of three passes per side: pending. The 30 Jun and 16 Oct files are still downloading.",
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "real",
-      "trap": null
+      "trap": null,
+      "pending": true
     },
     {
       "id": "no-data-before-june",
       "title": "No NISAR images before 18 June",
-      "kind": "data",
-      "src": "cases/passes.json",
-      "caption": "NASA's catalogue lists the first NISAR pass over this box on 18 Jun 2026. Before that, the record is empty.",
+      "kind": "image",
+      "src": "assets/cases/jebel-ali/ev-passes.png",
+      "caption": "NASA's catalogue lists the first NISAR pass over this box on 18 Jun 2026. The empty weeks before it mean 'not imaged', not 'nothing there'.",
       "source": "NASA CMR file catalogue",
       "bin": "trap",
       "trap": 6
     },
     {
       "id": "dark-inland",
-      "title": "A dark patch inland",
+      "title": "Two dark patches",
       "kind": "image",
-      "src": null,
-      "caption": "An area that looks dark in the radar image. Water, or smooth dry sand?",
+      "src": "assets/cases/jebel-ali/ev-sea-desert.png",
+      "caption": "Open sea and desert sand from the same NISAR image (18 Jun): -17.1 dB vs -16.9 dB in HH. Radar alone can't tell them apart here.",
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "trap",
       "trap": 11
@@ -167,8 +197,8 @@
       "id": "zoom-tile",
       "title": "NISAR map tile at zoom 10",
       "kind": "image",
-      "src": null,
-      "caption": "The same map tile requested several times at zoom 10 comes back as different images.",
+      "src": "assets/cases/jebel-ali/ev-zoom10.png",
+      "caption": "One NASA NISAR map-tile address at zoom 10, requested 5 times on 14 Nov 2026 04:08 UAE: 4 different image(s) came back. Map tiles are pictures; our numbers come from the science files.",
       "source": "NASA GIBS NISAR tiles, zoom 10",
       "bin": "trap",
       "trap": 2
@@ -177,38 +207,88 @@
       "id": "photo-check",
       "title": "Satellite photos: June vs October",
       "kind": "image",
-      "src": null,
-      "caption": "Optical images of the same box, used as an independent check on what the radar found.",
+      "src": "assets/cases/jebel-ali/ev-hls.png",
+      "caption": "NASA HLS photos of the same box, 2026-06-18 and 2026-10-29. Compare the port basin and the Palm: some ground clearly changed between them.",
       "source": "NASA HLS (Landsat and Sentinel-2)",
       "bin": "real",
       "trap": null
     }
   ],
-
   "toggles": [
     {
       "id": "median",
       "label": "Single dates ↔ Median of several passes",
       "explains": "Switch to two single dates and the interference blob appears as 'change'. Switch to medians and it disappears.",
       "trap": 8,
-      "layers": { "off": null, "on": null }
+      "layers": {
+        "off": {
+          "src": "assets/cases/jebel-ali/tg-single.png",
+          "label": "Two single dates"
+        },
+        "on": {
+          "src": null,
+          "label": "Median of several passes"
+        }
+      },
+      "disabled": "The median needs three passes per side; the 30 Jun and 16 Oct files are still downloading."
     },
     {
-      "id": "direction",
-      "label": "One direction ↔ Mixed directions",
-      "explains": "Mixing ascending and descending passes makes walls and slopes look changed when only the viewing side changed.",
-      "trap": 7,
-      "layers": { "off": null, "on": null }
+      "id": "band",
+      "label": "L-band (NISAR) ↔ C-band (Sentinel-1)",
+      "trap": 13,
+      "explains": "Longer L-band waves pass through plants and dry sand that stop shorter C-band waves, so the same place looks different. The C-band image is a NASA picture tile (trap 13), shown for comparison only.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/jebel-ali/tg-lband.png",
+          "label": "L-band NISAR"
+        },
+        "on": {
+          "src": "assets/cases/jebel-ali/tg-cband.png",
+          "label": "C-band Sentinel-1 (2026-06-16)"
+        }
+      },
+      "disabled": null
     },
     {
       "id": "channel",
       "label": "HH (direct echo) ↔ HV (rough and leafy echo)",
       "explains": "New walls and hard ground show most strongly in HH. HV rises more where plants grow or surfaces become rough.",
       "trap": 4,
-      "layers": { "off": null, "on": null }
+      "layers": {
+        "off": {
+          "src": "assets/cases/jebel-ali/tg-hh.png",
+          "label": "HH"
+        },
+        "on": {
+          "src": "assets/cases/jebel-ali/tg-hv.png",
+          "label": "HV"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "coherence",
+      "label": "Coherence mask off ↔ on",
+      "trap": 15,
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "explains": "Coherence shows where the radar signal stayed stable between two passes.",
+      "disabled": "Switched off for Jebel Ali: none of our NISAR interferograms cover this box (the UAE ones, track 128, start about 25.2° N)."
+    },
+    {
+      "id": "direction",
+      "label": "One direction ↔ Mixed directions",
+      "explains": "Mixing ascending and descending passes makes walls and slopes look changed when only the viewing side changed.",
+      "trap": 7,
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Jebel Ali: we only analyse ascending track 056. Comparing passes from opposite directions is trap 7."
     }
   ],
-
   "graph": {
     "nodes": [
       {
@@ -233,51 +313,112 @@
         ],
         "locationMatch": "pending photo check",
         "hidden": false,
-        "opens": { "layer": null, "chart": null, "badge": "From published sources" }
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": "From published sources"
+        }
       },
       {
         "id": "hh",
-        "label": "New hard surfaces and land",
-        "detail": "Measured by the change in NISAR's HH (direct echo) brightness.",
-        "source": "NISAR L-band, HH",
+        "label": "HH brightness rises",
+        "detail": "Measured by comparing NISAR HH (direct echo) brightness between June and October. In our box this measurement is contaminated: the 28 Oct pass carries a broad interference patch, shown in the chart as the jump in the box's median brightness.",
+        "source": "NISAR L-band GCOV, HH",
         "basis": "measured",
         "hidden": true,
         "prompt": "What should NISAR's HH brightness do where new hard surfaces and land appear?",
         "options": [
-          { "text": "HH goes up", "correct": true, "reply": "Yes. Water sends the beam away, so it looks dark. Hard ground and walls send much more of it straight back, so HH rises." },
-          { "text": "HH goes down", "correct": false, "reply": "That would mean the surface got smoother, like ground turning into calm water. New land and buildings do the opposite." },
-          { "text": "HH stays the same", "correct": false, "reply": "Swapping water or sand for hard surfaces changes how the beam bounces, so HH can't stay the same." }
+          {
+            "text": "HH goes up",
+            "correct": true,
+            "reply": "Yes. Water sends the beam away, so it looks dark. Hard ground and walls send much more of it straight back, so HH rises."
+          },
+          {
+            "text": "HH goes down",
+            "correct": false,
+            "reply": "That would mean the surface got smoother, like ground turning into calm water. New land and buildings do the opposite."
+          },
+          {
+            "text": "HH stays the same",
+            "correct": false,
+            "reply": "Swapping water or sand for hard surfaces changes how the beam bounces, so HH can't stay the same."
+          }
         ],
-        "opens": { "layer": null, "chart": null, "badge": "NISAR GCOV" }
+        "opens": {
+          "layer": "assets/cases/jebel-ali/ev-two-date.png",
+          "chart": {
+            "title": "Median HH brightness of the whole box, per pass",
+            "path": "results.pass_medians",
+            "x": "date",
+            "y": "hh_box_median_db",
+            "label": "Box median HH",
+            "unit": "dB"
+          },
+          "badge": "numbers"
+        }
       },
       {
         "id": "coherence",
         "label": "Surface disturbed",
-        "detail": "Measured by coherence: how similar the radar signal stays between two passes.",
+        "detail": "Coherence measures how similar the radar signal stays between two passes. Digging and building scramble it. We could not measure it here.",
         "source": "NISAR L-band interferograms (GUNW)",
-        "basis": "measured",
+        "basis": "none",
         "hidden": true,
         "prompt": "Construction disturbs the ground between two passes. What happens to coherence?",
         "options": [
-          { "text": "Coherence drops", "correct": true, "reply": "Right. Coherence measures how much the surface stays the same between passes. Digging, filling and building scramble it, so it drops." },
-          { "text": "Coherence rises", "correct": false, "reply": "Coherence rises when a surface stays unchanged, like old concrete. Active construction does the opposite." },
-          { "text": "Coherence doesn't change", "correct": false, "reply": "Coherence reacts to any change in the surface between passes, so disturbed ground shows up clearly." }
+          {
+            "text": "Coherence drops",
+            "correct": true,
+            "reply": "Right. Coherence measures how much the surface stays the same between passes. Digging, filling and building scramble it, so it drops."
+          },
+          {
+            "text": "Coherence rises",
+            "correct": false,
+            "reply": "Coherence rises when a surface stays unchanged, like old concrete. Active construction does the opposite."
+          },
+          {
+            "text": "Coherence doesn't change",
+            "correct": false,
+            "reply": "Coherence reacts to any change in the surface between passes, so disturbed ground shows up clearly."
+          }
         ],
-        "opens": { "layer": null, "chart": null, "badge": "NISAR GUNW" }
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": null
+        },
+        "notMeasured": "none of our NISAR interferograms cover Jebel Ali (the UAE ones, track 128, start about 25.2° N)."
       },
       {
         "id": "photos",
-        "label": "Confirmed in photos",
-        "detail": "An independent check: optical satellite images of the same place before and after.",
+        "label": "Checked against photos",
+        "detail": "An independent check: NASA HLS optical images of each radar hotspot, before and after, judged by eye by a team member.",
         "source": "NASA HLS (Landsat and Sentinel-2)",
         "basis": "measured",
         "hidden": false,
-        "opens": { "layer": null, "chart": null, "badge": "HLS check" }
+        "opens": {
+          "layer": "assets/cases/jebel-ali/ev-hls.png",
+          "chart": null,
+          "badge": "NASA HLS photo check",
+          "check": true
+        }
       }
     ],
-    "edges": [["cause", "hh"], ["hh", "coherence"], ["coherence", "photos"]]
+    "edges": [
+      [
+        "cause",
+        "hh"
+      ],
+      [
+        "hh",
+        "coherence"
+      ],
+      [
+        "coherence",
+        "photos"
+      ]
+    ]
   },
-
   "verdict": {
     "pending": "Evidence pending — this case's measurements are being processed.",
     "cantProve": [
@@ -286,7 +427,6 @@
       "What will happen to this coast in the future."
     ]
   },
-
   "lesson": {
     "title": "What this case teaches about radar",
     "points": [

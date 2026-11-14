@@ -1,23 +1,44 @@
 // The walkthrough: draws the current step of a mystery in the side panel.
-// Everything it shows is pre-written text from the case file. Each choice has its own
-// reply; a wrong choice shows its explanation (and the trap it fell into), then the
-// player tries again. The game rules themselves live in engine.js.
+// Everything it shows is pre-written text from the case file or real values from the numbers
+// file. Each choice has its own reply; a wrong choice shows its explanation (and the trap it
+// fell into), then the player tries again. The game rules themselves live in engine.js; the
+// sorting game, the cause-and-effect graph and the chain of custody have their own files.
 
 import { esc } from './util.js';
 import { trapChip, wireTrapChips } from './trapcard.js';
+import { mountMinigame } from './minigame.js';
+import { mountGraph } from './graph.js';
+import { openCustody } from './custody.js';
 
 const STEP_NAMES = {
-  tip: 'The tip', choice: 'Your call', evidence: 'Evidence', toggles: 'Interrogate',
+  tip: 'The tip', choice: 'Your call', evidence: 'Sort the evidence', toggles: 'Interrogate',
   graph: 'Cause and effect', verdict: 'Verdict', lesson: 'Radar lesson',
 };
 
 // Source tag: cyan only for NISAR (a fixed data colour), plain for every other source
-function sourceTag(text) {
+export function sourceTag(text) {
   return `<span class="tag ${/^NISAR/.test(text) ? 'tag-nisar' : ''}">${esc(text)}</span>`;
 }
 
+// Published sources as links that open in a new tab. Only https links are allowed, so a
+// typo or a strange link in a data file can never run code on the page.
+export function citationLinks(list) {
+  return list.map((c) => {
+    const text = `${esc(c.outlet)}, ${esc(c.date)}: “${esc(c.title)}”`;
+    return /^https:\/\//.test(c.url)
+      ? `<a class="tag cite" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${text}</a>`
+      : `<span class="tag cite">${text}</span>`;
+  }).join('');
+}
+
 export function runWalkthrough(root, mystery, { onExit }) {
-  const lastAnswer = {};   // most recent answer per choice / node, so its reply stays on screen
+  const lastAnswer = {};   // most recent answer per choice, so its reply stays on screen
+  const toggleState = {};  // toggle id -> true when switched "on"
+
+  function updateNav() {
+    const next = root.querySelector('#wt-next');
+    if (next) next.disabled = !mystery.isStepDone();
+  }
 
   function render() {
     const m = mystery;
@@ -36,17 +57,20 @@ export function runWalkthrough(root, mystery, { onExit }) {
 
     root.querySelector('#wt-exit').addEventListener('click', onExit);
     root.querySelector('#wt-back').addEventListener('click', () => { m.back(); render(); });
-    root.querySelector('#wt-next')?.addEventListener('click', () => { m.next(); render(); root.scrollTop = 0; });
+    root.querySelector('#wt-next')?.addEventListener('click', () => { m.next(); render(); });
     root.querySelector('#wt-finish')?.addEventListener('click', onExit);
 
     root.querySelectorAll('[data-choice]').forEach((btn) => btn.addEventListener('click', () => {
       lastAnswer[`choice:${btn.dataset.choice}`] = m.answerChoice(btn.dataset.choice, Number(btn.dataset.i));
       render();
     }));
-    root.querySelectorAll('[data-node]').forEach((btn) => btn.addEventListener('click', () => {
-      lastAnswer[`node:${btn.dataset.node}`] = m.answerNode(btn.dataset.node, Number(btn.dataset.i));
+    root.querySelectorAll('[data-toggle]').forEach((box) => box.addEventListener('change', () => {
+      toggleState[box.dataset.toggle] = box.checked;
       render();
     }));
+    root.querySelector('#wt-custody')?.addEventListener('click', () => openCustody(m.info, m.numbers));
+    if (step.type === 'evidence') mountMinigame(root.querySelector('#wt-mini'), m, { onChange: () => { updateNav(); wireTrapChips(root); } });
+    if (step.type === 'graph') mountGraph(root.querySelector('#wt-graph'), m, { onChange: updateNav });
     wireTrapChips(root);
     root.closest('.panel')?.scrollTo({ top: 0 });
   }
@@ -56,9 +80,9 @@ export function runWalkthrough(root, mystery, { onExit }) {
     switch (step.type) {
       case 'tip': return renderTip();
       case 'choice': return renderChoice(step.choice);
-      case 'evidence': return renderEvidence(step);
+      case 'evidence': return `<h2 class="wt-title">${esc(step.title)}</h2><p class="panel-text">${esc(step.text)}</p><div id="wt-mini"></div>`;
       case 'toggles': return renderToggles(step);
-      case 'graph': return renderGraph(step);
+      case 'graph': return `<h2 class="wt-title">${esc(step.title)}</h2><p class="panel-text">${esc(step.text)}</p><div id="wt-graph"></div>`;
       case 'verdict': return renderVerdict();
       case 'lesson': return renderLesson();
       default: return `<p class="panel-text">Unknown step type: ${esc(step.type)}</p>`;
@@ -101,90 +125,30 @@ export function runWalkthrough(root, mystery, { onExit }) {
       </div>`;
   }
 
-  // Evidence cards, shown in order. (The sorting game comes in Stage 2.)
-  function renderEvidence(step) {
-    return `
-      <h2 class="wt-title">${esc(step.title)}</h2>
-      <p class="panel-text">${esc(step.text)}</p>
-      <div class="evidence-list">
-        ${mystery.data.evidence.map((e, i) => `
-          <article class="evidence-card">
-            <p class="evidence-num">Exhibit ${i + 1}</p>
-            <h3>${esc(e.title)}</h3>
-            ${e.kind === 'image'
-              ? (e.src ? `<img src="${esc(e.src)}" alt="${esc(e.caption)}">` : '<div class="pending-box">Evidence pending</div>')
-              : ''}
-            <p class="evidence-caption">${esc(e.caption)}</p>
-            <p class="evidence-source">${sourceTag(e.source)}</p>
-          </article>`).join('')}
-      </div>`;
-  }
-
-  // Toggles: each switches how the evidence is processed. Their layers don't exist yet.
+  // Toggles: each one swaps between two REAL images made from our data. A toggle that can't
+  // be real for this case is switched off, with the reason written next to it.
   function renderToggles(step) {
     return `
       <h2 class="wt-title">${esc(step.title)}</h2>
       <p class="panel-text">${esc(step.text)}</p>
       <div class="toggle-list">
         ${mystery.data.toggles.map((t) => {
-          const ready = t.layers.off && t.layers.on;
+          const ready = !t.disabled && t.layers?.off?.src && t.layers?.on?.src;
+          const on = !!toggleState[t.id];
+          const shown = ready ? (on ? t.layers.on : t.layers.off) : null;
           return `
-            <div class="toggle-row">
-              <label class="toggle"><input type="checkbox" ${ready ? '' : 'disabled'}><span>${esc(t.label)}</span></label>
+            <div class="toggle-row ${ready ? '' : 'is-off'}">
+              <label class="toggle">
+                <input type="checkbox" data-toggle="${esc(t.id)}" ${ready ? '' : 'disabled'} ${on ? 'checked' : ''}>
+                <span>${esc(t.label)}</span>
+              </label>
+              ${shown ? `<figure class="toggle-fig"><img src="${esc(shown.src)}" alt="${esc(shown.label)}"><figcaption>Showing: <strong>${esc(shown.label)}</strong></figcaption></figure>` : ''}
               <p class="evidence-caption">${esc(t.explains)}</p>
-              <p class="toggle-meta">${ready ? '' : '<span class="pending-text">Layers pending</span>'} ${t.trap ? trapChip(t.trap) : ''}</p>
+              ${t.disabled ? `<p class="toggle-reason">${esc(t.disabled)}</p>` : ''}
+              <p class="toggle-meta">${!ready && !t.disabled ? '<span class="pending-text">Layers pending</span>' : ''} ${t.trap ? trapChip(t.trap) : ''}</p>
             </div>`;
         }).join('')}
       </div>`;
-  }
-
-  // Published sources as links that open in a new tab. Only https links are allowed, so a
-  // typo or a strange link in a data file can never run code on the page.
-  function citationLinks(list) {
-    return list.map((c) => {
-      const text = `${esc(c.outlet)}, ${esc(c.date)}: “${esc(c.title)}”`;
-      return /^https:\/\//.test(c.url)
-        ? `<a class="tag cite" href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${text}</a>`
-        : `<span class="tag cite">${text}</span>`;
-    }).join('');
-  }
-
-  // Cause-and-effect chain. Hidden nodes must be predicted before they are revealed.
-  function renderGraph(step) {
-    const nodes = mystery.data.graph.nodes;
-    return `
-      <h2 class="wt-title">${esc(step.title)}</h2>
-      <p class="panel-text">${esc(step.text)}</p>
-      <ol class="graph">
-        ${nodes.map((n) => {
-          const open = !n.hidden || mystery.solved.has(`node:${n.id}`);
-          const answer = lastAnswer[`node:${n.id}`];
-          const basis = n.basis === 'measured' ? 'Measured' : 'From published sources';
-          return `
-            <li class="node ${open ? '' : 'node-hidden'}">
-              <div class="node-head">
-                <span class="node-label">${open ? esc(n.label) : '?'}</span>
-                <span class="node-basis basis-${esc(n.basis)}">${basis}</span>
-              </div>
-              ${open ? `
-                <p class="evidence-caption">${esc(n.detail)}</p>
-                <p class="node-meta">
-                  ${n.basis === 'measured' ? sourceTag(n.source) : ''}
-                  ${n.basis === 'published' ? (n.citation?.length ? citationLinks(n.citation) : '<span class="pending-text">Source citation pending</span>') : ''}
-                  ${n.locationMatch ? `<span class="pending-text">Location match: ${esc(n.locationMatch)}</span>` : ''}
-                  ${n.basis === 'measured' && !n.opens.layer ? '<span class="pending-text">Layer pending</span>' : ''}
-                </p>` : `
-                <p class="node-prompt">${esc(n.prompt)}</p>
-                <div class="options">
-                  ${n.options.map((o, i) => {
-                    const tried = mystery.tried.has(`node:${n.id}:${i}`);
-                    return `<button class="option ${tried ? 'is-wrong' : ''}" data-node="${esc(n.id)}" data-i="${i}" ${tried ? 'disabled' : ''}>${esc(o.text)}</button>`;
-                  }).join('')}
-                </div>`}
-              ${answer ? `<div class="reply ${answer.correct ? 'reply-right' : 'reply-wrong'}"><p>${esc(answer.reply)}</p></div>` : ''}
-            </li>`;
-        }).join('<li class="node-arrow" aria-hidden="true">↓</li>')}
-      </ol>`;
   }
 
   // Verdict: real numbers only. No numbers file listed in results.json -> "evidence pending".
@@ -196,7 +160,8 @@ export function runWalkthrough(root, mystery, { onExit }) {
         ${n.measured.map((x) => `<div><dt>${esc(x.label)}</dt><dd><strong>${esc(x.value)}</strong> ${esc(x.unit || '')}${x.note ? `<br><span class="evidence-caption">${esc(x.note)}</span>` : ''}</dd></div>`).join('')}
         ${n.check ? `<div><dt>${esc(n.check.label)}</dt><dd>${esc(n.check.text)}</dd></div>` : ''}
       </dl>
-      ${n.badge ? `<p><span class="tag tag-nisar">${esc(n.badge)}</span></p>` : ''}`
+      ${n.badge ? `<p class="badge-line"><span class="tag tag-nisar">Evidence: ${esc(n.badge)}</span> <span class="evidence-caption">${esc(n.badge_reason || '')}</span></p>` : ''}
+      <button class="ghost-btn" id="wt-custody">Chain of custody: every file, step and threshold</button>`
       : `<div class="pending-box pending-verdict">${esc(v.pending)}</div>`;
     return `
       <h2 class="wt-title">Verdict</h2>
