@@ -1,0 +1,419 @@
+{
+  "id": "tonle-sap",
+  "format": 1,
+  "about": "Mystery file for Tonle Sap. All text is pre-written; every choice has its own reply. Evidence images, caption numbers and the band toggle are filled in by tools/process_tonle_sap.py from our analysis. src null = 'Evidence pending'.",
+  "numbersFile": "cases/tonle-sap.numbers.json",
+  "tip": {
+    "title": "A lake that breathes",
+    "text": [
+      "Every wet season, Cambodia's Tonle Sap lake swells to several times its dry-season size, and the forests around its shores stand in water for months.",
+      "Ordinary water maps find open water well, but water hidden under trees is much harder to see.",
+      "Your question: how much forest went underwater that ordinary water maps missed? NISAR's long L-band waves might reach under the canopy."
+    ]
+  },
+  "steps": [
+    {
+      "type": "tip"
+    },
+    {
+      "type": "choice",
+      "choice": "dark-bright"
+    },
+    {
+      "type": "choice",
+      "choice": "cband"
+    },
+    {
+      "type": "choice",
+      "choice": "wind"
+    },
+    {
+      "type": "choice",
+      "choice": "gap"
+    },
+    {
+      "type": "evidence",
+      "title": "The evidence so far",
+      "text": "Each card comes from our own processing of NISAR files, NASA's water map or NASA's file catalogue. Sort them: real change, or a trap?"
+    },
+    {
+      "type": "toggles",
+      "title": "Interrogate the evidence",
+      "text": "Switch between the radars and see what each one can find."
+    },
+    {
+      "type": "graph",
+      "title": "Cause and effect",
+      "text": "Fill in the hidden links. Each link is something we measured, or something a published source says."
+    },
+    {
+      "type": "choice",
+      "choice": "what-can-we-say"
+    },
+    {
+      "type": "verdict"
+    },
+    {
+      "type": "lesson"
+    }
+  ],
+  "choices": {
+    "dark-bright": {
+      "prompt": "In the NISAR image, the open lake is dark, but the flooded forest next to it is extremely bright. Why?",
+      "options": [
+        {
+          "text": "Calm water acts like a mirror and sends the beam away (dark). Under trees, the beam bounces off the water onto the trunks and straight back (bright).",
+          "correct": true,
+          "reply": "Exactly. Water plus tree trunks make a corner, like a wall standing on a street. This 'double bounce' makes flooded forest one of the brightest things in an HH radar image."
+        },
+        {
+          "text": "Bright means dry land, so the forest isn't flooded.",
+          "correct": false,
+          "reply": "Usually dry forest is only medium-bright. When water lies under the trees, the corner effect makes it much brighter, so here 'very bright' is the sign of water under trees."
+        },
+        {
+          "text": "Dark means deep water and bright means shallow water.",
+          "correct": false,
+          "reply": "Radar brightness doesn't measure depth. It depends on how smooth the surface is and what stands on it: open calm water is dark at any depth; trunks standing in water make it bright."
+        }
+      ]
+    },
+    "cband": {
+      "prompt": "A water map made from C-band radar (Sentinel-1) shows little water under the trees. Is the forest dry?",
+      "options": [
+        {
+          "text": "Yes: the radar water map shows where the water is.",
+          "correct": false,
+          "reply": "Careful: C-band's short 5.6 cm waves mostly bounce off the leaves at the top of the canopy, so they often never reach the water underneath. A C-band map can miss flooded forest that is really there."
+        },
+        {
+          "text": "Not necessarily. Short C-band waves stop near the top of the canopy; NISAR's 24 cm L-band waves reach the water under the trees.",
+          "correct": true,
+          "reply": "Right. That's the whole point of this case: the forest water that a C-band map misses is exactly what L-band can add."
+        }
+      ]
+    },
+    "wind": {
+      "prompt": "On one pass, part of the open lake looks grey instead of dark. Has it dried out?",
+      "options": [
+        {
+          "text": "Yes: it's not dark any more, so it isn't water.",
+          "correct": false,
+          "trap": 11,
+          "reply": "Radar sees smoothness, not wetness. Wind ripples or floating plants make water rough, and rough water scatters some of the beam back, so it looks grey like land."
+        },
+        {
+          "text": "Maybe not. Wind ripples or floating plants can roughen the water so it looks brighter. Check another date or another source.",
+          "correct": true,
+          "reply": "Right. A water rule that only looks for 'dark' can miss rough water. That's one reason we compare with an independent water map."
+        }
+      ]
+    },
+    "gap": {
+      "prompt": "NASA released no NISAR data between 27 July and 10 August 2026. How should the flood-pulse curve show those weeks?",
+      "options": [
+        {
+          "text": "Draw a straight line between the passes on each side.",
+          "correct": false,
+          "trap": 14,
+          "reply": "A line through a gap looks like a measurement but isn't one. The lake could have risen faster, or paused, during those two weeks."
+        },
+        {
+          "text": "Leave the gap visible and say there was no data.",
+          "correct": true,
+          "reply": "Right. Missing data is shown as missing. Our timeline shades that gap for every case."
+        }
+      ]
+    },
+    "what-can-we-say": {
+      "prompt": "The radar shows much more water in October than in June. What can you say?",
+      "options": [
+        {
+          "text": "This flood is a disaster.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "The Tonle Sap floods every wet season: it's the normal yearly pulse, and the lake's fish and forests depend on it. More water in October than in June is expected, not a disaster. Radar measures water, not harm."
+        },
+        {
+          "text": "Next year's flood will be bigger.",
+          "correct": false,
+          "limit": "who-why",
+          "reply": "That's a forecast. A few passes from one season can't say what next year will bring."
+        },
+        {
+          "text": "Open water and flooded forest grew as the wet season went on, and L-band found flooded forest that a C-band water map called dry.",
+          "correct": true,
+          "reply": "That's what the measurements support, with the numbers and their check shown in the verdict."
+        }
+      ]
+    }
+  },
+  "evidence": [
+    {
+      "id": "pulse",
+      "title": "Open water and flooded forest",
+      "kind": "image",
+      "src": "assets/cases/tonle-sap/ev-pass-2026-06-19.png",
+      "caption": "NISAR on 19 Jun: 874.5 km² of open water and 15.1 km² of flooded forest in our box. Only one pass is processed so far, so the pulse curve has one point.",
+      "source": "NISAR GCOV, track 083 ascending",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    },
+    {
+      "id": "check",
+      "title": "L-band vs a C-band water map",
+      "kind": "image",
+      "src": "assets/cases/tonle-sap/ev-check.png",
+      "caption": "19 Jun: NISAR and the C-band OPERA DSWx-S1 map (18 Jun) agree on open water at 98% of pixels. Of our flooded forest, 14.6 km² is 'not water' on the C-band map.",
+      "source": "NISAR GCOV + NASA OPERA DSWx-S1",
+      "bin": "real",
+      "trap": null,
+      "pending": false
+    },
+    {
+      "id": "wind",
+      "title": "Water that doesn't look dark",
+      "kind": "image",
+      "src": "assets/cases/tonle-sap/ev-wind.png",
+      "caption": "7.5 km² that the C-band map calls open water looked too bright to NISAR to count as water. Rough water (wind ripples, floating plants) scatters the beam back, so 'not dark' doesn't always mean 'not water'.",
+      "source": "NISAR GCOV + NASA OPERA DSWx-S1",
+      "bin": "trap",
+      "trap": 11,
+      "pending": false
+    },
+    {
+      "id": "gap",
+      "title": "Two weeks with no passes",
+      "kind": "image",
+      "src": "assets/cases/tonle-sap/ev-gap.png",
+      "caption": "NASA's catalogue lists 22 NISAR pass days over Tonle Sap from 1 Jun to 10 Nov, with nothing from 27 Jul to 10 Aug. A pulse curve has to skip that gap, not draw a line through it as if it were measured.",
+      "source": "NASA CMR file catalogue",
+      "bin": "trap",
+      "trap": 14,
+      "pending": false
+    }
+  ],
+  "toggles": [
+    {
+      "id": "band",
+      "label": "L-band (NISAR) ↔ C-band water map (OPERA DSWx-S1)",
+      "trap": 13,
+      "explains": "The C-band map is a NASA picture tile, decoded with its published colour table. Compare what each radar calls water near the forest edge.",
+      "layers": {
+        "off": {
+          "src": "assets/cases/tonle-sap/tg-lband.png",
+          "label": "NISAR L-band 19 Jun"
+        },
+        "on": {
+          "src": "assets/cases/tonle-sap/tg-cband.png",
+          "label": "OPERA DSWx-S1 C-band 18 Jun"
+        }
+      },
+      "disabled": null
+    },
+    {
+      "id": "direction",
+      "label": "One direction ↔ Mixed directions",
+      "trap": 7,
+      "explains": "Mixing ascending and descending passes changes the viewing angle, which changes how bright trunks and water look.",
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Tonle Sap: we only analyse ascending track 083."
+    },
+    {
+      "id": "coherence",
+      "label": "Coherence mask off ↔ on",
+      "trap": 15,
+      "explains": "Coherence shows where the radar signal stayed stable between two passes.",
+      "layers": {
+        "off": null,
+        "on": null
+      },
+      "disabled": "Switched off for Tonle Sap: we have no NISAR interferograms of this box, only radar images (GCOV)."
+    }
+  ],
+  "graph": {
+    "nodes": [
+      {
+        "id": "rain",
+        "label": "Monsoon rain",
+        "detail": "Measured monthly rain at the box centre from May. NASA POWER (MERRA-2), regional.",
+        "source": "NASA POWER (MERRA-2), regional",
+        "basis": "measured",
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": {
+            "title": "Monthly rain at the box centre, NASA POWER, regional",
+            "path": "results.rain.monthly",
+            "x": "date",
+            "y": "rain_mm",
+            "label": "Rain per month",
+            "unit": "mm",
+            "zero": true
+          },
+          "badge": "NASA POWER, regional"
+        }
+      },
+      {
+        "id": "mekong",
+        "label": "The Mekong pushes water into the lake",
+        "detail": "In the wet season the Mekong rises so high that the Tonle Sap River flows backwards, from the Mekong into the lake, and the lake system grows from about 2,500 km² to up to about 15,000 km². This comes from a published study, not from our radar.",
+        "source": "Published sources",
+        "basis": "published",
+        "citation": [
+          {
+            "outlet": "Chua et al., Hydrology and Earth System Sciences 26:609–625",
+            "date": "2022",
+            "title": "Drastic decline of flood pulse in the Cambodian floodplains (Mekong River and Tonle Sap system)",
+            "url": "https://hess.copernicus.org/articles/26/609/2022/"
+          }
+        ],
+        "hidden": false,
+        "opens": {
+          "layer": null,
+          "chart": null,
+          "badge": "From published sources"
+        }
+      },
+      {
+        "id": "openwater",
+        "label": "Open water spreads",
+        "detail": "Measured with NISAR (HH and HV both very dark) and checked against NASA's OPERA DSWx-S1 water map where a picture exists within 6 days.",
+        "source": "NISAR L-band GCOV, HH + HV",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "As the lake rises, what happens to the dark area in NISAR's images?",
+        "options": [
+          {
+            "text": "The dark area grows",
+            "correct": true,
+            "reply": "Yes. Calm open water is dark in both HH and HV, so as water spreads over mud and fields, the dark area grows."
+          },
+          {
+            "text": "The dark area shrinks",
+            "correct": false,
+            "reply": "Open water is what looks dark, so more water means more dark area (unless wind roughens it)."
+          },
+          {
+            "text": "Radar can't see water",
+            "correct": false,
+            "reply": "It can: calm water reflects the beam away like a mirror, so it shows up dark through any cloud."
+          }
+        ],
+        "opens": {
+          "layer": "assets/cases/tonle-sap/ev-check.png",
+          "chart": {
+            "title": "Open water in our box, per NISAR pass",
+            "path": "results.pulse",
+            "x": "date",
+            "y": "open_water_km2",
+            "label": "Open water",
+            "unit": "km²",
+            "zero": true
+          },
+          "badge": "numbers"
+        }
+      },
+      {
+        "id": "forest",
+        "label": "Forest floods",
+        "detail": "Measured with NISAR HH: forest (high HV on 19 June) whose HH jumped to −5 dB or more from the water-trunk double bounce.",
+        "source": "NISAR L-band GCOV, HH",
+        "basis": "measured",
+        "hidden": true,
+        "prompt": "What should NISAR's HH do where water rises under the trees?",
+        "options": [
+          {
+            "text": "HH gets much brighter",
+            "correct": true,
+            "reply": "Right: the water and the trunks form a corner and send the beam straight back."
+          },
+          {
+            "text": "HH gets darker, like open water",
+            "correct": false,
+            "reply": "Open water is dark, but with trunks standing in it the beam bounces back instead of away."
+          },
+          {
+            "text": "Nothing changes",
+            "correct": false,
+            "reply": "Long L-band waves reach the water under the canopy, so the change is large."
+          }
+        ],
+        "opens": {
+          "layer": null,
+          "chart": {
+            "title": "Flooded forest in our box, per NISAR pass (L-band only)",
+            "path": "results.pulse",
+            "x": "date",
+            "y": "flooded_forest_km2",
+            "label": "Flooded forest",
+            "unit": "km²",
+            "zero": true
+          },
+          "badge": "L-band only"
+        }
+      },
+      {
+        "id": "missed",
+        "label": "Flooded forest the water map missed",
+        "detail": "Our number: NISAR flooded forest where NASA's C-band DSWx-S1 map says 'not water'. Only exists for a NISAR pass with a DSWx-S1 picture within 6 days.",
+        "source": "NISAR L-band GCOV + NASA OPERA DSWx-S1",
+        "basis": "measured",
+        "hidden": false,
+        "opens": {
+          "layer": "assets/cases/tonle-sap/ev-check.png",
+          "chart": null,
+          "badge": "numbers",
+          "check": true
+        }
+      }
+    ],
+    "edges": [
+      [
+        "rain",
+        "mekong"
+      ],
+      [
+        "mekong",
+        "openwater"
+      ],
+      [
+        "openwater",
+        "forest"
+      ],
+      [
+        "forest",
+        "missed"
+      ]
+    ]
+  },
+  "verdict": {
+    "pending": "Evidence pending — this case's NISAR files are still downloading.",
+    "cantProve": [
+      "Whether this year's flood is harmful or unusual: the yearly pulse is normal, and radar measures water, not harm.",
+      "What the lake will do next year.",
+      "How deep the water is under the trees."
+    ]
+  },
+  "lesson": {
+    "title": "What this case teaches about radar",
+    "points": [
+      {
+        "head": "Dark water, bright forest",
+        "text": "Calm open water reflects the radar beam away like a mirror, so it looks dark. Water standing under trees forms a corner with the trunks, so the beam bounces straight back and flooded forest looks extremely bright in HH."
+      },
+      {
+        "head": "Why L-band sees under trees",
+        "text": "NISAR's L-band waves are 24 cm long, longer than leaves and twigs, so many of them reach the trunks and the water below. Sentinel-1's 5.6 cm C-band waves mostly bounce off the top of the canopy, so C-band water maps can miss flooded forest."
+      },
+      {
+        "head": "Water isn't always dark",
+        "text": "Wind ripples and floating plants roughen water, so it can look grey like land. And when there is no data, such as NASA's 27 Jul–10 Aug gap, a curve must show the gap instead of guessing across it."
+      }
+    ]
+  }
+}

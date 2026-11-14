@@ -1,0 +1,205 @@
+{
+ "case": "tonle-sap",
+ "generated": "2026-11-14T01:38Z",
+ "measured": [
+  {
+   "label": "Open water 19 Jun",
+   "value": 874.5,
+   "unit": "km²",
+   "note": "NISAR HH ≤ −16 dB and HV ≤ −22 dB; agreement with DSWx-S1 (18 Jun): 98%"
+  },
+  {
+   "label": "Flooded forest 19 Jun (L-band only)",
+   "value": 15.1,
+   "unit": "km²",
+   "note": "Forest on 19 Jun whose HH rose to ≥ −5 dB (double bounce). Moderate by definition: no independent check sees under trees. The C-band water map calls 14.6 km² of it 'not water'."
+  },
+  {
+   "label": "Passes analysed",
+   "value": 1,
+   "unit": "",
+   "note": "19 Jun. More passes (30 Aug, 17 Oct) give the pulse curve when they finish downloading."
+  },
+  {
+   "label": "Rain since 1 May",
+   "value": 1214.5,
+   "unit": "mm",
+   "note": "NASA POWER (MERRA-2), regional; 194 days with data."
+  }
+ ],
+ "check": {
+  "label": "Independent check",
+  "text": "19 Jun vs DSWx-S1 18 Jun: 98% agree on open water (IoU 95%)"
+ },
+ "badge": "Moderate",
+ "badge_reason": "open water: 1 of 1 checked date(s) agree ≥ 80% with DSWx-S1 → Moderate; case capped at Moderate because flooded forest is L-band only",
+ "sources": [
+  "NISAR_L2_PR_GCOV_023_083_A_008_2005_DHDH_M_20260619T223637_20260619T223711_P05023_N_F_J_001.h5"
+ ],
+ "method": {
+  "declared": "2026-11-14T05:12+04:00, before any Tonle Sap radar file was read",
+  "inputs": "NISAR L2 GCOV, track 083, ascending, frame 008, mode 2005, every finished pass",
+  "layers": [
+   "HHHH",
+   "HVHV",
+   "mask"
+  ],
+  "valid_pixel": "mask 1-254, HH > 0, HV > 0",
+  "speckle_filter": "k x k block mean in linear power, k = round(60 m / native pixel spacing) -> ~60 m pixels",
+  "target_pixel_m": 60,
+  "open_water": "HH <= -16 dB AND HV <= -22 dB",
+  "water_hh_db": -16.0,
+  "water_hv_db": -22.0,
+  "forest_at_start": "first pass (19 Jun): HV >= -16 dB and not open water (radar-only, declared)",
+  "forest_hv_db": -16.0,
+  "flooded_forest": "forest-at-start pixel with HH >= -5 dB on that pass (trunk-water double bounce)",
+  "flooded_hh_db": -5.0,
+  "check": "NASA OPERA DSWx-S1 (GIBS WMS layer OPERA_L3_Dynamic_Surface_Water_Extent-Sentinel-1), nearest date within +/-6 days with >= 50% of the box valid (tie -> earlier), sampled at our pixel centres",
+  "dswx_window_days": 6,
+  "dswx_colour_table": "GIBS colormap OPERA_Dynamic_Surface_Water_Extent_S1.xml v1.3: 255,255,255 = 0 not water; 0,0,255 = 1 open water; 0,255,0 = 3 inundated vegetation; 200,200,200 = 250 HAND masked; 128,128,128 = 251 layover/shadow masked; transparent = no data",
+  "agreement": "% of pixels (both valid, DSWx class 0/1/3) where NISAR open water and DSWx class 1 give the same yes/no; IoU and both one-way shares also reported",
+  "missed": "NISAR flooded forest where DSWx-S1 says 0 (not water)",
+  "badge_rule": "Open water: Strong if agreement >= 80% on >= 2 dates, Moderate if >= 80% on 1 date, Weak otherwise. Case badge capped at Moderate: flooded forest is L-band only by definition (no independent check)",
+  "rain": "NASA POWER daily PRECTOTCORR at the box centre (12.80 N, 104.20 E), 1 May -> today; regional, not per field",
+  "power_label": "NASA POWER (MERRA-2), regional"
+ },
+ "results": {
+  "pulse": [
+   {
+    "date": "2026-06-19",
+    "open_water_km2": 874.5,
+    "flooded_forest_km2": 15.1,
+    "valid_km2": 1931.5,
+    "hh_median_db": -13.28,
+    "hv_median_db": -21.08,
+    "dswx_date": "2026-06-18",
+    "agreement": 0.978,
+    "iou": 0.952,
+    "dswx_water_we_call_water": 0.991,
+    "our_water_dswx_calls_water": 0.96,
+    "dswx_open_water_km2": 847.8,
+    "dswx_inundated_veg_km2": 54.6,
+    "flooded_forest_missed_km2": 14.6,
+    "flooded_forest_dswx_inundated_veg_km2": 0.5,
+    "flooded_forest_dswx_open_water_km2": 0.0,
+    "dswx_unknown_colour_px": 0,
+    "dswx_tried": [
+     {
+      "date": "2026-06-19",
+      "valid_share": 0.0,
+      "unknown_colour_px": 0
+     },
+     {
+      "date": "2026-06-18",
+      "valid_share": 1.0,
+      "unknown_colour_px": 0
+     }
+    ],
+    "wind_or_rough_km2": 7.5
+   }
+  ],
+  "forest_at_start_km2": 676.8,
+  "pixel_m": 60.0,
+  "open_water_badge": "Moderate",
+  "rain": {
+   "label": "NASA POWER (MERRA-2), regional",
+   "since_1_may_mm": 1214.5,
+   "monthly": [
+    {
+     "date": "2026-05-15",
+     "month": "2026-05",
+     "rain_mm": 124.1
+    },
+    {
+     "date": "2026-06-15",
+     "month": "2026-06",
+     "rain_mm": 94.6
+    },
+    {
+     "date": "2026-07-15",
+     "month": "2026-07",
+     "rain_mm": 237.5
+    },
+    {
+     "date": "2026-08-15",
+     "month": "2026-08",
+     "rain_mm": 208.9
+    },
+    {
+     "date": "2026-09-15",
+     "month": "2026-09",
+     "rain_mm": 270.9
+    },
+    {
+     "date": "2026-10-15",
+     "month": "2026-10",
+     "rain_mm": 222.9
+    },
+    {
+     "date": "2026-11-15",
+     "month": "2026-11",
+     "rain_mm": 55.5
+    }
+   ]
+  },
+  "catalogue_pass_days": 22
+ },
+ "files": {
+  "grid": "assets/cases/tonle-sap/grid.json"
+ },
+ "provenance": {
+  "nasa_files": [
+   {
+    "file": "NISAR_L2_PR_GCOV_023_083_A_008_2005_DHDH_M_20260619T223637_20260619T223711_P05023_N_F_J_001.h5",
+    "date": "2026-06-19",
+    "start": "2026-06-19T22:36:37.000000000",
+    "direction": "Ascending",
+    "track": 83,
+    "frame": 8,
+    "product_version": "1.0.11",
+    "processing": "P05023"
+   }
+  ],
+  "collection": "NISAR L2 GCOV (ASF DAAC)",
+  "layers": [
+   "/science/LSAR/GCOV/grids/frequencyA/HHHH",
+   "/science/LSAR/GCOV/grids/frequencyA/HVHV",
+   "/science/LSAR/GCOV/grids/frequencyA/mask"
+  ],
+  "box_lonlat": [
+   104.0,
+   12.6,
+   104.4,
+   13.0
+  ],
+  "box_rows_cols": [
+   7405,
+   9623,
+   8661,
+   10839
+  ],
+  "projection_epsg": 32648,
+  "pixel_m_after_filter": 60.0,
+  "number_of_looks_native": 9.255792617797852,
+  "other_sources": {
+   "check": "NASA OPERA DSWx-S1 via GIBS WMS (OPERA_L3_Dynamic_Surface_Water_Extent-Sentinel-1)",
+   "rain": "NASA POWER daily API, https://power.larc.nasa.gov/api/temporal/daily/point?parameters=PRECTOTCORR&community=AG&longitude=104.2&latitude=12.8&start=20260501&end=20261114&format=JSON",
+   "heights": "AWS Terrarium elevation tiles, zoom 12 (s3.amazonaws.com/elevation-tiles-prod)",
+   "mekong": "Chua et al. 2022, Hydrol. Earth Syst. Sci. 26:609-625, doi:10.5194/hess-26-609-2022"
+  },
+  "steps": [
+   "read only the box",
+   "mask invalid pixels",
+   "3x3 multilook (linear power)",
+   "dB",
+   "forest at start from the first pass",
+   "open water and flooded forest per pass",
+   "DSWx-S1 nearest date, colours decoded",
+   "agreement -> badge"
+  ],
+  "script": "tools/process_tonle_sap.py",
+  "script_version": "1.0",
+  "script_sha256": "3f23489893eb67a8e0d2adf4ca87eaa4f8aa8b5086bc4e9bd41196b7f82e51bf",
+  "helpers_sha256": "d71853edabb0fb095ed99c2470163d6f05bd3687c088343e553c6e298e2c51c6"
+ }
+}
