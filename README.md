@@ -1,3 +1,5 @@
+<p><img src="assets/logo.svg" width="96" alt="OmniSAR logo: a radar block sending echoes"></p>
+
 # OmniSAR
 
 **Five real cases. One radar. You solve them.**

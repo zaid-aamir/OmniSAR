@@ -150,7 +150,8 @@
       "caption": "One pair, 26 Jun to 8 Jul, as NASA ships it (left) and after we subtract the ionosphere and troposphere (right). Across our pairs, humid air alone shifts the signal by 6-31 mm across the box.",
       "source": "NISAR GUNW, ascending track 010",
       "bin": "trap",
-      "trap": 15
+      "trap": 15,
+      "availableOn": "2026-10-12"
     },
     {
       "id": "motion",
@@ -160,7 +161,8 @@
       "caption": "Ground motion after corrections, all 8 ascending pairs chained (108 days). 28.8 km² of land moved down 30 mm or more (blue), relative to central Jakarta.",
       "source": "NISAR GUNW, ascending track 010",
       "bin": "trap",
-      "trap": 15
+      "trap": 15,
+      "availableOn": "2026-10-12"
     },
     {
       "id": "coherence",
@@ -170,7 +172,8 @@
       "caption": "Where coherence is below 0.4 (the bay, fields, building sites) the phase is noise. Only 63% of this pair's box passes; we mask the rest.",
       "source": "NISAR GUNW, ascending track 010",
       "bin": "trap",
-      "trap": 15
+      "trap": 15,
+      "availableOn": "2026-07-08"
     },
     {
       "id": "two-directions",
@@ -180,7 +183,8 @@
       "caption": "Ascending (05:39 local) and descending (18:11 local) chains side by side: two directions, two times of day, two different skies.",
       "source": "NISAR GUNW, tracks 010 and 018",
       "bin": "trap",
-      "trap": 14
+      "trap": 14,
+      "availableOn": "2026-10-13"
     },
     {
       "id": "gap",
@@ -190,7 +194,8 @@
       "caption": "NASA has no data from 27 Jul to 10 Aug 2026. A chain of only 12-day pairs would break here; the 24-day pairs bridge it.",
       "source": "NASA CMR file catalogue",
       "bin": "trap",
-      "trap": 14
+      "trap": 14,
+      "availableOn": "2026-10-13"
     },
     {
       "id": "sea-level",
@@ -200,7 +205,8 @@
       "caption": "In each 12-day pair the air alone moves the signal by up to 31 mm across the box. Global sea level rose about 4.5 mm in the whole of 2024 (NASA Sea Level Change, 2025), so over these months it is around a millimetre: far too small to see this way.",
       "source": "NISAR GUNW correction layers",
       "bin": "trap",
-      "trap": 16
+      "trap": 16,
+      "availableOn": "2026-10-12"
     }
   ],
   "toggles": [

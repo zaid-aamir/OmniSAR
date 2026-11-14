@@ -160,7 +160,8 @@
       "caption": "Change between just two NISAR images, 18 Jun and 28 Oct, with nothing removed. Our box reads +6.3 dB brighter in HH while the whole NISAR frame moved +0.1 dB: a broad patch over Dubai, not new buildings everywhere.",
       "source": "NISAR GCOV, track 056 ascending, 18 Jun and 28 Oct 2026",
       "bin": "trap",
-      "trap": 8
+      "trap": 8,
+      "availableOn": "2026-10-28"
     },
     {
       "id": "median-change",
@@ -181,7 +182,8 @@
       "caption": "NASA's catalogue lists the first NISAR pass over this box on 18 Jun 2026. The empty weeks before it mean 'not imaged', not 'nothing there'.",
       "source": "NASA CMR file catalogue",
       "bin": "trap",
-      "trap": 6
+      "trap": 6,
+      "availableOn": "2026-10-29"
     },
     {
       "id": "dark-inland",
@@ -191,7 +193,8 @@
       "caption": "Open sea and desert sand from the same NISAR image (18 Jun): -17.1 dB vs -16.9 dB in HH. Radar alone can't tell them apart here.",
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "trap",
-      "trap": 11
+      "trap": 11,
+      "availableOn": "2026-06-18"
     },
     {
       "id": "zoom-tile",
@@ -201,7 +204,8 @@
       "caption": "One NASA NISAR map-tile address at zoom 10, requested 5 times on 14 Nov 2026 12:39 UAE: 5 different image(s) came back. Map tiles are pictures; our numbers come from the science files.",
       "source": "NASA GIBS NISAR tiles, zoom 10",
       "bin": "trap",
-      "trap": 2
+      "trap": 2,
+      "availableOn": "2026-10-16"
     },
     {
       "id": "photo-check",
@@ -211,7 +215,8 @@
       "caption": "NASA HLS photos of the same box, 2026-06-18 and 2026-10-14. Compare the port basin and the Palm: some ground clearly changed between them.",
       "source": "NASA HLS (Landsat and Sentinel-2)",
       "bin": "real",
-      "trap": null
+      "trap": null,
+      "availableOn": "2026-10-14"
     }
   ],
   "toggles": [

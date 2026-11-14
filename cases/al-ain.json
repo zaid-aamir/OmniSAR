@@ -153,7 +153,8 @@
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "real",
       "trap": null,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-10-28"
     },
     {
       "id": "history",
@@ -164,7 +165,8 @@
       "source": "NASA MODIS NDVI (ORNL DAAC)",
       "bin": "real",
       "trap": null,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-10-31"
     },
     {
       "id": "tile",
@@ -175,7 +177,8 @@
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "trap",
       "trap": 2,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-06-18"
     },
     {
       "id": "dark",
@@ -186,7 +189,8 @@
       "source": "NISAR GCOV, track 056 ascending",
       "bin": "trap",
       "trap": 11,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-06-18"
     }
   ],
   "toggles": [

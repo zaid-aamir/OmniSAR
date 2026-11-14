@@ -157,5 +157,6 @@ export function createInspector(view) {
     setCase(caseInfo, nums, g) { info = caseInfo; numbers = nums; grid = g; close(); },
     inspect,
     close,
+    data: () => (info ? load() : Promise.resolve(null)),   // the case's inspect.json (or null), loaded once
   };
 }

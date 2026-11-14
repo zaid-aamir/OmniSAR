@@ -8,12 +8,12 @@
   --data-pending: #E0B44C;      /* "evidence pending" / "under investigation" */
   --data-unverified: #8A8F98;   /* grey: unverified tips (EONET, later) */
   --ui-wrong: #E07A5F;          /* feedback for a wrong answer (not a data colour) */
+  --alert: #FF3B47;             /* Live Ops alert red (alert rods, alarm edge): fixed, not a data colour */
 
   --font-ui: "Segoe UI", "Inter", system-ui, -apple-system, Roboto, Arial, sans-serif;
   --font-data: "Cascadia Mono", "Consolas", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --topbar-h: 56px;
-  --timeline-h: 110px;
   --panel-w: 380px;
   --radius: 10px;
 }
@@ -53,10 +53,10 @@ body {
 
 /* A small square "pixel" mark, echoing the one-block-one-pixel globe */
 .brand-mark {
-  width: 14px; height: 14px;
-  background: var(--accent);
-  box-shadow: 5px 5px 0 0 var(--accent-2);
-  border-radius: 2px;
+  /* OmniSAR logo: one radar block sending echoes (assets/logo.svg is the fixed-colour copy) */
+  width: 26px; height: 26px;
+  display: block;
+  flex: none;
 }
 
 .brand-name { font-weight: 700; font-size: 19px; letter-spacing: 0.2px; }
@@ -82,16 +82,14 @@ body {
   color: var(--muted);
 }
 
-/* ---------- Main layout: globe | panel, timeline under the globe ---------- */
+/* ---------- Main layout: globe | panel (v7: the timeline row under the globe is gone) ---------- */
 .layout {
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
   grid-template-columns: 1fr var(--panel-w);
-  grid-template-rows: 1fr var(--timeline-h);
-  grid-template-areas:
-    "globe    panel"
-    "timeline panel";
+  grid-template-rows: 1fr;
+  grid-template-areas: "globe panel";
 }
 
 .globe-area {
@@ -152,22 +150,6 @@ body {
 
 .panel-text { margin: 0 0 14px; color: var(--muted); }
 
-/* ---------- Timeline bar ---------- */
-.timeline {
-  grid-area: timeline;
-  border-top: 1px solid var(--line);
-  background: var(--surface-2);
-  padding: 12px 20px;
-}
-
-.timeline-label {
-  font-family: var(--font-data);
-  font-size: 12px;
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
 /* Hover label for a beacon */
 .beacon-label {
   position: absolute;
@@ -179,73 +161,6 @@ body {
   font-size: 13px;
   white-space: nowrap;
   pointer-events: none;
-}
-
-/* ---------- Timeline parts ---------- */
-.tl-head { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; min-width: 0; }
-.tl-date { font-family: var(--font-data); font-size: 14px; color: var(--text); min-width: 92px; }
-.tl-case {
-  font-size: 13px; color: var(--muted);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
-}
-.tl-case.on-pass { color: var(--data-nisar); }
-.tl-buttons { margin-left: auto; display: flex; gap: 6px; flex: 0 0 auto; }
-.tl-btn {
-  font: 12px var(--font-data);
-  color: var(--text);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 3px 9px;
-  cursor: pointer;
-}
-.tl-btn:hover { border-color: var(--accent); }
-
-.tl-track { position: relative; height: 50px; }
-
-.tl-gap {
-  position: absolute; top: 0; height: 30px;
-  background: repeating-linear-gradient(135deg,
-    color-mix(in srgb, var(--text) 10%, transparent) 0 4px, transparent 4px 8px);
-  border-left: 1px dashed var(--line);
-  border-right: 1px dashed var(--line);
-  font: 9px var(--font-data);
-  letter-spacing: 0.4px;
-  color: var(--muted);
-  text-align: center;
-  line-height: 10px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.tl-ticks { position: absolute; left: 0; right: 0; top: 10px; height: 20px; pointer-events: none; }
-.tl-tick {
-  position: absolute; top: 3px; width: 2px; height: 16px; margin-left: -1px;
-  background: var(--data-nisar);
-  border-radius: 1px;
-}
-
-/* The slider itself: a thin line with a 14 px square thumb (ticks are placed to match) */
-.tl-slider {
-  position: absolute; left: 0; right: 0; top: 11px; width: 100%; height: 18px;
-  margin: 0; background: transparent;
-  -webkit-appearance: none; appearance: none;
-  cursor: pointer;
-}
-.tl-slider::-webkit-slider-runnable-track { height: 2px; background: var(--line); }
-.tl-slider::-moz-range-track { height: 2px; background: var(--line); }
-.tl-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 14px; height: 14px; margin-top: -6px;
-  background: var(--accent); border: 2px solid var(--bg); border-radius: 3px;
-}
-.tl-slider::-moz-range-thumb {
-  width: 14px; height: 14px; background: var(--accent); border: 2px solid var(--bg); border-radius: 3px;
-}
-
-.tl-months { position: absolute; left: 0; right: 0; top: 33px; height: 16px; }
-.tl-months span {
-  position: absolute; transform: translateX(-50%);
-  font: 11px var(--font-data); color: var(--muted);
 }
 
 /* ---------- Panel parts ---------- */
@@ -405,8 +320,8 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
   .tagline { display: none; }
   .layout {
     grid-template-columns: 1fr;
-    grid-template-rows: 60vh var(--timeline-h) auto;
-    grid-template-areas: "globe" "timeline" "panel";
+    grid-template-rows: 60vh auto;
+    grid-template-areas: "globe" "panel";
   }
   .panel { border-left: 0; border-top: 1px solid var(--line); }
 }
@@ -511,7 +426,7 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
 
 /* ---------- Keyboard focus: always visible ---------- */
 .option:focus-visible, .ghost-btn:focus-visible, .primary-btn:focus-visible, .link-btn:focus-visible,
-.graph-node:focus-visible, .trap-chip:focus-visible, .case-row:focus-visible, .tl-btn:focus-visible,
+.graph-node:focus-visible, .trap-chip:focus-visible, .case-row:focus-visible,
 .toggle input:focus-visible, .sort-card:focus-visible, a.tag:focus-visible {
   outline: 2px solid var(--data-nisar);
   outline-offset: 2px;
@@ -529,12 +444,8 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
 .evidence-source .tag, .sort-filed, .sort-feedback { white-space: normal; overflow-wrap: anywhere; }
 .custody code, .custody td { overflow-wrap: anywhere; }
 
-/* ---------- Terrain <-> timeline sync ---------- */
+/* ---------- Terrain: the date line under the layer name ---------- */
 .terrain-when { margin: 2px 0 0; font: 12px var(--font-data); color: var(--muted); }
-.tl-tick.tl-tick-layer { top: 0; height: 22px; width: 4px; margin-left: -2px; background: var(--data-nisar);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--data-nisar) 70%, transparent); }
-/* when the timeline would change nothing it is hidden, and its row closes up */
-.layout:has(> .timeline[hidden]) { grid-template-rows: 1fr 0; }
 
 /* ---------- Contextual controls + accessibility (WCAG 2.1 AA) ---------- */
 /* Text only for screen readers (the live region that announces verdicts, trap cards, dates) */
@@ -546,16 +457,15 @@ a.cite:hover, a.cite:focus-visible { border-color: var(--accent); text-decoratio
 .terrain-view:focus-visible { outline-offset: -3px; }
 
 /* Control borders that can be seen (3:1); quiet --line stays for dividers */
-.ghost-btn, .option, .tl-btn, .case-row, .toggle-row:has(input) { border-color: var(--line-strong); }
+.ghost-btn, .option, .case-row, .toggle-row:has(input) { border-color: var(--line-strong); }
 .trap-chip { border-color: var(--line-strong); }
 
 /* Click targets at least 32 x 32 px */
-.link-btn, .trap-chip, .tl-btn { min-height: 32px; display: inline-flex; align-items: center; }
+.link-btn, .trap-chip { min-height: 32px; display: inline-flex; align-items: center; }
 .link-btn { padding: 0 4px; margin-left: -4px; }
 a.tag.cite { display: inline-block; padding-top: 6px; padding-bottom: 6px; }
 .toggle { min-height: 32px; }
 .toggle input { width: 18px; height: 18px; }
-.tl-slider { top: 4px; height: 32px; }
 
 /* "Next" stays visible while it can't be used yet, with the reason next to it */
 .wt-nav { align-items: center; }
@@ -572,14 +482,13 @@ a.tag.cite { display: inline-block; padding-top: 6px; padding-bottom: 6px; }
 .can-hide { transition: opacity 200ms ease, transform 200ms ease; }
 .can-hide.is-hiding { opacity: 0; transform: translateY(8px); pointer-events: none; }
 .terrain-stepper.can-hide.is-hiding { transform: translateY(-8px); }
-/* the timeline's row closes smoothly when the bar hides, so the globe grows instead of jumping */
-.layout { transition: grid-template-rows 240ms ease; }
-.timeline { overflow: hidden; min-height: 0; }
-.layout:has(> .timeline.is-hiding) { grid-template-rows: 1fr 0; }
 
-/* Less motion when the operating system asks for it */
+/* Less motion when the operating system asks for it: CLASSIC MODE ONLY.
+   Live Ops (the default mode) has no calm version by design: everyone gets the full effects,
+   and instead nothing in it may flash faster than 3 times per second. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+  body.mode-classic *, body.mode-classic *::before, body.mode-classic *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 

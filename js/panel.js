@@ -7,7 +7,7 @@ import { STATUS_TEXT } from './cases.js';
 import { esc } from './util.js';
 
 // After the panel redraws, the button that had focus is gone: move focus to the new heading
-// (only when focus was in the panel or nowhere, so we never steal it from the globe or timeline)
+// (only when focus was in the panel or nowhere, so we never steal it from the globe or terrain)
 function focusHeading(root) {
   const a = document.activeElement;
   if (a && a !== document.body && !root.contains(a) && a.isConnected) return;
@@ -56,7 +56,7 @@ export function createPanel(root, cases, { onPick, onBack, onOpen, onAction }) {
         <button class="ghost-btn" data-action="challenge">How OmniSAR answers the challenge</button>
         <button class="ghost-btn" data-action="about">About</button>
       </nav>
-      ${tipCount ? `<p class="panel-note">Grey columns are ${tipCount} unverified tips: natural events from NASA EONET (fires, floods, storms, volcanoes), 1 Jun – 10 Nov 2026. They appear as the timeline reaches their dates. Nobody has checked them with radar.</p>` : ''}`;
+      ${tipCount ? `<p class="panel-note">Grey columns are ${tipCount} unverified tips: natural events from NASA EONET (fires, floods, storms, volcanoes), 1 Jun – 10 Nov 2026, all shown at once. Nobody has checked them with radar.</p>` : ''}`;
     root.querySelectorAll('.case-row').forEach((btn) =>
       btn.addEventListener('click', () => onPick(btn.dataset.id)));
     root.querySelector('#end-btn')?.addEventListener('click', showEnd);

@@ -120,10 +120,16 @@ const sharedUniforms = {
   uHaze: { value: new THREE.Color('#5aa6ff') },
   uHazeStrength: { value: 0.32 },
 };
-function makeBlockMaterial({ roughness, metalness = 0, lift = 0 }) {
+//
+// 'hooks' (filled by addShaderHook, see createGlobe below) are extra shader edits from other files,
+// e.g. js/ripples.js. They run AFTER the globe's own edits, on both block materials.
+function makeBlockMaterial({ roughness, metalness = 0, lift = 0, hooks = [] }) {
   const material = new THREE.MeshStandardMaterial({
     vertexColors: true, flatShading: true, roughness, metalness,
   });
+  // three.js reuses a compiled shader if this key is unchanged, so the key names every hook:
+  // adding a hook changes the key, which makes three.js compile a new shader with the hook in it.
+  material.customProgramCacheKey = () => `globe-blocks|${hooks.map((h) => h.key).join(',')}`;
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, sharedUniforms, { uLift: { value: lift } });
     shader.vertexShader = shader.vertexShader
@@ -152,6 +158,15 @@ function makeBlockMaterial({ roughness, metalness = 0, lift = 0 }) {
         float edge = 1.0 - clamp(dot(normalize(vGlobePos), toCam), 0.0, 1.0);   // 0 facing us, 1 at the edge
         outgoingLight = mix(outgoingLight, uHaze * 0.55, pow(edge, 3.0) * uHazeStrength);
         #include <opaque_fragment>`);
+    for (const hook of hooks) {
+      try {
+        if (hook.patch(shader) === true) hook.applied += 1;   // the hook says it found its places in the shader
+        else hook.failed = true;
+      } catch (err) {
+        hook.failed = true;
+        console.warn(`globe: shader hook '${hook.key}' failed`, err);
+      }
+    }
   };
   return material;
 }
@@ -206,9 +221,10 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     land: cells.filter((c) => !isOcean(c)),
     ocean: cells.filter(isOcean),
   };
+  const shaderHooks = [];   // extra shader edits added later with addShaderHook()
   const materials = {
-    land: makeBlockMaterial({ roughness: 0.95 }),     // matte
-    ocean: makeBlockMaterial({ roughness: 0.55, lift: 0.35 }),   // smoother: catches the key light
+    land: makeBlockMaterial({ roughness: 0.95, hooks: shaderHooks }),     // matte
+    ocean: makeBlockMaterial({ roughness: 0.55, lift: 0.35, hooks: shaderHooks }),   // smoother: catches the key light
   };
 
   const m = new THREE.Matrix4();
@@ -354,9 +370,46 @@ export async function createGlobe(container, start = { lat: 22, lon: 45, distanc
     }
   });
 
+  // --- Let other files add to the block shader (used by js/ripples.js for the red alert rings) ---
+  // addShaderHook(key, patch) -> true / false
+  //   patch(shader) gets the block shader AFTER the globe's own edits (shader.vertexShader,
+  //   shader.fragmentShader, shader.uniforms) and must return true if it found the lines it edits.
+  //   The globe recompiles both block materials at once and draws one frame to test the result.
+  //   If the patch threw, returned false, or the GPU refused to compile it, the hook is taken out again,
+  //   the globe goes back to its normal shader, and the answer is false (the caller should use a fallback).
+  //   Call it once at start-up, not in the middle of an animation: compiling takes a moment.
+  function recompileBlocks() {
+    Object.values(materials).forEach((mat) => { mat.needsUpdate = true; });
+    renderer.render(scene, camera);   // compiles the new shaders and checks them for errors
+  }
+  function addShaderHook(key, patch) {
+    if (shaderHooks.some((h) => h.key === key)) return true;   // already added
+    const hook = { key, patch, applied: 0, failed: false };
+    shaderHooks.push(hook);
+    let ok = true;
+    try {
+      recompileBlocks();
+      const compiled = Object.values(materials).every((mat) => {
+        const program = renderer.properties.get(mat).currentProgram;
+        return program && !(program.diagnostics && program.diagnostics.runnable === false);
+      });
+      ok = compiled && !hook.failed && hook.applied >= Object.keys(materials).length;
+    } catch (err) {
+      console.warn(`globe: shader hook '${key}' could not be compiled`, err);
+      ok = false;
+    }
+    if (!ok) {
+      shaderHooks.splice(shaderHooks.indexOf(hook), 1);
+      try { recompileBlocks(); } catch (err) { console.warn('globe: could not restore the block shader', err); }
+    }
+    return ok;
+  }
+
   return {
     scene, camera, controls, renderer, meta, fx,
     blockCount: cells.length,
+    blockMaterials: Object.values(materials),   // [land, ocean]: the two block materials (read-only use, please)
+    addShaderHook,
     onFrame: (fn) => frameCallbacks.push(fn),
     setPaused: (p) => { paused = p; },
     flyTo,

@@ -158,7 +158,8 @@
       "source": "NISAR GCOV, track 083 ascending",
       "bin": "real",
       "trap": null,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-10-17"
     },
     {
       "id": "check",
@@ -169,7 +170,8 @@
       "source": "NISAR GCOV + NASA OPERA DSWx-S1",
       "bin": "real",
       "trap": null,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-10-17"
     },
     {
       "id": "wind",
@@ -180,7 +182,8 @@
       "source": "NISAR GCOV + NASA OPERA DSWx-S1",
       "bin": "trap",
       "trap": 11,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-10-17"
     },
     {
       "id": "gap",
@@ -191,7 +194,8 @@
       "source": "NASA CMR file catalogue",
       "bin": "trap",
       "trap": 14,
-      "pending": false
+      "pending": false,
+      "availableOn": "2026-11-03"
     }
   ],
   "toggles": [

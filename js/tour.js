@@ -1,9 +1,11 @@
-// A hands-free, captioned 1-minute tour (?tour, or "Watch a 1-minute tour" on the home screen):
-// globe -> timeline scrub -> fly into Jebel Ali -> sort a card wrongly so a trap card opens ->
+// A hands-free, captioned 1-minute tour of CLASSIC mode (?mode=classic&tour, or "Watch a
+// 1-minute tour" on the classic home screen; Live Ops does not offer it):
+// globe and its markers -> fly into Jebel Ali -> sort a card wrongly so a trap card opens ->
 // inspect one block -> Trap Lab -> verdict. It drives the real app (the same buttons a player
 // presses), so everything shown is the real thing. Pressing any key, or "Stop tour", stops it.
+// v7: the timeline slider is gone, so the tour no longer scrubs it.
 
-import { announce, reducedMotion } from './util.js';
+import { announce } from './util.js';
 
 class Stopped extends Error {}
 
@@ -64,14 +66,8 @@ export async function runTour(app) {
     say('OmniSAR: five real radar mysteries on a changing Earth. Every block of this globe is a real NASA data cell.');
     await wait(7000);
 
-    say('The timeline: every tick is a real NISAR pass. Grey columns are live-event markers: NASA EONET events nobody has checked with radar.');
-    const slider = $('#tl-slider');
-    for (let d = 0; d <= 150; d += reducedMotion() ? 50 : 3) {
-      slider.value = d;
-      slider.dispatchEvent(new Event('input'));
-      await wait(reducedMotion() ? 600 : 100);
-    }
-    await wait(800);
+    say('Each coloured column is one of our five cases. Grey columns are live-event markers: NASA EONET events nobody has checked with radar.');
+    await wait(5500);
 
     say('Fly into a case: Jebel Ali, Dubai. What appeared here between June and October 2026?');
     app.selectCase('jebel-ali');

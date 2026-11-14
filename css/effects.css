@@ -1,0 +1,309 @@
+/* effects.css: the look of js/effects.js (game moments) and js/panelresize.js (panel resize handle).
+
+   Safety rule: nothing here flashes (bright/dark/bright) more than 3 times a second.
+     red edge pulses ........ 1 per second, 3 times, then steady
+     hazard stripes ......... scroll one stripe pair per 2 s = 0.5 per second at any point
+     day card glitch ........ 2 short flickers per second; its light sweep passes once per 1.2 s
+     shockwave, burst, toast  happen once (no repeating flash)
+   Everyone gets the effects (Zaid's choice): the block at the end puts the real timings back for
+   people whose system asks for less motion, because style.css shortens every animation for them.
+   Colours here are effect colours only, never data colours. */
+
+:root {
+  --fx-red: #FF2E4A;
+  --fx-hazard-red: #C8102E;
+  --fx-hazard-black: #0B0B0D;
+  --fx-plate: rgba(6, 7, 10, 0.92);       /* dark plate under top-bar text while the stripes run */
+  --fx-green: #3BE38A;
+  --fx-ink: #EEF0F3;                      /* text on our own dark plates (toasts, day card) */
+}
+
+/* One click-through layer over the whole window holds every effect */
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* ---------- Red screen edge ---------- */
+/* It starts under the top bar: the bar has its own alarm look (stripes), and a red glow on top of
+   the bar's text measured only 3.6:1 contrast at the pulse peak. Below the bar the text stays ≥ 4.5:1. */
+.fx-edge {
+  position: absolute;
+  inset: var(--topbar-h, 48px) 0 0 0;
+  opacity: 0;
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 70, 90, 0.9),
+    inset 0 0 34px 6px rgba(255, 30, 60, 0.85),
+    inset 0 0 150px 30px rgba(255, 0, 40, 0.42);
+  transition: opacity 600ms ease;
+  will-change: opacity;
+}
+body.is-alarm .fx-edge { opacity: 0.38; }                     /* the faint steady glow */
+.fx-edge.is-pulsing {                                         /* 3 pulses, 1 per second */
+  transition: none;
+  animation: fx-edge-pulse 1000ms ease-in-out 3;
+}
+@keyframes fx-edge-pulse {
+  0%   { opacity: 0.38; }
+  40%  { opacity: 1; }
+  100% { opacity: 0.38; }
+}
+
+/* ---------- Shockwave ring (PLAY) ---------- */
+.fx-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid #FFD6DC;
+  box-shadow: 0 0 26px 5px rgba(255, 50, 75, 0.6), inset 0 0 46px 8px rgba(255, 60, 85, 0.35);
+  transform: translate(-50%, -50%) scale(0.02);
+  animation: fx-ring 400ms cubic-bezier(.15, .7, .3, 1) forwards;
+  will-change: transform, opacity;
+}
+@keyframes fx-ring {
+  from { transform: translate(-50%, -50%) scale(0.02); opacity: 1; }
+  65%  { opacity: 0.85; }
+  to   { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+}
+
+/* ---------- Alarm: hazard-stripe top bar ---------- */
+body:is(.is-alarm, .is-alarm-fading) header.topbar {
+  position: relative;
+  isolation: isolate;          /* the stripes sit behind the bar's own text */
+  overflow: clip;              /* the moving stripe strip never sticks out of the bar */
+}
+body.is-alarm header.topbar { border-bottom-color: var(--fx-red); }
+body:is(.is-alarm, .is-alarm-fading) header.topbar::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: -40px; right: 0;     /* 40 px extra on the left = one stripe pair, for the loop */
+  z-index: -1;
+  background: linear-gradient(45deg,
+    var(--fx-hazard-red) 25%, var(--fx-hazard-black) 25% 50%,
+    var(--fx-hazard-red) 50% 75%, var(--fx-hazard-black) 75%) 0 0 / 40px 40px;
+  animation: fx-hazard-scroll 2000ms linear infinite, fx-fade-in 600ms ease both;
+  pointer-events: none;
+}
+body.is-alarm-fading header.topbar::before {
+  animation: fx-hazard-scroll 2000ms linear infinite, fx-fade-out 600ms ease forwards;
+}
+@keyframes fx-hazard-scroll { from { transform: translateX(0); } to { transform: translateX(40px); } }
+@keyframes fx-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fx-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+/* The bar's text and buttons sit on dark plates (a box-shadow "spread" makes the plate bigger than the
+   text without moving anything). Measured contrast on the plate: well above 4.5:1 (see the B report). */
+body:is(.is-alarm, .is-alarm-fading) header.topbar > * {
+  transition: background-color 600ms ease, box-shadow 600ms ease;
+  border-radius: 4px;
+}
+body.is-alarm header.topbar > *:not([hidden]) {
+  background-color: var(--fx-plate);
+  box-shadow: 0 0 0 6px var(--fx-plate);
+}
+
+/* ---------- Shake (wrong answer) ---------- */
+main.layout.fx-shake { animation: fx-shake 300ms linear; }
+@keyframes fx-shake {
+  0%, 100% { transform: none; }
+  15% { transform: translate(-5px, 1px); }
+  30% { transform: translate(4px, -1px); }
+  45% { transform: translate(-3px, 1px); }
+  60% { transform: translate(3px, 0); }
+  75% { transform: translate(-2px, 0); }
+  90% { transform: translate(1px, 0); }
+}
+
+/* ---------- Burst (right answer): a ring and a spray of little blocks ---------- */
+.fx-burst { position: absolute; width: 0; height: 0; }
+.fx-burst-ring {
+  position: absolute; left: -30px; top: -30px; width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--fx-green);
+  box-shadow: 0 0 14px rgba(59, 227, 138, 0.6);
+  animation: fx-burst-ring 600ms ease-out forwards;
+}
+@keyframes fx-burst-ring {
+  from { transform: scale(0.2); opacity: 1; }
+  to   { transform: scale(1.6); opacity: 0; }
+}
+.fx-burst-bit {
+  position: absolute; left: -4px; top: -4px; width: 8px; height: 8px;
+  background: var(--fx-green);
+  box-shadow: 0 0 6px rgba(59, 227, 138, 0.8);
+  animation: fx-burst-bit 600ms cubic-bezier(.2, .8, .3, 1) forwards;
+}
+@keyframes fx-burst-bit {
+  from { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  70%  { opacity: 1; }
+  to   { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.4); opacity: 0; }
+}
+
+/* ---------- Toasts (top centre, stacking) ---------- */
+.fx-toasts {
+  position: absolute;
+  top: calc(var(--topbar-h, 48px) + 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(440px, calc(100vw - 32px));
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.fx-toast {
+  max-width: 100%;
+  padding: 9px 14px 9px 14px;
+  background: rgba(10, 12, 16, 0.95);
+  color: var(--fx-ink);
+  border: 1px solid rgba(255, 77, 94, 0.5);
+  border-left: 4px solid var(--fx-red);
+  border-radius: 6px;
+  font: 13px/1.4 var(--font-ui, system-ui, sans-serif);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  animation: fx-toast-in 220ms cubic-bezier(.2, .8, .2, 1) both;
+}
+.fx-toast.is-leaving { animation: fx-toast-out 250ms ease-in forwards; }
+@keyframes fx-toast-in  { from { opacity: 0; transform: translateY(-10px) scale(0.97); } }
+@keyframes fx-toast-out { to   { opacity: 0; transform: translateY(-6px); } }
+
+/* ---------- Day card ---------- */
+.fx-daycard {
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  transform: translateY(-50%);
+  display: grid; place-items: center;
+  padding: 30px 16px;
+  overflow: hidden;
+  background: linear-gradient(90deg, transparent, rgba(6, 8, 12, 0.88) 16%, rgba(6, 8, 12, 0.88) 84%, transparent);
+  animation: fx-card-in 320ms ease-out both;
+}
+/* fixed faint scanlines (they don't move, so they never flash) */
+.fx-daycard::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 4px);
+}
+/* hairlines above and below + one soft light band sweeping down once per 1.2 s */
+.fx-daycard::after {
+  content: '';
+  position: absolute; left: 10%; right: 10%; top: -40%; height: 40%;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.07), transparent);
+  animation: fx-card-sweep 1200ms linear infinite;
+}
+@keyframes fx-card-sweep { from { transform: translateY(0); } to { transform: translateY(350%); } }
+@keyframes fx-card-in { from { opacity: 0; } }
+.fx-daycard.is-leaving { animation: fx-card-out 350ms ease-in forwards; }
+.fx-daycard.is-leaving .fx-daycard-text { animation: fx-card-text-out 350ms ease-in forwards; }
+@keyframes fx-card-out { to { opacity: 0; } }
+@keyframes fx-card-text-out { to { transform: scale(1.06); opacity: 0; } }
+
+.fx-daycard-text {
+  position: relative;
+  z-index: 1;
+  white-space: pre-line;
+  text-align: center;
+  color: var(--fx-ink);
+  font: 700 clamp(28px, 5.6vw, 64px)/1.1 var(--font-data, ui-monospace, monospace);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 0 18px rgba(255, 60, 80, 0.5);
+  border-top: 1px solid rgba(255, 46, 74, 0.7);
+  border-bottom: 1px solid rgba(255, 46, 74, 0.7);
+  padding: 10px 0.6em;
+  animation: fx-card-text-in 320ms cubic-bezier(.2, .9, .25, 1.15) both, fx-glitch 1000ms linear 320ms infinite;
+}
+@keyframes fx-card-text-in { from { transform: scale(0.82); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+/* Glitch: two short dips per second (2 Hz, under the 3 Hz limit), each with a small sideways jump */
+@keyframes fx-glitch {
+  0%, 17%, 24%, 61%, 68%, 100% { opacity: 1; transform: none; }
+  18%, 23% { opacity: 0.62; transform: translateX(3px); }
+  62%, 67% { opacity: 0.7; transform: translateX(-2px); }
+}
+/* Red and cyan copies of the text appear only during those same two dips */
+.fx-daycard-text::before, .fx-daycard-text::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  padding: inherit;
+  opacity: 0;
+  pointer-events: none;
+}
+.fx-daycard-text::before { color: rgba(255, 46, 74, 0.8);  animation: fx-split-a 1000ms linear 320ms infinite; }
+.fx-daycard-text::after  { color: rgba(34, 211, 238, 0.7); animation: fx-split-b 1000ms linear 320ms infinite; }
+@keyframes fx-split-a {
+  0%, 17%, 24%, 61%, 68%, 100% { opacity: 0; transform: none; }
+  18%, 23% { opacity: 1; transform: translateX(-5px); }
+  62%, 67% { opacity: 1; transform: translateX(4px); }
+}
+@keyframes fx-split-b {
+  0%, 17%, 24%, 61%, 68%, 100% { opacity: 0; transform: none; }
+  18%, 23% { opacity: 1; transform: translateX(5px); }
+  62%, 67% { opacity: 1; transform: translateX(-4px); }
+}
+
+/* ---------- Panel resize handle (js/panelresize.js) ---------- */
+.layout { position: relative; }                 /* so the handle can sit on the panel column's edge */
+.panel-resizer {
+  position: absolute;
+  grid-column: -2 / -1;                         /* the panel's column (last one) ... */
+  grid-row: 1 / -1;                             /* ... all rows */
+  top: 0; bottom: 0; left: -6px;                /* centred on the panel's left border */
+  width: 12px;
+  z-index: 8;
+  cursor: col-resize;
+  touch-action: none;                           /* a finger drag resizes instead of scrolling */
+  outline: none;
+}
+.panel-resizer::before {                        /* the line that lights up */
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: 5px; width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.panel-resizer::after {                         /* the grip in the middle */
+  content: '';
+  position: absolute; left: 2px; top: 50%; width: 8px; height: 38px; margin-top: -19px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  background: radial-gradient(circle, var(--accent) 1.2px, transparent 1.7px) center / 8px 8px repeat-y, var(--surface-2);
+}
+.panel-resizer:hover::before,
+body.is-resizing .panel-resizer::before { opacity: 0.85; }
+.panel-resizer:focus-visible::before { opacity: 1; }
+.panel-resizer:focus-visible {
+  outline: 2px solid var(--data-nisar, #22D3EE);
+  outline-offset: 0;
+  border-radius: 3px;
+}
+/* while dragging: the column follows the pointer at once (no 280 ms slide) and text doesn't get selected */
+body.is-resizing .layout { transition: none !important; }
+body.is-resizing, body.is-resizing * { cursor: col-resize !important; user-select: none; }
+
+/* no handle when the panel is folded into its rail, not there yet (before PLAY), or stacked on phones */
+.layout.panel-collapsed > .panel-resizer,
+body.is-prestart .panel-resizer { display: none; }
+@media (max-width: 860px) { .panel-resizer { display: none; } }
+
+/* ---------- Everyone gets the full effects ----------
+   style.css cuts every animation to 0.01 ms when the system asks for less motion. Zaid chose no calm
+   version for these effects (they still never flash faster than 3 times a second), so we put their
+   real timings back here. */
+@media (prefers-reduced-motion: reduce) {
+  body.is-alarm .fx-edge, .fx-edge { transition-duration: 600ms !important; }
+  .fx-edge.is-pulsing { animation-duration: 1000ms !important; animation-iteration-count: 3 !important; }
+  .fx-ring { animation-duration: 400ms !important; animation-iteration-count: 1 !important; }
+  body:is(.is-alarm, .is-alarm-fading) header.topbar::before {
+    animation-duration: 2000ms, 600ms !important; animation-iteration-count: infinite, 1 !important;
+  }
+  body:is(.is-alarm, .is-alarm-fading) header.topbar > * { transition-duration: 600ms !important; }
+  main.layout.fx-shake { animation-duration: 300ms !important; animation-iteration-count: 1 !important; }
+  .fx-burst-ring, .fx-burst-bit { animation-duration: 600ms !important; animation-iteration-count: 1 !important; }
+  .fx-toast { animation-duration: 220ms !important; animation-iteration-count: 1 !important; }
+  .fx-toast.is-leaving { animation-duration: 250ms !important; }
+  .fx-daycard { animation-duration: 320ms !important; animation-iteration-count: 1 !important; }
+  .fx-daycard.is-leaving, .fx-daycard.is-leaving .fx-daycard-text { animation-duration: 350ms !important; animation-iteration-count: 1 !important; }
+  .fx-daycard::after { animation-duration: 1200ms !important; animation-iteration-count: infinite !important; }
+  .fx-daycard-text { animation-duration: 320ms, 1000ms !important; animation-iteration-count: 1, infinite !important; }
+  .fx-daycard-text::before, .fx-daycard-text::after { animation-duration: 1000ms !important; animation-iteration-count: infinite !important; }
+  .panel-resizer::before { transition-duration: 150ms !important; }
+}

@@ -2,12 +2,12 @@
    Rules: readable first, data first. Data colours, the NISAR-cyan tags and the badge colours
    are NOT touched here (they live in style.css and never change). Decoration (grid texture,
    corner brackets, glows) stays in empty areas and frames, never on top of data.
-   Every animation uses only transform/opacity and is switched off by prefers-reduced-motion
-   (see the end of style.css and js/motion.js). */
+   Every animation uses only transform/opacity. In classic mode they are switched off by
+   prefers-reduced-motion (see the end of style.css and js/motion.js); Live Ops has no calm version.
+   v7: the timeline bar under the globe is gone; the top bar now carries the game's DAY readout. */
 
 :root {
   --topbar-h: 48px;
-  --timeline-h: 90px;
   --panel-w: clamp(320px, 26vw, 400px);
   --radius: 6px;
   --hud-line: color-mix(in srgb, var(--accent) 42%, transparent);
@@ -36,15 +36,15 @@ body {
 .brand-name { font-size: 18px; letter-spacing: 0.4px; }
 .brand-mark { animation: idle-glow 4s ease-in-out infinite; }           /* the one idle glow in the bar */
 .tagline { font: 12px var(--font-data); letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
-@keyframes idle-glow { 50% { box-shadow: 5px 5px 0 0 var(--accent-2), 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); } }
+@keyframes idle-glow { 50% { filter: drop-shadow(0 0 5px color-mix(in srgb, var(--accent) 70%, transparent)); } }
 
 /* ---------- Layout: the globe / terrain gets the room; the panel folds into a rail ---------- */
-.layout { transition: grid-template-rows 240ms ease, grid-template-columns 280ms var(--ease); }
+.layout { transition: grid-template-columns 280ms var(--ease); }
 .layout.panel-collapsed { grid-template-columns: 1fr 44px; }
 .globe-area { background: transparent; }
 
 /* Shared HUD frame: thin cyan hairline + corner brackets + translucent dark glass */
-.panel, .terrain-hud, .timeline, .trap-card, .terrain-note, .beacon-label, .terrain-tip {
+.panel, .terrain-hud, .trap-card, .terrain-note, .beacon-label, .terrain-tip {
   --b: var(--accent);
   background-color: var(--glass);
   background-image:
@@ -62,7 +62,7 @@ body {
   border-color: var(--hud-line); border-radius: var(--radius);
 }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .panel, .terrain-hud, .timeline, .trap-card, .terrain-note, .beacon-label, .terrain-tip { background-color: var(--surface-2); }
+  .panel, .terrain-hud, .trap-card, .terrain-note, .beacon-label, .terrain-tip { background-color: var(--surface-2); }
 }
 
 /* ---------- Side panel ---------- */
@@ -114,20 +114,37 @@ body {
   border-radius: 4px; padding: 11px 18px; min-height: 40px;
   transition: box-shadow 160ms ease, transform 120ms ease, filter 160ms ease;
 }
-.ghost-btn, .tl-btn, .option, .case-row, .trap-chip, .link-btn, .graph-node {
+.ghost-btn, .option, .case-row, .trap-chip, .link-btn, .graph-node {
   transition: border-color 160ms ease, box-shadow 160ms ease, transform 120ms ease, color 160ms ease;
 }
 .primary-btn:hover:not(:disabled) { box-shadow: 0 0 0 1px var(--accent), 0 0 22px color-mix(in srgb, var(--accent) 55%, transparent); filter: none; }
-:is(.ghost-btn, .tl-btn, .option, .case-row, .trap-chip):hover:not(:disabled) { border-color: var(--accent); box-shadow: var(--glow); }
-:is(.primary-btn, .ghost-btn, .tl-btn, .option, .case-row, .trap-chip, .link-btn):active:not(:disabled) { transform: scale(.97); }
-.ghost-btn, .tl-btn { border-radius: 4px; }
-.tl-btn { font-size: 12px; padding: 0 10px; }
+:is(.ghost-btn, .option, .case-row, .trap-chip):hover:not(:disabled) { border-color: var(--accent); box-shadow: var(--glow); }
+:is(.primary-btn, .ghost-btn, .option, .case-row, .trap-chip, .link-btn):active:not(:disabled) { transform: scale(.97); }
+.ghost-btn { border-radius: 4px; }
 
-/* ---------- Timeline: slim bottom bar ---------- */
-.timeline { padding: 6px 16px 4px; border-top: 1px solid var(--hud-line); }
-.tl-head { margin-bottom: 2px; gap: 12px; }
-.tl-track { height: 46px; }
-.tl-date { color: var(--accent); }
+/* ---------- Top bar: the Live Ops DAY readout (js/hud.js setDay) ---------- */
+/* Fixed width and tabular digits, so "DAY – · –" -> "DAY 2 · 15 SEP 2026" never makes the bar jump */
+.hud-day {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-width: 21ch; justify-content: center;
+  padding: 4px 12px; border: 1px solid var(--hud-line); border-radius: 4px;
+  font: 600 12px var(--font-data); letter-spacing: 1.6px; white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);   /* a dark plate: readable over any top-bar effect */
+}
+.hud-day::before {                       /* a small status light: dim while no day is running */
+  content: ""; width: 6px; height: 6px; border-radius: 1px; flex: none;
+  background: var(--muted); opacity: .6;
+}
+.hud-day.is-running::before { background: var(--alert); opacity: 1; box-shadow: 0 0 6px var(--alert); }
+.hud-day .hud-day-sep { color: var(--muted); }
+.mode-classic .hud-day { display: none; }   /* classic mode has no days */
+/* phones: the DAY readout shrinks and the NISAR tag steps aside, so the bar never overflows sideways */
+@media (max-width: 560px) {
+  .hud-day { min-width: 0; padding: 4px 8px; letter-spacing: 1px; }
+  .mode-live .topbar-right .tag-nisar { display: none; }
+}
 
 /* ---------- Case terrain HUD: compact, at the edges ---------- */
 .terrain-top { right: auto; max-width: min(640px, calc(100% - 24px)); padding: 8px 10px 8px 14px; }

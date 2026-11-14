@@ -1,0 +1,187 @@
+{
+  "about": "Live Ops day plan (data only, read by js/liveops.js). Each event is a real NISAR pass date from cases/passes.json. An event only uses evidence cards whose availableOn date (in cases/<case>.json: the date of the last pass or other data the card uses) is on or before the event date. teachCard is the card that teaches teachTrap. keyNumbers are LABELS of entries in the case's numbers file; the values are read from that file at run time, never written here.",
+  "rules": [
+    "every card in an event has availableOn <= the event date",
+    "the teach card shows the teach trap and is available on/before the event date",
+    "each event shows the teach card + 2-3 other cards, mixing real and trap where the case has both",
+    "days and the events inside them move forward in time",
+    "event dates are real NISAR pass dates (Jakarta: the end date of an interferogram pair)"
+  ],
+  "days": [
+    {
+      "day": 1,
+      "date": "2026-09-15",
+      "events": [
+        {
+          "id": "d1-big-sur",
+          "caseId": "big-sur",
+          "date": "2026-09-15",
+          "teachTrap": 9,
+          "teachCard": "geometry",
+          "cards": [
+            "hv-drop",
+            "geometry",
+            "speckle",
+            "steep-hwy"
+          ],
+          "keyNumbers": [
+            "Burned (NISAR HV fell ≥ 2 dB)",
+            "Burned on slopes ≥ 23°",
+            "Burn on radar-distorted slopes (low confidence)"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "date": "2026-10-13",
+      "events": [
+        {
+          "id": "d2-jakarta",
+          "caseId": "jakarta",
+          "date": "2026-10-13",
+          "teachTrap": 15,
+          "teachCard": "raw-pair",
+          "cards": [
+            "raw-pair",
+            "two-directions",
+            "coherence",
+            "sea-level"
+          ],
+          "keyNumbers": [
+            "Fastest-sinking district (2 km)",
+            "Land sinking ≥ 30 mm"
+          ]
+        },
+        {
+          "id": "d2-tonle-sap",
+          "caseId": "tonle-sap",
+          "date": "2026-10-17",
+          "teachTrap": 11,
+          "teachCard": "wind",
+          "cards": [
+            "pulse",
+            "wind",
+            "check"
+          ],
+          "keyNumbers": [
+            "Open water 17 Oct",
+            "Flooded forest 17 Oct (L-band only)"
+          ]
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "date": "2026-10-28",
+      "events": [
+        {
+          "id": "d3-jebel-ali",
+          "caseId": "jebel-ali",
+          "date": "2026-10-28",
+          "teachTrap": 8,
+          "teachCard": "two-date",
+          "cards": [
+            "photo-check",
+            "two-date",
+            "dark-inland",
+            "zoom-tile"
+          ],
+          "keyNumbers": [
+            "New structures (HH rose ≥ 3 dB)",
+            "Water ↔ land"
+          ]
+        },
+        {
+          "id": "d3-al-ain",
+          "caseId": "al-ain",
+          "date": "2026-10-28",
+          "teachTrap": 2,
+          "teachCard": "tile",
+          "cards": [
+            "pivots",
+            "tile",
+            "dark"
+          ],
+          "keyNumbers": [
+            "Pivot A",
+            "Pivot B",
+            "Pivot C",
+            "Pivot D"
+          ]
+        },
+        {
+          "id": "d3-tonle-sap",
+          "caseId": "tonle-sap",
+          "date": "2026-11-03",
+          "teachTrap": 14,
+          "teachCard": "gap",
+          "cards": [
+            "gap",
+            "pulse",
+            "wind"
+          ],
+          "keyNumbers": [
+            "Open water 17 Oct",
+            "Flooded forest 17 Oct (L-band only)"
+          ]
+        }
+      ]
+    }
+  ],
+  "waitEligible": {
+    "jebel-ali/two-date": "Change between just two NISAR images, 18 Jun and 28 Oct, with nothing removed."
+  },
+  "notInLiveOps": {
+    "jebel-ali/median-change": "pending (no image): never in Live Ops",
+    "jebel-ali/no-data-before-june": "availableOn 2026-10-29 (the chart plots every Jebel Ali pass in passes.json); the Jebel Ali event is 28 Oct",
+    "big-sur/rain": "availableOn 2026-11-10 (NASA POWER series end), after every Big Sur pass in the game",
+    "big-sur/dark": "available (15 Sep) but left out to keep Day 1 at four cards",
+    "al-ain/history": "availableOn 2026-10-31 (the last MODIS composite, dated 16 Oct, covers 16-31 Oct); the Al Ain event is 28 Oct",
+    "jakarta/gap": "available on 13 Oct, left out to keep the Jakarta event at four cards",
+    "tonle-sap/check": "used on Day 2; left out on Day 3 to keep that event at three cards",
+    "jakarta/motion": "available (12 Oct), left out to keep the Jakarta event at four cards"
+  },
+  "changes": [
+    {
+      "target": "Day 1: Tonle Sap 19 Jun, trap 11",
+      "final": "Day 1: Big Sur 15 Sep, trap 9 (geometry)",
+      "reason": "No Tonle Sap card is available before 17 Oct (every card uses the 17 Oct pass or the 3 Nov catalogue). Big Sur's 15 Sep pass is the earliest date where a full event exists."
+    },
+    {
+      "target": "Day 2: Big Sur 15 Sep, trap 9",
+      "final": "moved to Day 1",
+      "reason": "Days move forward in time; Big Sur 15 Sep becomes the first day."
+    },
+    {
+      "target": "Day 2: Jakarta latest pair on/before the day, trap 15",
+      "final": "Day 2: Jakarta 13 Oct (latest pair on or before the day: the descending pair ending 13 Oct; the ascending chain ends 12 Oct), trap 15 (raw-pair)",
+      "reason": "Only the coherence card exists before 12 Oct. The event is set to 13 Oct (a real Jakarta pass date, descending track 018) rather than 12 Oct so that nothing in it, including the Weak verdict revealed at the end (it needs the descending pair), uses data from after the event. Jakarta has NO real cards (its Weak badge made 'motion' a trap), so this event cannot mix real and trap cards."
+    },
+    {
+      "target": "Day 3: Tonle Sap 17 Oct, trap 14",
+      "final": "Day 2: Tonle Sap 17 Oct, trap 11 (wind) + Day 3: Tonle Sap 3 Nov, trap 14 (gap)",
+      "reason": "Tonle Sap's trap-14 card (gap) plots every catalogue pass up to 3 Nov, so it is available only from 3 Nov (a real descending pass, track 148). Trap 11 (wind) is available on 17 Oct and fills Day 2's second slot."
+    },
+    {
+      "target": "Day 3: Jebel Ali 28 Oct, trap 8; Al Ain 28 Oct, trap 2",
+      "final": "unchanged",
+      "reason": "two-date (28 Oct) and tile (18 Jun) are available on 28 Oct."
+    },
+    {
+      "target": "lead plan: Jakarta cards may include two-directions",
+      "final": "raw-pair, two-directions, coherence, sea-level",
+      "reason": "With the event on 13 Oct, two-directions (13 Oct) is available; motion is left out to keep the event at four cards."
+    },
+    {
+      "target": "lead plan: Al Ain cards pivots, history, dark",
+      "final": "pivots, tile, dark",
+      "reason": "history's last MODIS composite (dated 16 Oct) is a 16-day composite covering 16-31 Oct, so it is available on 31 Oct, after the 28 Oct event."
+    },
+    {
+      "target": "lead plan: Tonle Sap 3 Nov cards gap + pulse, check, wind",
+      "final": "gap, pulse, wind",
+      "reason": "Shorter run time (normal run target 4-5 min); keeps one real and one trap card besides the teach card."
+    }
+  ]
+}

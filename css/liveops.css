@@ -1,0 +1,150 @@
+/* Live Ops (js/liveops.js): the panel views, the evidence card with its timer ring, and the red
+   INCOMING banner over the globe.
+   Zaid's rules: no reduced-motion branches for these effects, and nothing flashes faster than
+   3 times a second (every repeating pulse here is 1 Hz or slower). Alert red = var(--alert),
+   a fixed UI colour; amber = var(--data-pending); text and surfaces come from the palette. */
+
+.lo { display: flex; flex-direction: column; gap: 10px; }
+.lo .eyebrow { margin: 0; }
+.lo-title { margin: 0; font-size: 22px; line-height: 1.2; }
+.lo-title:focus { outline: none; }
+.lo-place { display: block; font-size: 13px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.lo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.lo-score { margin: 0; font-family: var(--font-data); font-size: 12px; letter-spacing: 1.2px; color: var(--muted); }
+.lo-score b { color: var(--accent); font-size: 16px; font-variant-numeric: tabular-nums; }
+.lo-when { margin: 0; font-family: var(--font-data); font-size: 12px; color: var(--text); }
+.lo-queue {
+  margin: 0; align-self: flex-start; padding: 2px 8px; border-radius: 999px;
+  font-family: var(--font-data); font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  color: #fff; background: color-mix(in srgb, var(--alert) 70%, black);
+}
+.lo-question { margin: 0; font-style: italic; color: var(--muted); font-size: 13px; }
+.lo-terrain-note { margin: 0; }
+.lo-terrain-note:empty { display: none; }
+.lo-queue-list { margin: 0; padding-left: 20px; font-family: var(--font-data); font-size: 13px; }
+.lo-queue-list li { margin: 4px 0; }
+
+/* the deck: one slot per card in this event */
+.lo-deck { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.lo-slot {
+  width: 22px; height: 30px; border-radius: 4px;
+  border: 1px solid var(--line-strong, rgba(255,255,255,.25));
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--surface) 80%, black) 0 4px, var(--surface) 4px 8px);
+  transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
+.lo-slot.is-current { transform: translateY(-4px); border-color: var(--accent); }
+.lo-slot.is-right { background: color-mix(in srgb, var(--accent) 35%, var(--surface)); border-color: var(--accent); }
+.lo-slot.is-wrong { background: color-mix(in srgb, var(--ui-wrong) 40%, var(--surface)); border-color: var(--ui-wrong); }
+
+/* ---------- the evidence card ---------- */
+.lo-stage { perspective: 1200px; }
+.lo-card {
+  border: 1px solid var(--line-strong, rgba(255,255,255,.25)); border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface) 92%, black); padding: 12px;
+  transform-origin: 50% 50%;
+  animation: lo-flip-in var(--flip-ms, 450ms) cubic-bezier(.2,.8,.3,1) both;
+}
+.lo-card:focus { outline: none; }
+.lo-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@keyframes lo-flip-in {
+  from { transform: rotateY(-88deg) translateX(30px); opacity: 0; }
+  60% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+.lo-card h3 { margin: 4px 0 8px; font-size: 16px; }
+/* the image shrinks with the window so the card and its answers fit at 1366×768 and 1440×900 */
+.lo-card img { display: block; width: 100%; height: auto; max-height: clamp(110px, calc(100vh - 560px), 240px); object-fit: contain; border-radius: 6px; background: #000; }
+.lo-card-top { display: flex; align-items: center; justify-content: space-between; }
+
+/* timer ring: --left goes 1 -> 0; cyan, then amber, then red (red breathes at 1 Hz) */
+.lo-timer { position: relative; width: 44px; height: 44px; flex: none; color: var(--accent); --left: 1; }
+.lo-timer svg { width: 44px; height: 44px; transform: rotate(-90deg); }
+.lo-ring-bg { fill: none; stroke: color-mix(in srgb, currentColor 20%, transparent); stroke-width: 4; }
+.lo-ring { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round;
+  stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--left) * 100); transition: stroke-dashoffset .1s linear, color .3s ease; }
+.lo-timer-n { position: absolute; inset: 0; display: grid; place-items: center;
+  font-family: var(--font-data); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lo-timer.is-amber { color: var(--data-pending); }
+.lo-timer.is-red { color: var(--alert); animation: lo-breathe 1s ease-in-out infinite; }
+.lo-timer.is-stopped { animation: none; opacity: .6; }
+@keyframes lo-breathe { 50% { transform: scale(1.1); } }
+
+/* the answers are a bar that sticks to the bottom of the panel (above its foot readout), so they
+   are always on screen without scrolling, whatever the card's length */
+.lo-answers {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px -12px 0; padding: 8px 12px;
+  position: sticky; bottom: var(--lo-foot, 0px); z-index: 3;
+  background: color-mix(in srgb, var(--surface) 96%, black);
+  border-top: 1px solid var(--line-strong, rgba(255,255,255,.25));
+  box-shadow: 0 -8px 16px -8px rgba(0, 0, 0, .6);
+}
+.lo-answer {
+  font: inherit; font-size: 14px; color: var(--text); cursor: pointer; text-align: left;
+  padding: 9px 10px; border-radius: 8px; border: 1px solid var(--line-strong, rgba(255,255,255,.25));
+  background: color-mix(in srgb, var(--surface) 70%, black);
+}
+.lo-answer[data-a="wait"] { grid-column: 1 / -1; }
+.lo-answer:hover:not(:disabled) { border-color: var(--accent); }
+.lo-answer:focus-visible, .lo-conf-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lo-answer:disabled { cursor: default; opacity: .55; }
+.lo-answer.is-picked { opacity: 1; border-color: var(--accent); }
+.lo kbd {
+  display: inline-block; min-width: 18px; margin-right: 6px; padding: 0 4px; border-radius: 4px; text-align: center;
+  font-family: var(--font-data); font-size: 11px; line-height: 18px; color: var(--bg); background: var(--accent);
+}
+.lo-feedback:empty { display: none; }
+.lo-feedback { margin-top: 10px; padding: 8px 10px; border-radius: 8px; border-left: 3px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent); animation: lo-rise .25s ease-out both; }
+.lo-feedback.bad { border-left-color: var(--ui-wrong); background: color-mix(in srgb, var(--ui-wrong) 10%, transparent); }
+.lo-feedback p { margin: 0 0 6px; font-size: 13px; }
+.lo-feedback .reply-head { font-weight: 700; font-size: 14px; }
+@keyframes lo-rise { from { transform: translateY(6px); opacity: 0; } }
+
+/* ---------- final call, confidence, reveal ---------- */
+.lo-final, .lo-conf, .lo-reveal { animation: lo-rise .3s ease-out both; }
+.lo-q { margin: 4px 0 10px; font-size: 16px; line-height: 1.35; }
+.lo-q:focus { outline: none; }
+.lo-options .option { text-align: left; }
+.lo-reply .primary-btn, .lo-reveal .primary-btn { margin-top: 10px; }
+.lo-conf-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.lo-conf-btn { flex: 1 1 90px; }
+.lo-badge { font-size: 14px; padding: 4px 10px; }
+.lo-match { margin: 0 0 8px; font-weight: 600; }
+.lo-match.ok { color: var(--accent); }
+.lo-facts { margin: 6px 0; }
+
+/* ---------- day end + game end ---------- */
+.lo-trap-list { margin: 0; padding-left: 18px; }
+.lo-trap-list li { margin: 4px 0; }
+.lo-auto { margin: 0; }
+.lo-best { margin: 0; font-family: var(--font-data); color: var(--accent); }
+.lo-trap-grid { display: flex; flex-direction: column; gap: 6px; }
+.lo-trap-btn { text-align: left; }
+.lo-end-actions { display: flex; gap: 8px; margin-top: 6px; }
+
+/* ---------- INCOMING banner over the globe ---------- */
+.lo-banner {
+  position: absolute; z-index: 30; left: 50%; top: 18px; transform: translateX(-50%);
+  width: min(560px, calc(100% - 32px)); overflow: hidden; pointer-events: none;
+  padding: 10px 16px 10px 44px; border-radius: 8px;
+  color: #fff; background: color-mix(in srgb, var(--alert) 30%, #0b0507);
+  border: 1px solid var(--alert);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--alert) 55%, transparent);
+  animation: lo-banner-in .45s cubic-bezier(.2,.8,.3,1) both;
+}
+.lo-banner.is-leaving { animation: lo-banner-out .3s ease-in both; }
+.lo-banner-stripes {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 28px;
+  background: repeating-linear-gradient(45deg, var(--alert) 0 8px, #120406 8px 16px);
+  background-size: 22.6px 22.6px;
+  animation: lo-stripes 1.5s linear infinite;            /* slides, no brightness flicker */
+}
+.lo-banner-main { margin: 0; font-family: var(--font-data); font-size: 14px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; }
+.lo-banner-sub { margin: 2px 0 0; font-size: 12px; color: #ffd9dc; }
+@keyframes lo-banner-in {
+  0% { transform: translate(-50%, -24px); opacity: 0; clip-path: inset(0 100% 0 0); }
+  60% { opacity: 1; clip-path: inset(0 0 0 0); }
+  100% { transform: translate(-50%, 0); opacity: 1; clip-path: inset(0 0 0 0); }
+}
+@keyframes lo-banner-out { to { transform: translate(-50%, -16px); opacity: 0; } }
+@keyframes lo-stripes { to { background-position: 0 22.6px; } }
