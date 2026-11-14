@@ -55,7 +55,7 @@ async function start() {
   note.className = 'globe-note';
   note.textContent =
     `Heights exaggerated ×${globe.meta.heightExaggeration} · one block ≈ ${globe.meta.cellDeg}° ` +
-    `· colours: NASA Blue Marble · heights: AWS Terrarium`;
+    `· colours: NASA Blue Marble · heights: AWS Terrarium · glow, stars, lighting: visual only`;
   area.appendChild(note);
 
   const panel = createPanel(document.getElementById('panel-inner'), data.cases, {
