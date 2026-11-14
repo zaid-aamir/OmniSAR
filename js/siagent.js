@@ -344,7 +344,8 @@ export function createSiAgent({ view, triggerSlot, panelSlot, onOpen } = {}) {
       if (!r.width || !r.height) continue;
       if (r.left < pr.right && r.right > pr.left && r.bottom > top) maxH = Math.min(maxH, r.top - 8 - top);
     }
-    panel.style.maxHeight = `${Math.max(160, Math.floor(maxH))}px`;
+    // never past the side region (100%): the bottom bar can grow while the panel is open (replay banner lines)
+    panel.style.maxHeight = `min(${Math.max(160, Math.floor(maxH))}px, 100%)`;
   }
   const ro = new ResizeObserver(() => fit());
   ro.observe(view);
