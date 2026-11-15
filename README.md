@@ -4,6 +4,23 @@
 
 **Five real cases. One radar. You solve them.**
 
+**▶ Play it:** https://zaid-aamir.github.io/OmniSAR &nbsp;·&nbsp; **30-second demo:** https://youtu.be/FwgIRJujk00
+Free, in any browser, with no login, install or coding.
+
+![The OmniSAR case picker: five real NISAR cases over a blocky 3D globe](assets/readme/case_picker.jpg)
+
+**Team Iteration Lab:** Zaid, Shaurya, Yuruihang, Rayyan · NASA Space Apps Challenge 2026 · Challenge: *Dancing with the SARs*
+· **1st place, Sharjah local event**
+
+| | |
+|---|---|
+| **138 GB → 32 MB** | 55 real NISAR files processed into a website over 4,000 times smaller |
+| **5 real 2026 cases** | Big Sur fires, Jebel Ali building, Tonle Sap floods, Jakarta sinking, Al Ain farms |
+| **17 traps** | ways radar data fools you, each one shown with our own NISAR data |
+| **Checked answers** | every verdict tested against a second source; 86% of the Big Sur burn map sits inside the official NIFC fire perimeters |
+
+![Burned forest flashing red as the Big Sur passes replay](assets/readme/burn_flash.gif)
+
 OmniSAR is an interactive web app built for the 2026 NASA Space Apps Challenge **"Dancing with the SARs"**. It uses
 radar data from **NISAR**, the NASA-ISRO L-band radar satellite, to track surface change at five places around the world.
 You play each place as a mystery: sort real evidence from traps, test the evidence with switches, rebuild the chain of
@@ -150,7 +167,7 @@ NASA Earthdata login).
 
 ## Licences and attributions
 
-- OmniSAR code: written for the NASA Space Apps Challenge 2026.
+- OmniSAR code: MIT licence (`LICENSE`), © 2026 Team Iteration Lab. Written for the NASA Space Apps Challenge 2026.
 - three.js r170 and OrbitControls, MIT licence (`lib/three/LICENSE`), © three.js authors.
 - Globe colours: NASA GIBS Blue Marble (Shaded Relief and Bathymetry). Heights: AWS Terrain Tiles (Terrarium).
 - Highway 1: © OpenStreetMap contributors (ODbL). Fire perimeters: NIFC. Rain: NASA POWER. Water map and C-band pictures:
