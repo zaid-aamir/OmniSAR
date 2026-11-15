@@ -23,7 +23,23 @@ badge and a list of what the radar can't prove.
 The current numbers and badges are in each case's verdict in the app, and in `cases/<case>.numbers.json`.
 A case whose measurements don't exist yet says **"Evidence pending"**. The app never shows a made-up number.
 
-## How to play
+## How to play: Live Ops (the default)
+
+Live Ops is a replay of real 2026 NISAR passes on their real dates. (In reality, processed NISAR data reaches users
+days after a pass.)
+
+1. **Press PLAY.** The case picker opens over the globe: one card per case, with its place, the date of the NISAR pass
+   it replays and its question. Pick a case (click it, Tab + Enter, or press **1–5**), or choose
+   **Play all days in order** for the full Day 1 → Day 2 → Day 3 run.
+2. **The pass comes in.** The globe flies to the case, red alert ripples spread, and the case terrain opens on the
+   latest processed pass on or before that date. No card ever shows data dated after the pass.
+3. **Call each evidence card** in your own time (there is no timer): **Real change**, **Trap** or **Wait for next
+   pass** (keys 1, 2, 3). A wrong call on a trap explains what fooled you and how OmniSAR handles it; press Continue
+   when you're ready.
+4. **Make the final call, rate the evidence** (Strong / Moderate / Weak), then see OmniSAR's real verdict from the
+   case's numbers. **Choose another case** goes back to the picker, where solved cases show their score and badge.
+
+## How to play: classic case mode (`?mode=classic`)
 
 1. **Globe.** Spin the blocky globe. Each column is a case. Drag the timeline (1 Jun – 10 Nov 2026) to see the real
    NISAR pass dates, NASA's 27 Jul – 10 Aug data gap, and grey **unverified tips** (natural events from NASA EONET that
@@ -52,7 +68,9 @@ No build step. Any static file server works:
 py -m http.server 8000        (or: python3 -m http.server 8000)
 ```
 
-Then open <http://localhost:8000>. Useful links: `?case=big-sur&play` opens a case straight away;
+Then open <http://localhost:8000>. Useful links: `?mode=live&case=big-sur` jumps straight into one Live Ops case;
+`?mode=live&day=2` makes PLAY start the days at Day 2; `?speed=fast` speeds up the Live Ops animations;
+`?mode=classic&case=big-sur&play` opens a classic case straight away;
 `?palette=1` to `?palette=9` switch the colour palette; `?at=lat,lon,distance` sets the starting view.
 
 The app loads only files from this repository at run time: no accounts, no keys, no tracking. Links to sources open

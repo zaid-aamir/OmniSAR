@@ -4,8 +4,12 @@
 //   LIVE OPS (default, or ?mode=live): the game. It starts with only the slowly spinning globe,
 //     the top bar and one big PLAY button with the honesty line ("a replay of real 2026 NISAR
 //     passes ..."). No panel, no markers yet. Pressing PLAY swaps the body class is-prestart ->
-//     is-live: the start screen collapses, the case-files panel slides in, the alert rods show.
-//     ?mode=live&autostart presses PLAY for you. &speed=fast and &day=N are read for the game.
+//     is-live: the start screen collapses, the case-files panel slides in, and the CASE PICKER
+//     (js/casepicker.js) opens over the globe: pick one of the five cases, or "Play all days in order".
+//     A picked case plays on its own and its verdict ends with "Choose another case" (back to the picker).
+//     ?mode=live&autostart presses PLAY for you. &case=<id> jumps straight into that case (PLAY is
+//     pressed for you). &day=N makes PLAY go straight into the days, starting at day N. &speed=fast
+//     speeds up the animations (never the player: there is no answer timer).
 //     PLAY also starts the start effects (js/effects.js: shockwave, red edge pulses, hazard top bar)
 //     and the game loop (js/liveops.js), which uses the alert ripples on the globe (js/ripples.js).
 //
@@ -35,16 +39,20 @@ import * as effects from './effects.js';
 import { makeResizable } from './panelresize.js';
 import { createRipples } from './ripples.js';
 import { createLiveOps } from './liveops.js';
+import { createCasePicker } from './casepicker.js';
 
 const params = new URLSearchParams(location.search);
 const MODE = params.get('mode') === 'classic' ? 'classic' : 'live';
 const HOME_DISTANCE = 3.2;
 const CASE_DISTANCE = 1.45;
 
-// Live Ops options for the game (used at the integration hook): &speed=fast, &day=1..3
+// Live Ops options for the game: &speed=fast (animation pacing), &day=1..3 (PLAY goes straight into the
+// days from that day), &case=<id> (straight into one case)
 const LIVE_OPTIONS = {
   speed: params.get('speed') === 'fast' ? 'fast' : 'normal',
   day: Math.min(3, Math.max(1, Math.round(Number(params.get('day'))) || 1)),
+  dayGiven: params.has('day'),
+  caseId: params.get('case'),
 };
 
 const body = document.body;
@@ -111,7 +119,7 @@ async function start() {
   window.addEventListener('omnisar:terrain', (e) => resizer.setMode(e.detail?.open ? 'terrain' : 'globe'));
 
   const app = MODE === 'live'
-    ? startLive({ area, panelEl, panelRoot, data, globe, hud, terrain })
+    ? startLive({ area, panelEl, panelRoot, data, byId, globe, hud, terrain })
     : startClassic({ area, data, byId, globe, hud, terrain });
 
   // the app's own controls, used by the tour and by tests (and handy in the browser console)
@@ -122,7 +130,7 @@ async function start() {
 // ---------------------------------------------------------------------------------------------
 // LIVE OPS: the start state, then the game (js/liveops.js)
 // ---------------------------------------------------------------------------------------------
-function startLive({ area, panelEl, panelRoot, data, globe, hud, terrain }) {
+function startLive({ area, panelEl, panelRoot, data, byId, globe, hud, terrain }) {
   const markers = createMarkers(globe, data.cases, { live: true });   // no case beacons, no tips
 
   // Until the game fills it, the panel says plainly that it is waiting (no invented content)
@@ -131,6 +139,14 @@ function startLive({ area, panelEl, panelRoot, data, globe, hud, terrain }) {
       <p class="eyebrow">Live Ops</p>
       <h1 class="panel-title">Case files</h1>
       <p class="panel-text">Standing by for the first NISAR pass.</p>`;
+  }
+  // While the case picker is open over the globe
+  function showPanelPicker() {
+    panelRoot.innerHTML = `
+      <p class="eyebrow">Live Ops</p>
+      <h1 class="panel-title">Choose a case</h1>
+      <p class="panel-text">Pick one of the five case files over the globe (keys 1–5), or play all three days in order.
+        Each card replays one real NISAR pass; answer every card in your own time.</p>`;
   }
 
   // Trap Lab (from a trap card, or a trap on the end screen). It opens ON TOP of whatever the panel
@@ -162,8 +178,48 @@ function startLive({ area, panelEl, panelRoot, data, globe, hud, terrain }) {
 
   const startScreen = createStartScreen(area, { onPlay });
 
+  // The case picker over the globe (after PLAY). A picked case plays on its own; its verdict's
+  // "Choose another case" brings the picker back with that case marked solved.
+  const picker = createCasePicker(area, { onPick: playCase, onPlayAll: () => playAllDays(1) });
+  let pickerToken = 0;                       // a newer showPicker() or game start wins over a slow one
+  let lastCaseId = null;
+  async function showPicker() {
+    const my = ++pickerToken;
+    hud.setSolvedCount(liveops.solved.size);   // the panel bar's SOLVED n/5 = cases solved in the picker
+    hud.setCase(null);
+    hud.setDay(null, null);
+    let cases;
+    try {
+      cases = await liveops.pickerCases();   // stops any run; the rods stand one per case
+    } catch (err) {
+      console.error('Case picker could not load the day plan:', err);
+      if (my === pickerToken) playAllDays(1);       // fall back to the full game, which shows its own error
+      return;
+    }
+    if (my !== pickerToken || !playing) return;
+    showPanelPicker();
+    if (lastCaseId && byId[lastCaseId]) {    // pull back out above the case just played
+      const c = byId[lastCaseId].centre;
+      globe.flyTo(c[0], c[1], HOME_DISTANCE, 1.2);
+    }
+    picker.show(cases);
+  }
+  function playCase(id) {
+    pickerToken++;
+    picker.hide();
+    lastCaseId = id;
+    liveops.startCase(id, { speed: LIVE_OPTIONS.speed }).then((res) => { if (res && playing) showPicker(); });
+  }
+  function playAllDays(day) {
+    pickerToken++;
+    picker.hide();
+    liveops.start({ speed: LIVE_OPTIONS.speed, day });
+  }
+
   // The start state: spinning globe, PLAY button, nothing else
   function showStartState() {
+    pickerToken++;
+    picker.hide();
     body.classList.remove('is-live');
     body.classList.add('is-prestart');
     panelEl.inert = true;
@@ -179,7 +235,8 @@ function startLive({ area, panelEl, panelRoot, data, globe, hud, terrain }) {
   }
 
   // PLAY: shockwave from the button, red edge pulses + hazard top bar (effects), the button
-  // collapses, the panel slides in, the rods can show, and the game starts (speed/day from the URL)
+  // collapses, the panel slides in, the rods can show, and the case picker opens
+  // (or, from the URL: &case=<id> starts that case, &day=N starts the days at day N)
   function onPlay(buttonEl) {     // buttonEl = the PLAY button, or null with ?autostart
     if (playing) return;
     playing = true;
@@ -190,7 +247,9 @@ function startLive({ area, panelEl, panelRoot, data, globe, hud, terrain }) {
     globe.controls.autoRotate = false;
     markers.setVisible(true);
     hud.setDay(null, null);
-    liveops.start(LIVE_OPTIONS);
+    if (byId[LIVE_OPTIONS.caseId]) playCase(LIVE_OPTIONS.caseId);
+    else if (LIVE_OPTIONS.dayGiven) playAllDays(LIVE_OPTIONS.day);
+    else showPicker();
   }
 
   // "Back to globe" on the end screen: stop everything and return to the PLAY button
@@ -203,10 +262,10 @@ function startLive({ area, panelEl, panelRoot, data, globe, hud, terrain }) {
   });
 
   showStartState();
-  // ?mode=live&autostart: the same start path as pressing PLAY, without showing the button first
-  if (params.has('autostart')) onPlay(null);
+  // ?mode=live&autostart (or &case=<id>): the same start path as pressing PLAY, without showing the button first
+  if (params.has('autostart') || byId[LIVE_OPTIONS.caseId]) onPlay(null);
 
-  return { mode: MODE, globe, data, terrain, markers, hud, startScreen, openTrapLab, liveOptions: LIVE_OPTIONS, liveops, ripples, effects };
+  return { mode: MODE, globe, data, terrain, markers, hud, startScreen, picker, showPicker, openTrapLab, liveOptions: LIVE_OPTIONS, liveops, ripples, effects };
 }
 
 // ---------------------------------------------------------------------------------------------

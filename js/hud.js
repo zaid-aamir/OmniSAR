@@ -44,13 +44,14 @@ export function createHud(cases) {
   panel.classList.add('hud-frame');
 
   let current = null;
+  let solvedOverride = null;               // Live Ops: the case picker's own solved count (this visit)
   // every real pass date over all five cases (one per day), for the foot readout with no case open
   const allDates = [...new Set(cases.flatMap((c) => c.passDates))].sort();
 
   function render() {
     const n = current ? ids.indexOf(current.id) + 1 : 0;
     bar.querySelector('#hud-case').textContent = current ? `CASE ${String(n).padStart(2, '0')} · ${current.name.toUpperCase()}` : 'CASE FILES';
-    bar.querySelector('#hud-solved').textContent = `SOLVED ${finishedCount(ids)}/${ids.length}`;
+    bar.querySelector('#hud-solved').textContent = `SOLVED ${solvedOverride ?? finishedCount(ids)}/${ids.length}`;
     const dates = current ? current.passDates : allDates;
     foot.querySelector('#hud-date').innerHTML = dates.length
       ? `NISAR PASSES <b>${dates.length}</b> · <b>${esc(fmt(dates[0]))} – ${esc(fmt(dates[dates.length - 1]))}</b>`
@@ -106,6 +107,8 @@ export function createHud(cases) {
   render();
   return {
     setCase(c) { current = c; render(); },
+    // Live Ops counts cases solved from its case picker, not the classic mode's saved progress
+    setSolvedCount(n) { solvedOverride = n == null ? null : Number(n); render(); },
     setDay,
     expand() { setCollapsed(false); },
   };

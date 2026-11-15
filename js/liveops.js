@@ -1,10 +1,13 @@
-// Live Ops: the game loop. Three "days" replay real 2026 NISAR passes on their real dates.
-// Each day: a title card, the top-bar date counts up, red alert rods rise where passes land.
+// Live Ops: the game loop. Two ways to play, both replaying real 2026 NISAR passes on their real dates:
+//   - ONE CASE (startCase): the player picks a case in the case picker (js/casepicker.js); that case's
+//     event from the day plan runs on its own, and its verdict ends with "Choose another case".
+//   - ALL DAYS IN ORDER (start): three "days". Each day: a title card, the top-bar date counts up,
+//     red alert rods rise where passes land, then each of the day's events in turn.
 // Each event (one pass over one case): an alert banner, the globe flies there, the case terrain
 // opens on the latest processed pass on or before that date, then evidence cards deal in one by
-// one. The player calls each card against a timer: Real change / Trap / Wait for next pass.
-// Then the case's own final question, a confidence pick (Strong / Moderate / Weak), and the
-// reveal of OmniSAR's real verdict from the case's numbers file.
+// one. The player calls each card in their own time (there is no timer): Real change / Trap /
+// Wait for next pass. Then the case's own final question, a confidence pick (Strong / Moderate /
+// Weak), and the reveal of OmniSAR's real verdict from the case's numbers file.
 //
 // Honesty rules built in here:
 //   - the day plan (cases/liveops.json) only names cards and dates; every card's text, image and
@@ -16,7 +19,8 @@
 //   - the reveal says when OmniSAR processed the case, so nobody mistakes it for a live result
 //
 // API (see reports/liveops_contract.md, section 4):
-//   createLiveOps({ globe, markers, terrain, panel, hud, effects, ripples, data }) -> { start, stop }
+//   createLiveOps({ globe, markers, terrain, panel, hud, effects, ripples, data })
+//     -> { start({ speed, day }), startCase(caseId, { speed }), pickerCases(), stop(), solved, debug }
 //   events on window: liveops:day { day, date } · liveops:end { score, best } · liveops:exit {}
 //                     liveops:traplab { trap }  (a trap button on the end screen; the app opens the Trap Lab)
 
@@ -26,15 +30,16 @@ import { loadTraps } from './trapcard.js';
 // Each event shows the globe with its red ripples for at least this long before the terrain opens
 const GLOBE_RIPPLE_MS = 3000;
 
-// Timing for each speed. normal ≈ 4–5 min for a quick player, fast ≈ 90 s (see the report)
+// Pacing of the animations for each speed (?speed=fast for quick tests). None of these limit the
+// player: every card, answer explanation and question waits for them, however long they take.
 const SPEEDS = {
-  normal: { cardS: 20, dayCardMs: 2200, countMs: 1200, bannerMs: 1700, flyS: 1.6, flipMs: 450,
-    dealGapMs: 250, rightHoldMs: 1800, wrongHoldMs: 5000, dayEndMs: 4000, rodsMs: 700 },
-  fast: { cardS: 10, dayCardMs: 900, countMs: 400, bannerMs: 600, flyS: 0.6, flipMs: 300,
-    dealGapMs: 50, rightHoldMs: 500, wrongHoldMs: 2000, dayEndMs: 1500, rodsMs: 200 },
+  normal: { dayCardMs: 2200, countMs: 1200, bannerMs: 1700, flyS: 1.6, flipMs: 450,
+    dealGapMs: 250, dayEndMs: 4000, rodsMs: 700 },
+  fast: { dayCardMs: 900, countMs: 400, bannerMs: 600, flyS: 0.6, flipMs: 300,
+    dealGapMs: 50, dayEndMs: 1500, rodsMs: 200 },
 };
-// Scoring (the same at both speeds)
-const POINTS = { right: 100, perSecondLeft: 5, wrong: -50, finalRight: 100, confidence: 150 };
+// Scoring (the same at both speeds; no points for speed)
+const POINTS = { right: 100, wrong: -50, finalRight: 100, confidence: 150 };
 const BEST_KEY = 'omnisar.liveops.best';
 const CASE_DISTANCE = 1.45;          // how close the globe camera flies to a case (same as classic mode)
 const DAY_DISTANCE = 2.6;            // day intro: far enough out to see the day's rods rise
@@ -96,6 +101,7 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
   let banner = null;
   let S = SPEEDS.normal;               // speed of the current run
   let st = null;                       // score and history of the current run (for api.debug)
+  const solved = new Map();            // caseId -> { score, badge, eventId }: cases finished from the picker (this visit only)
 
   // ---------- data ----------
   function loadCase(id) {
@@ -186,6 +192,47 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
 
   const currentRun = () => run;
 
+  // The event a case plays when it is picked on its own: its FIRST event in the day plan
+  // (Tonle Sap appears twice; the picker uses its 17 Oct pass). Same cards, same availableOn rule.
+  function caseEvent(plan, caseId) {
+    for (const d of plan.days) {
+      const k = d.events.findIndex((e) => e.caseId === caseId);
+      if (k >= 0) return { d, k };
+    }
+    throw new Error(`Live Ops: case ${caseId} has no event in cases/liveops.json`);
+  }
+
+  // One rod per case while the picker is up (rods that already stand don't rise again); solved = cyan
+  function showPickerRods(plan) {
+    const evs = data.cases.map((c) => { try { const { d, k } = caseEvent(plan, c.id); return d.events[k]; } catch { return null; } })
+      .filter(Boolean);
+    markers.setEvents(evs.map((e) => ({ id: e.id, caseId: e.caseId, lat: byId[e.caseId].centre[0], lon: byId[e.caseId].centre[1] })));
+    for (const e of evs) if (solved.has(e.caseId)) markers.setSolved(e.id);
+  }
+
+  // Everything a run leaves behind, except the rods (the picker keeps them)
+  function endRun() {
+    if (run) run.cancel();
+    run = null;
+    keyHandler = null;
+    document.removeEventListener('keydown', onKey);
+    hideBanner(true);
+    ripples.clear();
+    leaveTerrain();
+  }
+  function newState(speed) {
+    S = SPEEDS[speed] || SPEEDS.normal;
+    st = { speed: SPEEDS[speed] ? speed : 'normal', score: 0, shown: 0, dayScore: 0, cards: [], finals: [], confidence: [],
+      dodged: new Set(), caughtBy: new Set(), log: [], lastDate: null };
+    run = makeRun();
+    document.addEventListener('keydown', onKey);
+    return run;
+  }
+  function showError(retry) {
+    root.innerHTML = '<div class="lo"><p class="eyebrow">LIVE OPS</p><h2 class="lo-title">Live Ops could not continue</h2><p class="panel-text">A case file could not be loaded. Check your connection and press Replay.</p><button class="primary-btn lo-replay">Replay</button></div>';
+    root.querySelector('.lo-replay').addEventListener('click', retry);
+  }
+
   // ---------- the game ----------
   // Each play-through gets its own copy of these functions, bound to ITS run, score state and
   // speed, so a cancelled run (Replay, stop) can never write into the next one.
@@ -226,7 +273,8 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       }
     }
 
-    async function play(startDay) {
+    // the day plan and the trap texts, shared by both ways to play
+    async function prepare() {
       const plan = await run.guard(loadPlan());
       const traps = await run.guard(loadTraps());
       st.trapTitle = (id) => traps.traps.find((t) => t.id === id)?.title || `Trap #${id}`;
@@ -234,6 +282,12 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       st.limit = (id) => traps.limits.find((t) => t.id === id) || null;
       st.wait = plan.waitEligible || {};
       effects.setAlarm(true);
+      return plan;
+    }
+
+    // ----- ALL DAYS IN ORDER (unchanged Day 1 -> 2 -> 3 flow) -----
+    async function play(startDay) {
+      const plan = await prepare();
       const days = plan.days.filter((d) => d.day >= startDay);
       const before = plan.days.filter((d) => d.day < startDay).pop();
       let prev = before ? before.events[before.events.length - 1].date : (data.window?.start || days[0].date);
@@ -268,19 +322,36 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       await dayEnd(d, isLast);
     }
 
-    async function runEvent(d, k) {
+    // ----- ONE CASE from the picker: that case's event from the day plan, on its own -----
+    // Returns { caseId, score, badge } once the player leaves the verdict ("Choose another case").
+    async function playCase(caseId) {
+      const plan = await prepare();
+      const { d, k } = caseEvent(plan, caseId);
+      const ev = d.events[k];
+      st.dayNo = d.day;
+      st.dayScore = 0;
+      st.lastDate = data.window?.start || ev.date;     // the top-bar date counts up from the start of the replay
+      leaveTerrain();
+      // the picker's rods stay up (solved ones stay cyan); this case's rod flares when its pass comes in
+      showPickerRods(plan);
+      await run.sleep(S.rodsMs);
+      const { numbers } = await runEvent(d, k, true);
+      return { caseId, eventId: ev.id, score: st.score, badge: numbers?.badge || null };
+    }
+
+    async function runEvent(d, k, single = false) {
       const ev = d.events[k];
       const c = byId[ev.caseId];
       const { numbers } = await run.guard(loadCase(ev.caseId));
       const left = d.events.length - k - 1;
-      const queue = left ? `${left} more incoming` : 'last one today';
+      const queue = single ? 'one case' : left ? `${left} more incoming` : 'last one today';
       const tracks = [...new Set(c.passes.filter((p) => p.date === ev.date)
         .map((p) => `track ${p.track} ${p.direction === 'A' ? 'ascending' : 'descending'}`))].join(' + ');
       ev.deal.forEach((card) => { const im = new Image(); im.src = card.src; });   // load while we fly
       leaveTerrain();
       const el = view('lo-event', `
         <div class="lo-head">
-          <p class="eyebrow">DAY ${d.day} · EVENT ${k + 1} OF ${d.events.length}</p>
+          <p class="eyebrow">${single ? 'LIVE OPS · CASE FILE' : `DAY ${d.day} · EVENT ${k + 1} OF ${d.events.length}`}</p>
           ${scoreHTML()}
         </div>
         <h2 class="lo-title" tabindex="-1">${esc(c.name)} <span class="lo-place">${esc(c.place)}</span></h2>
@@ -327,25 +398,20 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       }
       el.querySelectorAll('.lo-slot').forEach((s) => s.classList.remove('is-current'));
       await finalChoice(stage, ev, c);
-      await confidencePick(stage, ev, c, numbers);
+      await confidencePick(stage, ev, c, numbers, single ? 'Choose another case ▶' : ev.isLastOfDay ? 'Day summary ▶' : 'Next ▶');
       ripples.remove(ev.id);
       terrain.setAlert(null);
       markers.setSolved(ev.id);
+      return { numbers };
     }
 
-    // ----- one evidence card, against the clock -----
+    // ----- one evidence card: no timer, the player answers in their own time -----
     async function runCard(stage, ev, card, i, slot) {
-      const total = S.cardS;
-      const amberAt = total / 2, redAt = total / 4;            // 10 s and 5 s at normal speed
       const isNisar = /^NISAR/.test(card.source || '');
       stage.innerHTML = `
         <article class="lo-card" tabindex="-1" aria-labelledby="lo-card-title" data-case="${esc(ev.caseId)}" data-card="${esc(card.id)}" style="--flip-ms:${S.flipMs}ms">
           <div class="lo-card-top">
             <p class="eyebrow">CARD ${i + 1} OF ${ev.deal.length}</p>
-            <div class="lo-timer" role="timer" aria-label="${total} seconds to answer">
-              <svg viewBox="0 0 44 44" aria-hidden="true"><circle class="lo-ring-bg" cx="22" cy="22" r="19"/><circle class="lo-ring" cx="22" cy="22" r="19" pathLength="100"/></svg>
-              <span class="lo-timer-n" aria-hidden="true">${total}</span>
-            </div>
           </div>
           <h3 id="lo-card-title">${esc(card.title)}</h3>
           <img src="${esc(card.src)}" alt="${esc(card.caption)}" decoding="async">
@@ -362,36 +428,17 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       // the answer bar sticks just above the panel's foot readout, so it is never scrolled out of view
       const foot = document.querySelector('.panel-foot');
       root.closest('.panel')?.style.setProperty('--lo-foot', `${foot ? foot.offsetHeight : 0}px`);
-      const ring = art.querySelector('.lo-timer');
-      const num = art.querySelector('.lo-timer-n');
       const buttons = [...art.querySelectorAll('.lo-answer')];
       art.focus({ preventScroll: true });
       art.scrollIntoView?.({ block: 'nearest' });
-      announce(`Card ${i + 1} of ${ev.deal.length}: ${card.title}. ${total} seconds. Keys 1 real change, 2 trap, 3 wait for next pass.`);
-      const t0 = performance.now();
+      announce(`Card ${i + 1} of ${ev.deal.length}: ${card.title}. Take your time. Keys 1 real change, 2 trap, 3 wait for next pass.`);
+      const t0 = performance.now();                           // only for the end screen's average response time
       const answer = await run.waitFor((done) => {
-        let phase = '';
-        const tick = () => {
-          const leftS = Math.max(0, total - (performance.now() - t0) / 1000);
-          ring.style.setProperty('--left', (leftS / total).toFixed(4));
-          num.textContent = Math.ceil(leftS);
-          const p = leftS <= redAt ? 'is-red' : leftS <= amberAt ? 'is-amber' : '';
-          if (p !== phase) {
-            ring.classList.remove('is-amber', 'is-red');
-            if (p) ring.classList.add(p);
-            if (p) announce(`${Math.ceil(leftS)} seconds left`);
-            phase = p;
-          }
-          if (leftS <= 0) done({ a: 'timeout', leftS: 0, tookS: total });
-        };
-        tick();
-        const iv = setInterval(tick, 100);
-        buttons.forEach((b) => { b.onclick = () => done({ a: b.dataset.a, leftS: Math.max(0, total - (performance.now() - t0) / 1000), tookS: (performance.now() - t0) / 1000, btn: b }); });
+        buttons.forEach((b) => { b.onclick = () => done({ a: b.dataset.a, tookS: (performance.now() - t0) / 1000, btn: b }); });
         keysFor(buttons);
-        return () => { clearInterval(iv); keyHandler = null; };
+        return () => { keyHandler = null; };
       });
       buttons.forEach((b) => { b.disabled = true; b.classList.toggle('is-picked', b === answer.btn); });
-      ring.classList.add('is-stopped');
 
       // judge it
       const eligibleQuote = st.wait[`${ev.caseId}/${card.id}`] || null;
@@ -400,8 +447,7 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       const trapLine = trap ? `Trap #${trap.id} · ${trap.title}` : '';
       let head, body = '', delta;
       if (right) {
-        const secs = Math.ceil(answer.leftS);
-        delta = POINTS.right + secs * POINTS.perSecondLeft;
+        delta = POINTS.right;
         head = `Right · +${delta}`;
         if (answer.a === 'wait') body = `Two single dates aren’t enough here: “${eligibleQuote}” More passes let a median outvote one bad date. This card is ${trapLine}.`;
         else body = card.bin === 'real' ? 'Real change: the evidence on the card holds up.' : `${trapLine}.`;
@@ -412,13 +458,13 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
         }
       } else {
         delta = POINTS.wrong;
-        head = `${answer.a === 'timeout' ? 'Time’s up' : 'Not quite'} · ${delta}`;
+        head = `Not quite · ${delta}`;
         if (card.bin === 'real') {
           body = answer.a === 'wait'
             ? 'No need to wait: this card is a real change, and the evidence on it holds up.'
             : 'This one is a real change: the evidence on the card holds up.';
         } else {
-          const lead = answer.a === 'wait' ? 'Another pass won’t fix this one. It’s a trap:' : answer.a === 'real' ? 'Not real. It’s a trap:' : 'It’s a trap:';
+          const lead = answer.a === 'wait' ? 'Another pass won’t fix this one. It’s a trap:' : 'Not real. It’s a trap:';
           body = `${lead} ${trapLine}. What fools you: ${trap?.fools || ''} How OmniSAR handles it: ${trap?.handling || ''}`;
           st.caughtBy.add(card.trap);
         }
@@ -437,10 +483,11 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       cont.focus({ preventScroll: true });
       fb.scrollIntoView?.({ block: 'nearest' });
       if (card.bin === 'trap') terrain.replayFreeze?.(true);     // the change replay holds on AFTER while a trap card shows
+      // the explanation stays until the player presses Continue (or Enter): nothing moves on by itself
       await run.waitFor((done) => {
-        const t = setTimeout(done, right ? S.rightHoldMs : S.wrongHoldMs);
         cont.onclick = done;
-        return () => clearTimeout(t);
+        keyHandler = (k) => (k === 'Enter' && document.activeElement !== cont ? (done(), true) : false);
+        return () => { keyHandler = null; };
       });
       terrain.replayFreeze?.(false);
     }
@@ -489,7 +536,7 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
     }
 
     // ----- confidence, then OmniSAR's real verdict -----
-    async function confidencePick(stage, ev, c, numbers) {
+    async function confidencePick(stage, ev, c, numbers, nextLabel) {
       stage.innerHTML = `
         <section class="lo-conf">
           <p class="eyebrow">CONFIDENCE · ${esc(c.name.toUpperCase())}</p>
@@ -525,7 +572,7 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
           ${numbers?.check?.text ? `<p class="evidence-caption"><b>${esc(numbers.check.label || 'Check')}:</b> ${esc(numbers.check.text)}</p>` : ''}
           ${numbers?.badge_reason ? `<p class="evidence-caption"><b>Why this badge:</b> ${esc(numbers.badge_reason)}</p>` : ''}
           <p class="evidence-caption">Measured from the passes in the case’s chain of custody, after the fact. Every number above comes from the case’s numbers file.</p>
-          <button class="primary-btn lo-continue">${ev.isLastOfDay ? 'Day summary ▶' : 'Next ▶'}</button>
+          <button class="primary-btn lo-continue">${esc(nextLabel)}</button>
         </section>`;
       if (match) effects.burst(stage.querySelector('.lo-match'));
       const cont = stage.querySelector('.lo-continue');
@@ -597,35 +644,56 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       window.dispatchEvent(new CustomEvent('liveops:end', { detail: { score: st.score, best } }));
     }
 
-    return play;
+    return { play, playCase };
   }
 
   const api = {
+    // All days in order (Day 1 -> 2 -> 3, or from ?day=N)
     start({ speed = 'normal', day = 1 } = {}) {
       api.stop();
-      S = SPEEDS[speed] || SPEEDS.normal;
       const startDay = Math.min(3, Math.max(1, Math.round(Number(day)) || 1));
-      st = { speed: SPEEDS[speed] ? speed : 'normal', score: 0, shown: 0, dayScore: 0, cards: [], finals: [], confidence: [],
-        dodged: new Set(), caughtBy: new Set(), log: [], lastDate: null };
-      run = makeRun();
-      document.addEventListener('keydown', onKey);
-      const r = run;
-      makeGame(r, st, S)(startDay).catch((err) => {
+      const r = newState(speed);
+      makeGame(r, st, S).play(startDay).catch((err) => {
         if (err === CANCEL || !r.alive) return;
         console.error('Live Ops stopped:', err);
-        root.innerHTML = '<div class="lo"><p class="eyebrow">LIVE OPS</p><h2 class="lo-title">Live Ops could not continue</h2><p class="panel-text">A case file could not be loaded. Check your connection and press Replay.</p><button class="primary-btn lo-replay">Replay</button></div>';
-        root.querySelector('.lo-replay').addEventListener('click', () => api.start({ speed, day: startDay }));
+        showError(() => api.start({ speed, day: startDay }));
       });
     },
+    // One case, picked in the case picker (or ?mode=live&case=<id>). Resolves with
+    // { caseId, score, badge } after its verdict, or null if it was stopped first.
+    startCase(caseId, { speed = 'normal' } = {}) {
+      endRun();                                  // keeps the picker's rods
+      root.replaceChildren();
+      const r = newState(speed);
+      return makeGame(r, st, S).playCase(caseId).then((res) => {
+        if (!r.alive) return null;
+        solved.set(caseId, { score: res.score, badge: res.badge, eventId: res.eventId });
+        endRun();
+        return res;
+      }, (err) => {
+        if (err === CANCEL || !r.alive) return null;
+        console.error('Live Ops stopped:', err);
+        showError(() => api.startCase(caseId, { speed }));
+        return null;
+      });
+    },
+    // What the case picker shows: one entry per case, in case-file order, with the date of the pass it
+    // plays and its question. Score and badge only for cases already solved in this visit.
+    async pickerCases() {
+      const plan = await loadPlan();
+      endRun();
+      showPickerRods(plan);
+      return data.cases.map((c) => {
+        let date = null;
+        try { const { d, k } = caseEvent(plan, c.id); date = d.events[k].date; } catch { /* not in the plan */ }
+        return { id: c.id, name: c.name, place: c.place, question: c.question, date, dateText: date ? fmtDate(date) : null,
+          solved: solved.get(c.id) || null };
+      }).filter((x) => x.date);
+    },
+    get solved() { return new Map(solved); },
     stop() {
-      if (run) run.cancel();
-      run = null;
-      keyHandler = null;
-      document.removeEventListener('keydown', onKey);
-      hideBanner(true);
+      endRun();
       markers.setEvents([]);
-      ripples.clear();
-      leaveTerrain();
       root.replaceChildren();
     },
     // read-only view of the current run, for tests and the browser console

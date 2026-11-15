@@ -1,4 +1,4 @@
-/* Live Ops (js/liveops.js): the panel views, the evidence card with its timer ring, and the red
+/* Live Ops (js/liveops.js): the panel views, the evidence card (no timer), and the red
    INCOMING banner over the globe.
    Zaid's rules: no reduced-motion branches for these effects, and nothing flashes faster than
    3 times a second (every repeating pulse here is 1 Hz or slower). Alert red = var(--alert),
@@ -55,19 +55,6 @@
 /* the image shrinks with the window so the card and its answers fit at 1366×768 and 1440×900 */
 .lo-card img { display: block; width: 100%; height: auto; max-height: clamp(110px, calc(100vh - 560px), 240px); object-fit: contain; border-radius: 6px; background: #000; }
 .lo-card-top { display: flex; align-items: center; justify-content: space-between; }
-
-/* timer ring: --left goes 1 -> 0; cyan, then amber, then red (red breathes at 1 Hz) */
-.lo-timer { position: relative; width: 44px; height: 44px; flex: none; color: var(--accent); --left: 1; }
-.lo-timer svg { width: 44px; height: 44px; transform: rotate(-90deg); }
-.lo-ring-bg { fill: none; stroke: color-mix(in srgb, currentColor 20%, transparent); stroke-width: 4; }
-.lo-ring { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round;
-  stroke-dasharray: 100; stroke-dashoffset: calc(100 - var(--left) * 100); transition: stroke-dashoffset .1s linear, color .3s ease; }
-.lo-timer-n { position: absolute; inset: 0; display: grid; place-items: center;
-  font-family: var(--font-data); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.lo-timer.is-amber { color: var(--data-pending); }
-.lo-timer.is-red { color: var(--alert); animation: lo-breathe 1s ease-in-out infinite; }
-.lo-timer.is-stopped { animation: none; opacity: .6; }
-@keyframes lo-breathe { 50% { transform: scale(1.1); } }
 
 /* the answers are a bar that sticks to the bottom of the panel (above its foot readout), so they
    are always on screen without scrolling, whatever the card's length */
