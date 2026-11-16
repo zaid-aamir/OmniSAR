@@ -4,8 +4,9 @@
 
 **Five real cases. One radar. You solve them.**
 
+NASA's new NISAR radar sees through clouds, but almost nobody can use it: each image is almost 6 GB, needs a login and coding to open, and is full of data traps that fake change, which shuts out beginners from a satellite this new. OmniSAR is the first game that teaches NISAR using real NISAR data: we processed 138 GB of NISAR files into a 32 MB website, over 4,000 times smaller, that runs free in any browser with no login, install or coding.
+
 **▶ Play it:** https://zaid-aamir.github.io/OmniSAR &nbsp;·&nbsp; **30-second demo:** https://youtu.be/FwgIRJujk00
-Free, in any browser, with no login, install or coding.
 
 ![The OmniSAR case picker: five real NISAR cases over a blocky 3D globe](assets/readme/case_picker.jpg)
 
