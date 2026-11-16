@@ -6,14 +6,17 @@
 //   - block COLOUR = the selected layer's real value on a fixed data scale
 //     (sequential = "how much", diverging = brighter/darker or up/down)
 //   - block HEIGHT = AWS Terrarium ground height, exaggerated (factor shown on screen)
-//   - a pass stepper moves through the real layers; hovering a block shows value, date, source
+//   - a stepper moves through the real layers; hovering a block shows value, date, source. It names each
+//     step for what it is: "Radar pass 2 of 3" (one NISAR pass), "Change map" (computed from two passes,
+//     e.g. CHANGE 17 Jul → 15 Sep; Jakarta's motion maps are "Change map 3 of 8"), "Slope map". While the
+//     change replay runs, the stepper follows what is on screen ("Between passes" during a fade).
 //   - v7: there is no timeline slider any more. In classic mode the ◀ ▶ stepper picks the layer;
 //     in Live Ops the game picks it with showLayerAt() (below). showDate() is what both use to
 //     pick "the latest processed pass on or before a date" (the name "sliderDate" is historical).
 //   - player (pass-to-pass Play) is kept but nothing calls it since the slider's Play button went.
 //   - Every switch blends the block colours over ~0.5 s, and blocks that moved by more than the
 //     case's own declared threshold get a brief cyan outline (rules: js/terraintime.js).
-//   - A large label on the terrain always says which pass is showing ("Pass 2 of 3 · 16 Oct 2026"),
+//   - A large label on the terrain always says which pass is showing ("Radar pass 2 of 3 · 16 Oct 2026"),
 //     or "No new pass until <date>" when the chosen date sits after the pass on screen.
 //   - Live Ops calls setAlert(lat, lon): a red ring spreads over the blocks from the event's centre
 //     block, one ring every 1.2 s (the same rhythm as the globe's ripples), drawn in the blocks'
@@ -91,19 +94,22 @@ export function createCaseTerrain(container) {
   view.className = 'terrain-view';
   view.hidden = true;
   view.tabIndex = 0;                       // focusable, so the arrow keys can step through layers
-  view.setAttribute('aria-label', 'Case terrain: arrow keys change the layer; Enter or I inspects the block in the middle of the view');
+  view.setAttribute('aria-label', 'Case terrain: arrow keys step through the radar passes and change maps; Space pauses the change replay; Enter or I inspects the block in the middle of the view');
   // Every overlay sits in ONE layer, a CSS grid with named regions (css/terrainlayout.css), so they
   // can never pile on top of each other when the terrain gets narrower:
-  //   title (top-left)            si (top-right: the SI Agent trigger)
+  //   title (top-left: case name + a small ⓘ Source link)   si (top-right: the SI Agent trigger)
   //   main  (popovers dock here)  side (SI Agent panel, block inspector: dock here, right-aligned)
-  //   bar   (bottom: stepper · pass banner · ⓘ Source · legend; wraps on narrow terrain)
+  //   bar   (bottom: stepper · play/pause · pass banner · legend; wraps on narrow terrain)
   // Container queries on the terrain width rearrange the bar (>= 900 px one row; 640-899 the banner
   // gets its own row and the legend goes compact; < 640 the banner text goes short).
   view.innerHTML = `
     <div class="tv-overlay">
       <div class="terrain-hud terrain-top">
         <div class="tv-title-text">
-          <p class="eyebrow" id="tv-case"></p>
+          <div class="tv-case-row">
+            <p class="eyebrow" id="tv-case"></p>
+            <button type="button" class="tv-src-btn" id="tv-src" aria-haspopup="dialog" aria-expanded="false" aria-controls="tv-pop" title="Where these blocks come from">ⓘ Source</button>
+          </div>
           <p class="terrain-layer" id="tv-layer"></p>
           <p class="terrain-when" id="tv-when"></p>
         </div>
@@ -121,9 +127,9 @@ export function createCaseTerrain(container) {
       <div class="tv-dock tv-side" id="tv-side"></div>
       <div class="tv-bar" id="tv-bar">
         <div class="terrain-hud terrain-stepper" role="group" aria-label="Pass stepper">
-          <button class="ghost-btn" id="tv-prev" aria-label="Previous layer">◀</button>
-          <span id="tv-step"></span>
-          <button class="ghost-btn" id="tv-next" aria-label="Next layer">▶</button>
+          <button class="ghost-btn" id="tv-prev" aria-label="Previous radar pass">◀</button>
+          <span id="tv-step" aria-live="polite"></span>
+          <button class="ghost-btn" id="tv-next" aria-label="Next radar pass">▶</button>
         </div>
         <div class="tv-bar-extra" id="tv-bar-extra"></div>
         <div class="terrain-hud terrain-pass" id="tv-pass" role="status" aria-live="polite">
@@ -131,7 +137,6 @@ export function createCaseTerrain(container) {
           <p class="tp-sub" id="tv-pass-sub"></p>
           <p class="tp-key" id="tv-pass-key" hidden><span class="tp-swatch" aria-hidden="true"></span><span id="tv-pass-key-text"></span></p>
         </div>
-        <button class="terrain-hud tv-src-btn" id="tv-src" aria-haspopup="dialog" aria-expanded="false" aria-controls="tv-pop">ⓘ Source</button>
         <div class="terrain-hud terrain-legend" id="tv-legend"></div>
       </div>
     </div>
@@ -410,12 +415,6 @@ export function createCaseTerrain(container) {
     flash(old, layer);
     $('tv-tip').hidden = true;                 // an old tooltip would show the previous layer's value
     $('tv-layer').textContent = layer.label;
-    $('tv-step').textContent = `Layer ${layerIndex + 1} of ${grid.layers.length}`;
-    // at either end the button stays visible but disabled, and says why
-    $('tv-prev').disabled = layerIndex === 0;
-    $('tv-next').disabled = layerIndex === grid.layers.length - 1;
-    $('tv-prev').title = layerIndex === 0 ? 'This is the first layer' : 'Previous layer';
-    $('tv-next').title = layerIndex === grid.layers.length - 1 ? 'This is the last layer' : 'Next layer';
     const [lo, hi] = layer.scale;
     $('tv-legend').innerHTML = `
       <p class="legend-title">${esc(layer.what)}</p>
@@ -455,15 +454,15 @@ export function createCaseTerrain(container) {
       else parts.push(`Showing the pass of ${fmtDate(layer.date)}`);
       parts.push(next ? `next processed pass ${fmtDate(next)}` : 'no later processed pass');
       if (layer.leftOut) parts.push(`left out of the verdict: ${layer.leftOut}`);
-      main = `Pass ${same.indexOf(layer.date) + 1} of ${same.length} · ${fmtDate(layer.date)}`;
-      short = `Pass ${same.indexOf(layer.date) + 1}/${same.length} · ${fmtShort(layer.date)}`;
+      main = `${stepLabel(layer)} · ${fmtDate(layer.date)}`;
+      short = `${stepLabel(layer, true)} · ${fmtShort(layer.date)}`;
       if (sliderDate && sliderDate < layer.date) sub = `No processed pass before ${fmtDate(layer.date)}`;
       else if (sliderDate && sliderDate > layer.date) sub = next ? `No new pass until ${fmtDate(next)}` : 'No later processed pass';
       if (layer.leftOut) sub = [sub, 'Left out of the verdict (interference check)'].filter(Boolean).join(' · ');
     } else {
       parts.push(`Not a single pass (${layer.date || 'no date'}): reach it with ◀ ▶`);
       const r = rangeOf(layer);
-      main = r ? `Change: ${fmtShort(r[0])} → ${fmtDate(r[1])}` : layer.label;
+      main = r ? `Change map: ${fmtShort(r[0])} → ${fmtDate(r[1])}` : layer.label;
       short = r ? `${fmtShort(r[0])} → ${fmtShort(r[1])}` : layer.label;
       sub = r ? layer.label : 'Not a pass: the same on every date';
     }
@@ -500,6 +499,51 @@ export function createCaseTerrain(container) {
     $('tv-pass').dataset.phase = replayBanner?.phase || '';
     // the banner's lines end in "…" when the bar is tight; the tooltip has the whole text
     $('tv-pass').title = [main, sub, keyText].filter(Boolean).join('\n');
+    syncStepper();
+  }
+
+  // What one stepper position is, in words. A single NISAR pass is a "Radar pass N of M" (counted among
+  // the passes of the same kind); a layer computed from two passes is a "Change map" (never a pass);
+  // Jakarta's motion maps (each one "first pass → this pass") are "Change map N of M".
+  function stepLabel(l, short = false) {
+    if (!l) return '';
+    if (isDated(l)) {
+      const same = [...new Set(grid.layers.filter((x) => isDated(x) && family(x) === family(l)).map((x) => x.date))].sort();
+      const n = same.indexOf(l.date) + 1;
+      const word = /→/.test(l.label || '') ? 'Change map' : 'Radar pass';
+      const base = same.length > 1 ? (short ? `${word} ${n}/${same.length}` : `${word} ${n} of ${same.length}`) : word;
+      // one pass, two maps (Tonle Sap: HH and water share): name the map, so ◀ ▶ visibly moves
+      const twins = new Set(grid.layers.filter((x) => isDated(x) && x.date === l.date).map(family)).size > 1;
+      const name = (l.label || '').split(/\s\d/)[0];
+      return twins && !short && name ? `${base} · ${name}` : base;
+    }
+    if (rangeOf(l)) return 'Change map';
+    return l.unit === '°' ? 'Slope map' : 'Map (not a pass)';
+  }
+  // The layer the stepper stands on: while the change replay runs, the pass on screen (CHANGE: the
+  // grid's change map for exactly those two passes, if there is one); otherwise the stepper's own layer.
+  function shownIndex() {
+    if (!replay.active || !replayBanner) return layerIndex;
+    const steps = replay.plan.steps;
+    if (replayBanner.phase === 'change') {
+      const i = grid.layers.findIndex((l) => { const r = rangeOf(l); return r && r[0] === steps[0].date && r[1] === steps[steps.length - 1].date; });
+      return i >= 0 ? i : layerIndex;
+    }
+    const i = grid.layers.indexOf(replay.currentLayer());
+    return i >= 0 ? i : layerIndex;
+  }
+  function syncStepper() {
+    const ph = replay.active ? replayBanner?.phase : null;
+    const at = shownIndex(), last = grid.layers.length - 1;
+    $('tv-step').textContent = ph === 'change' ? 'Change map' : ph === 'fade' ? 'Between passes' : stepLabel(grid.layers[at]);
+    // at either end the button stays visible but disabled, and says why
+    const prev = grid.layers[at - 1], next = grid.layers[at + 1];
+    $('tv-prev').disabled = at === 0;
+    $('tv-next').disabled = at === last;
+    $('tv-prev').title = prev ? `Previous: ${stepLabel(prev)} (← key)` : 'This is the first step';
+    $('tv-next').title = next ? `Next: ${stepLabel(next)} (→ key)` : 'This is the last step';
+    $('tv-prev').setAttribute('aria-label', prev ? `Previous: ${stepLabel(prev)}` : 'Previous (this is the first step)');
+    $('tv-next').setAttribute('aria-label', next ? `Next: ${stepLabel(next)}` : 'Next (this is the last step)');
   }
 
   // Show layer i; a dated layer moves the timeline slider to its date
@@ -512,12 +556,13 @@ export function createCaseTerrain(container) {
     }
     if (isDated(grid.layers[i])) onLayerDate?.(grid.layers[i].date);
   }
-  // The stepper (a person's hand) stops Play first
+  // The stepper (a person's hand) stops Play first. It steps from the layer on screen (shownIndex).
   function stepTo(i) {
-    if (!grid || i < 0 || i >= grid.layers.length || i === layerIndex) return;
+    if (!grid || i < 0 || i >= grid.layers.length || (i === layerIndex && !replay.active)) return;
     stopPlay();
     replay.suspend();                          // a person's hand on the stepper pauses the change replay
     go(i);
+    syncStepper();
   }
 
   // ----- Play: one processed pass after another -----
@@ -758,8 +803,8 @@ export function createCaseTerrain(container) {
     replay.load(plan);
   }
 
-  $('tv-prev').addEventListener('click', () => stepTo(layerIndex - 1));
-  $('tv-next').addEventListener('click', () => stepTo(layerIndex + 1));
+  $('tv-prev').addEventListener('click', () => stepTo(shownIndex() - 1));
+  $('tv-next').addEventListener('click', () => stepTo(shownIndex() + 1));
   $('tv-globe').addEventListener('click', () => onGlobe?.());
 
   // ----- "ⓘ Source" popover: the source note (and, on narrow terrain, the legend's title and note) -----
@@ -917,12 +962,14 @@ export function createCaseTerrain(container) {
     },
     inspectAt,
     // Live Ops: hold the change replay on its AFTER phase while a trap card is shown, then carry on
-    replayFreeze(on) { replay.freeze(on); },
+    // (trapId: the card's trap number; "Show the trap" appears only if the replay shows that same trap)
+    replayFreeze(on, trapId) { replay.freeze(on, trapId); },
     // the change replay's controls and state (tests and the browser console)
     replay: {
       get state() { return replay.state; },
       toggle: () => replay.toggle(),
       setSpeed: (x) => replay.setSpeed(x),
+      seek: (ms) => replay.seek(ms),
       trap: (on) => startReplay({ trap: on }),
     },
     // tests: the screen point (client px) of the top of the flashing block nearest the camera's focus

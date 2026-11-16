@@ -75,7 +75,7 @@ days after a pass.)
    download.
 8. **What you learned.** The radar lesson and the traps you met. Finish all five cases for your investigation summary.
 
-Everything works with a keyboard: Tab moves between buttons, Enter/Space presses them, and the arrow keys step through the terrain layers.
+Everything works with a keyboard: Tab moves between buttons, Enter/Space presses them, and on a case terrain the arrow keys step through the radar passes and change maps (the ◀ ▶ stepper reads "Radar pass 2 of 3" or "Change map") and Space pauses the change replay.
 
 ## Run it locally
 
@@ -191,3 +191,7 @@ Every reply to a choice in OmniSAR is pre-written, and every number comes from t
   wrong. The numbers come from OmniSAR's measured data." If the proxy fails, times out (8 s) or hits its rate limit,
   the pre-written answer is shown instead. In this version the proxy address is empty, so the Grok layer is off.
 - The site never holds an API key: the key exists only as a secret inside the Worker.
+
+## Changes after the submission deadline
+
+- 16 Nov 2026: renamed 'Layer' to 'Radar pass' and simplified the terrain bar for clarity. No data, cases or scoring changed.
