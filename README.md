@@ -195,4 +195,7 @@ Every reply to a choice in OmniSAR is pre-written, and every number comes from t
 
 ## Changes after the submission deadline
 
-- 16 Nov 2026: renamed 'Layer' to 'Radar pass' and simplified the terrain bar for clarity. No data, cases or scoring changed.
+- 16 Nov 2026: renamed 'Layer' to 'Radar pass' and simplified the terrain bar. We made this change because judges and other
+  first-time players, who may not know radar terms, might not understand what 'Layer 2 of 5' meant or what the replay was
+  showing. The stepper now says 'Radar pass' or 'Change map', the banner explains each step in plain words, and unused
+  controls were removed. No data, cases, numbers or scoring changed.
