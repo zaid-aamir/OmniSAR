@@ -7,6 +7,8 @@
 //   BEFORE). RED = the radar value fell (burned, lost, sank); CYAN = it rose (new structures, new water);
 //   ORANGE = a trap (Jebel Ali's 28 Oct interference), so red only ever means "fell".
 //   A caption gives the key measured number and a legend line says what the flashing colour means.
+//   The banner's big line says in plain words what is on screen ("Before the fires: 17 Jul 2026",
+//   "Change: red = burned forest"); the words per case are in PLAIN below (text only, no numbers).
 // Cases with 3+ passes step through each one (Tonle Sap 19 Jun → 30 Aug → 17 Oct; Jakarta's 8 dates,
 // with the blocks sinking by the measured motion, exaggerated by a stated factor).
 //
@@ -28,7 +30,18 @@ const family = (l) => `${l.kind}|${l.unit}|${(l.scale || []).join(',')}`;
 
 const HOLD_MS = 2000, FADE_MS = 1000, CHANGE_MS = 2500;      // the loop at 1× speed
 const MANY_HOLD_MS = 1000, MANY_FADE_MS = 600;                // 5+ passes (Jakarta): shorter steps
-const SPEEDS = [0.5, 1, 2];
+const SPEEDS = [0.5, 1, 2];      // setSpeed() only (tests / console): the bar has no speed control
+
+// Plain words for the banner's big line, per case. {date} = the pass date on screen. Text only: every
+// number on the banner still comes from the numbers file (the captions under the big line).
+const PLAIN = {
+  'big-sur': { before: 'Before the fires: {date}', after: 'After the fires: {date}', change: 'red = burned forest' },
+  'jebel-ali': { change: 'cyan = new structures (radar rule)', trapAfter: 'The bad date: {date}', trapChange: 'orange = one bad date, not construction' },
+  'tonle-sap': { change: 'cyan = became water · red = dried out' },
+  'jakarta': { before: 'Ground motion by {date}', step: 'Ground motion by {date}', after: 'Ground motion by {date}', change: 'red = ground that sank most' },
+  'al-ain': { change: 'red = crop echo lost · cyan = crop echo gained' },
+};
+const GENERIC = { before: 'Before: {date}', step: 'Then: {date}', after: 'After: {date}', change: 'what changed' };
 const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
 let configPromise = null;
@@ -158,6 +171,7 @@ export function buildPlan({ caseId, grid, numbers, config, limit = null, trap = 
   return {
     caseId, trap, steps, mask, count, red, cyan, orange, focus, caption, legend, swatch, stepCaptions, sink,
     label: trap ? cfg.trap.label : null,
+    trapId: Number(/Trap (\d+)/.exec(cfg?.trap?.label || '')?.[1]) || null,     // "Trap 8: ..." -> 8
     trapAvailable, trapButton: cfg?.trap?.button || null,
   };
 }
@@ -196,19 +210,21 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
   box.setAttribute('aria-label', 'Change replay');
   box.hidden = true;
   box.innerHTML = `
-    <button type="button" class="ghost-btn rp-play" aria-label="Pause the change replay">❚❚</button>
-    <div class="rp-scrub">
-      <div class="rp-marks" aria-hidden="true"></div>
-      <input type="range" class="rp-range" min="0" max="1000" step="1" value="0" aria-label="Change replay position">
-    </div>
-    <button type="button" class="ghost-btn rp-speed" aria-label="Replay speed 1×, press to change">1×</button>
+    <button type="button" class="ghost-btn rp-play" aria-label="Pause the change replay" title="Pause the change replay (Space)">❚❚</button>
     <button type="button" class="ghost-btn rp-trap" aria-pressed="false" hidden></button>`;
   slot.appendChild(box);
-  const playBtn = box.querySelector('.rp-play'), range = box.querySelector('.rp-range');
-  const marks = box.querySelector('.rp-marks'), speedBtn = box.querySelector('.rp-speed'), trapBtn = box.querySelector('.rp-trap');
+  const playBtn = box.querySelector('.rp-play'), trapBtn = box.querySelector('.rp-trap');
 
   let plan = null, phases = [], total = 0, t = 0, last = 0, playing = true, frozen = false, speed = 1;
   let curPhase = -1, curPair = null, on = false;
+  let trapCard = false;              // Live Ops: a trap card's explanation is on screen (freeze): true or its trap number
+
+  // "Show the trap" only while a trap card is on screen; "Back to the real change" while the trap plays
+  // (a card about a different trap does not show it: the replay only demonstrates its own trap)
+  function syncTrapBtn() {
+    const cardMatches = trapCard === true || (trapCard && trapCard === plan?.trapId);
+    trapBtn.hidden = !(plan?.trapAvailable && (cardMatches || plan.trap));
+  }
 
   function makePhases(p) {
     const many = p.steps.length >= 5;
@@ -226,23 +242,26 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
 
   function bannerFor(ph) {
     const s = plan.steps, sc = plan.stepCaptions;
+    const words = { ...GENERIC, ...(PLAIN[plan.caseId] || {}) };
+    if (plan.trap) { words.after = words.trapAfter || words.after; words.change = words.trapChange || words.change; }
+    const say = (k, iso, short = false) => words[k].replace('{date}', short ? fmtShort(iso) : fmtDate(iso));
     const sinkNote = plan.sink ? `motion shown ×${plan.sink.factor} (sinking blocks drop)` : '';
     const join = (...xs) => xs.filter(Boolean).join(' · ');
     if (ph.kind === 'fade') {
-      return { main: 'fading between two real passes (no data in between)', short: 'fading · no data between',
-        sub: join(`${fmtDate(s[ph.a].date)} → ${fmtDate(s[ph.b].date)}`, sinkNote), phase: 'fade',
+      return { main: 'Fading between two real passes', short: 'Fading between passes',
+        sub: join(`${fmtDate(s[ph.a].date)} → ${fmtDate(s[ph.b].date)}`, 'no data in between', sinkNote), phase: 'fade',
         title: `Fading ${fmtShort(s[ph.a].date)} → ${fmtDate(s[ph.b].date)}`,
         when: 'Change replay · a cross-fade between two real passes, no data in between · ◀ ▶ pauses it' };
     }
     if (ph.kind === 'change') {
-      return { main: `CHANGE · ${fmtShort(s[0].date)} → ${fmtDate(s[s.length - 1].date)}`, short: `CHANGE · ${fmtShort(s[0].date)} → ${fmtShort(s[s.length - 1].date)}`,
-        sub: join(plan.caption, sinkNote), key: plan.legend, swatch: plan.swatch, phase: 'change',
+      return { main: `Change: ${words.change}`, short: `Change: ${words.change}`,
+        sub: join(`${fmtShort(s[0].date)} → ${fmtDate(s[s.length - 1].date)}`, plan.caption, sinkNote), key: plan.legend, swatch: plan.swatch, phase: 'change',
         title: `CHANGE ${fmtShort(s[0].date)} → ${fmtDate(s[s.length - 1].date)}`,
         when: `Change replay · ${plan.legend || 'what changed between the two passes'} · ◀ ▶ pauses it` };
     }
     const d = s[ph.at].date;
     const word = ph.kind === 'before' ? 'BEFORE' : ph.kind === 'after' ? 'AFTER' : 'PASS';
-    return { main: `${word} · ${fmtDate(d)}`, short: `${word} · ${fmtShort(d)}`, sub: join(sc[ph.at], sinkNote), phase: ph.kind,
+    return { main: say(ph.kind, d), short: say(ph.kind, d, true), sub: join(sc[ph.at], sinkNote), phase: ph.kind,
       title: `${word} · ${fmtDate(d)}`, when: `Change replay · ${s[ph.at].label} · ◀ ▶ pauses it` };
   }
 
@@ -273,7 +292,6 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
       if (ph.kind === 'change') adapter.focus?.(plan.focus);
       else if (ph.kind === 'before') adapter.focus?.(null);
     }
-    range.value = String(Math.round((t / total) * 1000));
   }
 
   function tick(now) {
@@ -288,6 +306,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
     playing = p;
     playBtn.textContent = p ? '❚❚' : '▶';
     playBtn.setAttribute('aria-label', p ? 'Pause the change replay' : 'Play the change replay');
+    playBtn.title = p ? 'Pause the change replay (Space)' : 'Play the change replay (Space)';
     box.classList.toggle('is-paused', !p);
   }
 
@@ -297,8 +316,7 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
     if (!p) { stop(); return; }
     phases = makePhases(p);
     total = phases.reduce((a, ph) => a + ph.ms, 0);
-    marks.innerHTML = phases.map((ph) => `<span class="rp-mark rp-mark-${ph.kind}" style="left:${((ph.t0 / total) * 100).toFixed(2)}%"></span>`).join('');
-    trapBtn.hidden = !p.trapAvailable;
+    syncTrapBtn();
     trapBtn.textContent = p.trap ? 'Back to the real change' : (p.trapButton || 'Show the trap');
     trapBtn.setAttribute('aria-pressed', String(!!p.trap));
     box.classList.toggle('is-trap', !!p.trap);
@@ -313,6 +331,8 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
   function stop() {
     on = false;
     plan = null;
+    trapCard = false;
+    syncTrapBtn();
     adapter.focus?.(null);
     box.hidden = true;
     adapter.setOn(false, null);
@@ -321,17 +341,6 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
   }
 
   playBtn.addEventListener('click', () => api.toggle());
-  speedBtn.addEventListener('click', () => {
-    speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
-    speedBtn.textContent = `${speed}×`;
-    speedBtn.setAttribute('aria-label', `Replay speed ${speed}×, press to change`);
-  });
-  range.addEventListener('input', () => {
-    if (!plan) return;
-    if (!on) { on = true; adapter.setOn(true, plan); apply(true); }
-    t = (Number(range.value) / 1000) * total * 0.9999;
-    apply();
-  });
   trapBtn.addEventListener('click', () => onTrapToggle?.(!plan?.trap));
 
   const api = {
@@ -355,7 +364,9 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
       adapter.setLabel(null);
     },
     // Live Ops: hold on the AFTER phase while a trap card is on screen, then carry on
-    freeze(f) {
+    freeze(f, trapId = null) {
+      trapCard = f ? (trapId ?? true) : false;
+      syncTrapBtn();
       if (!plan) return;
       frozen = !!f;
       if (frozen) {
@@ -363,7 +374,16 @@ export function createReplay({ slot, adapter, onTrapToggle }) {
         if (after) { t = after.t0 + 1; if (!on) { on = true; adapter.setOn(true, plan); } apply(true); }
       }
     },
-    setSpeed(s) { if (SPEEDS.includes(s)) { speed = s; speedBtn.textContent = `${s}×`; } },
+    setSpeed(s) { if (SPEEDS.includes(s)) speed = s; },
+    // tests: jump to a moment in the loop (ms from the start), as the old scrubber did
+    seek(ms) {
+      if (!plan) return;
+      if (!on) { on = true; adapter.setOn(true, plan); }
+      t = Math.max(0, Math.min(total * 0.9999, ms));
+      apply(true);
+    },
+    // the phase on screen ('before', 'fade', 'step', 'after', 'change'), or null when the replay is off
+    get phase() { return plan && on && curPhase >= 0 ? phases[curPhase].kind : null; },
     get active() { return !!plan && on; },
     get plan() { return plan; },
     // which layer is on screen now (for the hover tooltip), and a summary for tests

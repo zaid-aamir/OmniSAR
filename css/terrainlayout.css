@@ -1,9 +1,9 @@
 /* Case terrain overlays (js/caseterrain.js): ONE overlay layer, a CSS grid with named regions,
    so the boxes can't pile on top of each other when the terrain gets narrower.
 
-     ┌ title ──────────────────────┬ si ┐   title = case name, layer, which pass; si = SI Agent trigger
+     ┌ title ──────────────────────┬ si ┐   title = case name + ⓘ Source link, layer, which pass; si = SI Agent
      │ main (popovers dock here)   │side│   side = SI Agent panel + block inspector (right-aligned dock)
-     ├ bar ────────────────────────┴────┤   bar  = [stepper] [pass banner, takes the rest] [ⓘ Source] [legend]
+     ├ bar ────────────────────────┴────┤   bar  = [stepper] [play/pause] [pass banner, takes the rest] [legend]
      └──────────────────────────────────┘
 
    The docks (main, side) are empty grid cells: what docks there is positioned inside the cell, so a
@@ -37,9 +37,9 @@
 .tv-side > .inspector { top: 0; right: 0; }
 .tv-side > .si-panel { top: 0; right: 0; }
 
-/* the "ⓘ Source" popover: bottom-left of the main region, just above the bar */
+/* the "ⓘ Source" popover: top-left of the main region, just under the title box that holds its link */
 .tv-overlay .tv-main > .tv-pop {
-  left: 0; bottom: 0; width: min(460px, 100%); overflow-y: auto; padding: 10px 12px;
+  left: 0; top: 0; width: min(460px, 100%); overflow-y: auto; padding: 10px 12px;
   box-shadow: 0 10px 30px rgb(0 0 0 / 0.5);
 }
 .tv-pop[hidden] { display: none; }
@@ -57,11 +57,20 @@
 .tv-overlay .terrain-stepper { padding: 6px 10px; }
 .tv-overlay .terrain-pass { flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 6px 12px; }
 .terrain-pass p { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.terrain-pass .tp-main { font-size: 20px; }
+/* the pass banner is the bar's focus: the largest text, a stronger border */
+.terrain-pass .tp-main { font-size: 24px; }
+.tv-overlay .terrain-pass { border-color: color-mix(in srgb, var(--accent) 45%, var(--line-strong, transparent)); }
 .tp-short { display: none; }
-.tv-src-btn { font: 600 12px var(--font-data); color: var(--text); cursor: pointer; padding: 0 12px; }
-.tv-src-btn[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
-.tv-src-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* "ⓘ Source": a small link next to the case name in the title box (opens the Source popover) */
+.tv-case-row { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; min-width: 0; }
+.tv-src-btn {
+  flex: none; background: none; border: 0; padding: 0; cursor: pointer;
+  font: 600 11px var(--font-data); letter-spacing: 0.4px; color: var(--accent);
+  text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--accent) 45%, transparent); text-underline-offset: 3px;
+}
+.tv-src-btn:hover, .tv-src-btn[aria-expanded="true"] { text-decoration-color: var(--accent); }
+.tv-src-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
 .tv-overlay .terrain-legend { flex: 0 0 250px; padding: 6px 10px; }
 .terrain-legend .legend-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
 
@@ -74,7 +83,7 @@
   .tv-overlay .terrain-legend { flex: 1 1 160px; max-width: 260px; margin-left: auto; }
   .terrain-legend .legend-title, .terrain-legend .legend-note, .terrain-legend .legend-ticks + .legend-ticks { display: none; }
   .tv-pop-legend { display: block; }
-  .terrain-pass .tp-main { font-size: 17px; }
+  .terrain-pass .tp-main { font-size: 20px; }
 }
 
 /* ----- < 640 px: short banner text, stepper + source + legend in one compact row ----- */
@@ -82,9 +91,8 @@
   .tp-long { display: none; }
   .tp-short { display: inline; }
   .terrain-pass .tp-sub, .terrain-pass .tp-key { display: none !important; }
-  .terrain-pass .tp-main { font-size: 15px; }
+  .terrain-pass .tp-main { font-size: 17px; }
   .tv-overlay .terrain-stepper { gap: 6px; padding: 4px 6px; }
   .tv-overlay .terrain-legend { flex: 1 1 100px; }
-  .tv-src-btn { padding: 0 8px; }
   .terrain-when { -webkit-line-clamp: 1; }
 }

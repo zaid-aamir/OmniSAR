@@ -482,7 +482,7 @@ export function createLiveOps({ globe, markers, terrain, panel, hud, effects, ri
       const cont = fb.querySelector('.lo-continue');
       cont.focus({ preventScroll: true });
       fb.scrollIntoView?.({ block: 'nearest' });
-      if (card.bin === 'trap') terrain.replayFreeze?.(true);     // the change replay holds on AFTER while a trap card shows
+      if (card.bin === 'trap') terrain.replayFreeze?.(true, card.trap);     // the change replay holds on AFTER while a trap card shows
       // the explanation stays until the player presses Continue (or Enter): nothing moves on by itself
       await run.waitFor((done) => {
         cont.onclick = done;
